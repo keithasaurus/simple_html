@@ -1,5 +1,5 @@
-from simple_html.attributes import (class_, enctype, href, method,
-                                    placeholder, type_, value)
+from simple_html.attributes import (class_, enctype, href, method, placeholder,
+                                    type_, value)
 from simple_html.nodes import (a, br, button, div, form, input_, label, p,
                                SafeString, span)
 from simple_html.render import render_node
@@ -41,30 +41,26 @@ def test_safe_strings_are_not_escaped():
 
 def test_simple_form():
     node = form(
-        attrs=[method('POST'), enctype('multipart/form-data')],
-        nodes=[
-            label(
-                nodes=[
-                    "Name",
-                    input_(
-                        attrs=[type_('text'),
-                               value('some_value'),
-                               placeholder('example text')
-                               ]
-                    )
-                ]
-            ),
-            div(
-                attrs=[class_('button-container')],
-                nodes=[
-                    button(nodes=["Submit"])
-                ]
-            )
-        ]
+        [method('POST'), enctype('multipart/form-data')],
+        [label([],
+               ["Name",
+                input_([type_('text'),
+                        value('some_value'),
+                        placeholder('example text')])
+                ]),
+         div([class_('button-container')],
+             [button([],
+                     ["Submit"])
+              ])]
     )
 
     assert render_node(node) == (
-        '<form method="POST" enctype="multipart/form-data"><label>Name<input '
-        'type="text" value="some_value" placeholder="example text"/></label>'
-        '<div class="button-container"><button>Submit</button></div></form>'
+        '<form method="POST" enctype="multipart/form-data">'
+        '<label>Name'
+        '<input type="text" value="some_value" placeholder="example text"/>'
+        '</label>'
+        '<div class="button-container">'
+        '<button>Submit</button>'
+        '</div>'
+        '</form>'
     )
