@@ -1,5 +1,5 @@
 from .attributes import Attribute
-from typing import Callable, List, NamedTuple
+from typing import Any, Callable, List, NamedTuple, Tuple
 
 
 class SafeString(NamedTuple):
@@ -9,18 +9,11 @@ class SafeString(NamedTuple):
 class Tag(NamedTuple):
     name: str
     attrs: List[Attribute]
-    nodes: List  # actually List[Union["Tag", SafeString, str]] but mypy is sad
+    nodes: Tuple[Any, ...]  # really Tuple[Union["Tag", SafeString, str], ...]
 
 
 def named_tag(tag_name: str) -> Callable:
-    def closure(attrs: List[Attribute]=None,
-                nodes: List=None) -> Tag:
-        if attrs is None:
-            attrs = []
-
-        if nodes is None:
-            nodes = []
-
+    def closure(attrs: List[Attribute], *nodes) -> Tag:
         return Tag(
             tag_name,
             attrs,

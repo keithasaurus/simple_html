@@ -6,26 +6,40 @@ from simple_html.render import render_node
 
 
 def test_renders_no_children():
-    node = a(attrs=[], nodes=[])
+    node = a([])
 
     assert render_node(node) == "<a/>"
 
 
 def test_renders_children():
-    node = p(attrs=[class_('pclass')],
-             nodes=[
-                 "hey!",
-                 a(attrs=[href("http://google.com"),
-                          class_('aclass')],
-                   nodes=['link text',
-                          span(nodes=["whatever"])]),
-                 br()]
-             )
+    node = p(
+        [class_('pclass')],
+        "hey!",
+        a(
+            [href("http://google.com"), class_('aclass')],
+            'link text',
+            span(
+                [],
+                "whatever"
+            )
+        ),
+        br([])
+    )
 
     assert (
         render_node(node) == ('<p class="pclass">hey!<a href="http://google.com" '
                               'class="aclass">link text<span>whatever</span></a>'
                               '<br/></p>')
+    )
+
+
+def test_string_attrs_work_as_expected():
+    node = div(
+        [('class', 'dinosaur'),
+         ('some-random-attr', 'spam')]
+    )
+    assert render_node(node) == (
+        '<div class="dinosaur" some-random-attr="spam"/>'
     )
 
 
@@ -42,16 +56,20 @@ def test_safe_strings_are_not_escaped():
 def test_simple_form():
     node = form(
         [method('POST'), enctype('multipart/form-data')],
-        [label([],
-               ["Name",
-                input_([type_('text'),
-                        value('some_value'),
-                        placeholder('example text')])
-                ]),
-         div([class_('button-container')],
-             [button([],
-                     ["Submit"])
-              ])]
+        label(
+            [],
+            "Name",
+            input_(
+                [type_('text'), value('some_value'), placeholder('example text')]
+            )
+        ),
+        div(
+            [class_('button-container')],
+            button(
+                [],
+                "Submit"
+            )
+        )
     )
 
     assert render_node(node) == (

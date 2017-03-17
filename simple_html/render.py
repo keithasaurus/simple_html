@@ -29,4 +29,6 @@ def render_node(node: Any) -> str:  # mypy is fucking up union types right now.
     elif isinstance(node, SafeString):
         return node.safe_val
     else:
-        raise TypeError(f'Expected `Tag` or `str` but got `{type(node)}`')
+        raise TypeError(
+            f'Expected `Tag`, `SafeString` or `str` but got `{type(node)}`'
+        )
