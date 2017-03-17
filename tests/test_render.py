@@ -1,4 +1,4 @@
-from simple_html.attributes import (class_, enctype, for_, href, method,
+from simple_html.attributes import (class_, enctype, href, method,
                                     placeholder, type_, value)
 from simple_html.nodes import (a, br, button, div, form, input_, label, p,
                                SafeString, span)
