@@ -4,6 +4,7 @@ from typing import Any
 
 
 def render_tag(tag: Tag) -> str:
+    # todo: rewrite with while loop to avoid recursion limit
     tag_start = f"<{tag.name}"
     attrs = " ".join([f'{key}="{val}"' for key, val in tag.attrs])
 
