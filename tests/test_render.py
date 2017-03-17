@@ -1,7 +1,9 @@
+import json
+
 from simple_html.attributes import (class_, enctype, href, method, placeholder,
                                     type_, value)
 from simple_html.nodes import (a, br, button, div, form, input_, label, p,
-                               SafeString, span)
+                               SafeString, span, script)
 from simple_html.render import render_node
 
 
@@ -81,4 +83,17 @@ def test_simple_form():
         '<button>Submit</button>'
         '</div>'
         '</form>'
+    )
+
+
+def test_safestring_in_tag():
+    node = script(
+        [type_('ld+json')],
+        SafeString(json.dumps({
+            'some_key': 'some_val'
+        }))
+    )
+
+    assert render_node(node) == (
+        '<script type="ld+json">{"some_key": "some_val"}</script>'
     )
