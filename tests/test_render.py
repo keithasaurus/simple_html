@@ -1,10 +1,11 @@
-import json
-
 from simple_html.attributes import (class_, enctype, href, method, placeholder,
                                     type_, value)
-from simple_html.nodes import (a, br, button, div, form, input_, label, p,
-                               SafeString, span, script)
+from simple_html.nodes import (a, body, br, button, div, form, head, html,
+                               input_, label, named_tag, p, SafeString, script,
+                               span)
 from simple_html.render import render_node
+
+import json
 
 
 def test_renders_no_children():
@@ -32,6 +33,26 @@ def test_renders_children():
         render_node(node) == ('<p class="pclass">hey!<a href="http://google.com" '
                               'class="aclass">link text<span>whatever</span></a>'
                               '<br/></p>')
+    )
+
+
+def test_hello_world():
+    node = html(
+        [],
+        head(
+            []
+        ),
+        body(
+            [],
+            p(
+                [("class", "some-class")],
+                "Hello World!"
+            )
+        )
+    )
+
+    assert render_node(node) == (
+        '<html><head/><body><p class="some-class">Hello World!</p></body></html>'
     )
 
 
