@@ -33,12 +33,13 @@ returns
 
 Strings are escaped by default, but you can pass in `SafeString`s to avoid escaping.
 ```python
-from simple_html.nodes import p, SafeString
+from simple_html.nodes import br, p, SafeString
 from simple_html.render import render_node
 
 node = p(
     [],
     "Escaped & stuff",
+    br([]),
     SafeString("Not escaped & stuff")
 ) 
 
