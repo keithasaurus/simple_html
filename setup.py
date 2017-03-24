@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(
     name='simple_html',
-    version='0.0.2',
+    version='0.0.3',
     license='MIT',
     description='Simple HTML generator',
     author='Keith Philpott',
