@@ -1,8 +1,7 @@
 from simple_html.attributes import (class_, enctype, href, method, placeholder,
-                                    type_, value)
+                                    src, type_, value)
 from simple_html.nodes import (a, body, br, button, div, form, head, html,
-                               input_, label, named_tag, p, SafeString, script,
-                               span)
+                               input_, label, p, SafeString, script, span)
 from simple_html.render import render_node
 
 import json
@@ -11,7 +10,7 @@ import json
 def test_renders_no_children():
     node = a([])
 
-    assert render_node(node) == "<a/>"
+    assert render_node(node) == "<a></a>"
 
 
 def test_renders_children():
@@ -52,7 +51,8 @@ def test_hello_world():
     )
 
     assert render_node(node) == (
-        '<html><head/><body><p class="some-class">Hello World!</p></body></html>'
+        '<html><head></head><body><p class="some-class">Hello World!</p>'
+        '</body></html>'
     )
 
 
@@ -62,7 +62,7 @@ def test_string_attrs_work_as_expected():
          ('some-random-attr', 'spam')]
     )
     assert render_node(node) == (
-        '<div class="dinosaur" some-random-attr="spam"/>'
+        '<div class="dinosaur" some-random-attr="spam"></div>'
     )
 
 
@@ -118,3 +118,10 @@ def test_safestring_in_tag():
     assert render_node(node) == (
         '<script type="ld+json">{"some_key": "some_val"}</script>'
     )
+
+
+def test_script_tag_doesnt_self_close():
+    example_script_url = "http://example.com/main.js"
+
+    node = script([src(example_script_url)])
+    assert render_node(node) == f'<script src="{example_script_url}"></script>'

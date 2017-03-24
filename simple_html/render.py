@@ -15,7 +15,10 @@ def render_tag(tag: Tag) -> str:
     if len(children_str) > 0:
         return f"{tag_with_attrs}>{children_str}</{tag.name}>"
     else:
-        return f"{tag_with_attrs}/>"
+        if tag.self_closes:
+            return f"{tag_with_attrs}/>"
+        else:
+            return f"{tag_with_attrs}></{tag.name}>"
 
 
 def escape_str(val: str) -> str:
