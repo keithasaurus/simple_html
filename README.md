@@ -30,7 +30,7 @@ render_node(node)
 returns
 
 ```html
-<html><head/><body><p class="some-class">Hello World!</p></body></html>
+<html><head></head><body><p class="some-class">Hello World!</p></body></html>
 ```
 
 
