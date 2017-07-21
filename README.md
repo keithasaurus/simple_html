@@ -1,5 +1,5 @@
 # simple_html
-The idea here is make sure HTML is easy to generate but always valid. It
+The idea here is to make sure HTML is easy to generate but always valid. It
 builds on the idea that HTML is comprised of recursive nodes with a list of 
 attributes and a list of child nodes.
 
