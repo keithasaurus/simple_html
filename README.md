@@ -1,8 +1,15 @@
 # simple_html
-The idea here is to make sure HTML is easy to generate but always valid. It
-builds on the idea that HTML is comprised of recursive nodes with a list of 
+The idea here is to make HTML easy to generate without using templating.
+It builds on the idea that HTML is comprised of recursive nodes with a list of 
 attributes and a list of child nodes. It's heavily influenced by Elm's Html 
 library.
+ 
+
+Three things nice about this library is:
+1. The generated HTML is always valid.
+2. Space if always significant.
+3. Formalized types mean MyPy can help avoid certain classes of errors.
+
 
 ### Install
 `pip install simple_html`

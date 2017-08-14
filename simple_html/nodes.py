@@ -9,7 +9,7 @@ class SafeString(NamedTuple):
 class Tag(NamedTuple):
     name: str
     attrs: List[Attribute]
-    nodes: Tuple[Any, ...]  # really Tuple[Union["Tag", SafeString, str], ...]
+    nodes: Tuple[Any, ...]  # mypy can't understand recursive types yet
     self_closes: bool
 
 
