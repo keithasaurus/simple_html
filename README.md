@@ -5,10 +5,11 @@ attributes and a list of child nodes. It's heavily influenced by Elm's Html
 library.
  
 
-Three things nice about this library is:
+Some things nice about this library are:
 1. The generated HTML is always valid.
 2. Space if always significant.
 3. Formalized types mean MyPy can help avoid certain classes of errors.
+4. It's framework agnostic.
 
 
 ### Install
