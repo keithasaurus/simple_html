@@ -24,7 +24,7 @@ def str_attr(name: str) -> Callable[[str], Attribute]:
 
 
 def style(props: List[Tuple[str, str]]) -> Attribute:
-    return "style", " ".join([f"{key}: {val};" for key, val in props])
+    return "style", " ".join(["{}: {};".format(key, val) for key, val in props])
 
 
 alt = str_attr('alt')

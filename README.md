@@ -121,4 +121,4 @@ cols = int_attr('cols')
 Very early development. Feel free to contribute.
 
 #### Requirements
-Python 3.6+
+Python 3.5+

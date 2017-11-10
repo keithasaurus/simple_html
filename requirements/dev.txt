@@ -1,4 +1,4 @@
 flake8-isort==2.2.1
-mypy==0.520
+mypy==0.540
 pytest==3.1.3
 

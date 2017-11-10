@@ -124,4 +124,5 @@ def test_script_tag_doesnt_self_close():
     example_script_url = "http://example.com/main.js"
 
     node = script([src(example_script_url)])
-    assert render_node(node) == f'<script src="{example_script_url}"></script>'
+    assert render_node(node) == '<script src="{}"></script>'.format(
+        example_script_url)

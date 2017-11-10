@@ -1,16 +1,15 @@
 from .attributes import Attribute
 from typing import Any, Callable, List, NamedTuple, Tuple
 
-
-class SafeString(NamedTuple):
-    safe_val: str
+SafeString = NamedTuple('SafeString', [("safe_val", str)])
 
 
-class Tag(NamedTuple):
-    name: str
-    attrs: List[Attribute]
-    nodes: Tuple[Any, ...]  # mypy can't understand recursive types yet
-    self_closes: bool
+Tag = NamedTuple('Tag', [
+    ('name', str),
+    ('attrs', List[Attribute]),
+    ('nodes', Tuple[Any, ...]),
+    ('self_closes', bool)
+])
 
 
 def named_tag(tag_name: str, self_closes=False) -> Callable:
