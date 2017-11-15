@@ -1,9 +1,8 @@
 from html import escape
-from simple_html.nodes import SafeString, Tag
-from typing import Any
+from simple_html.nodes import Node, SafeString, TagProtocol
 
 
-def render_tag(tag: Tag) -> str:
+def render_tag(tag: TagProtocol) -> str:
     # todo: rewrite with while loop to avoid recursion limit
     tag_start = "<{}".format(tag.name)
     attrs = " ".join(['{}="{}"'.format(key, val) for key, val in tag.attrs])
@@ -25,9 +24,9 @@ def escape_str(val: str) -> str:
     return escape(val)
 
 
-def render_node(node: Any) -> str:  # mypy is fucking up union types right now.
-    if isinstance(node, Tag):
-        return render_tag(node)  # type: ignore
+def render_node(node: Node) -> str:
+    if isinstance(node, TagProtocol):
+        return render_tag(node)
     elif isinstance(node, str):
         return escape(node)
     elif isinstance(node, SafeString):

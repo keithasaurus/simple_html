@@ -1,19 +1,45 @@
 from .attributes import Attribute
-from typing import Any, Callable, List, NamedTuple, Tuple
+from typing import Callable, List, NamedTuple, Tuple, Union
+from typing_extensions import Protocol, runtime
 
 SafeString = NamedTuple('SafeString', [("safe_val", str)])
+
+
+Node = Union[str, SafeString, 'TagProtocol']
+
+
+@runtime
+class TagProtocol(Protocol):
+    """
+    protocols allow us to check recursive types in mypy
+    """
+    @property
+    def name(self) -> str:
+        return ""
+
+    @property
+    def attrs(self) -> List[Attribute]:
+        return []
+
+    @property
+    def nodes(self) -> Tuple[Node, ...]:
+        return tuple()
+
+    @property
+    def self_closes(self) -> bool:
+        return False
 
 
 Tag = NamedTuple('Tag', [
     ('name', str),
     ('attrs', List[Attribute]),
-    ('nodes', Tuple[Any, ...]),
+    ('nodes', Tuple[Node, ...]),
     ('self_closes', bool)
 ])
 
 
 def named_tag(tag_name: str, self_closes=False) -> Callable:
-    def closure(attrs: List[Attribute], *nodes) -> Tag:
+    def closure(attrs: List[Attribute], *nodes) -> TagProtocol:
         return Tag(
             tag_name,
             attrs,
