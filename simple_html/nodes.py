@@ -39,9 +39,9 @@ Tag = NamedTuple('Tag', [
 
 
 def named_tag(tag_name: str, self_closes=False) -> Callable:
-    def closure(*args: Union[Attribute, Tag]) -> TagProtocol:
+    def closure(*args: Union[Attribute, Node]) -> TagProtocol:
         attrs: List[Attribute] = []
-        nodes: List[Tag] = []
+        nodes: List[Node] = []
 
         seen_tags = False
         for arg in args:
@@ -57,7 +57,7 @@ def named_tag(tag_name: str, self_closes=False) -> Callable:
         return Tag(
             tag_name,
             attrs,
-            nodes,
+            tuple(nodes),
             self_closes
         )
 
