@@ -39,7 +39,21 @@ Tag = NamedTuple('Tag', [
 
 
 def named_tag(tag_name: str, self_closes=False) -> Callable:
-    def closure(attrs: List[Attribute], *nodes) -> TagProtocol:
+    def closure(*args: Union[Attribute, Tag]) -> TagProtocol:
+        attrs: List[Attribute] = []
+        nodes: List[Tag] = []
+
+        seen_tags = False
+        for arg in args:
+            if isinstance(arg, Attribute):
+                if seen_tags:
+                    raise TypeError("Attributes must precede tags.")
+                else:
+                    attrs.append(arg)
+            else:
+                seen_tags = True
+                nodes.append(arg)
+
         return Tag(
             tag_name,
             attrs,

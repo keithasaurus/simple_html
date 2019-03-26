@@ -1,29 +1,32 @@
-from typing import Callable, List, Tuple
-
-Attribute = Tuple[str, str]
+from typing import Callable, List, NamedTuple
 
 
-def bool_attr(name: str) -> Attribute:
+class Attribute(NamedTuple):
+    name: str
+    val: str
+
+
+def bool_attr(attr_name: str) -> Attribute:
     """
     e.g. required="required", selected="selected"
     """
-    return name, name
+    return Attribute(attr_name, attr_name)
 
 
-def int_attr(name: str) -> Callable[[int], Attribute]:
+def int_attr(attr_name: str) -> Callable[[int], Attribute]:
     def closure(val: int) -> Attribute:
-        return name, str(val)
+        return Attribute(attr_name, str(val))
     return closure
 
 
-def str_attr(name: str) -> Callable[[str], Attribute]:
+def str_attr(attr_name: str) -> Callable[[str], Attribute]:
     def closure(val: str) -> Attribute:
-        return name, val
+        return Attribute(attr_name, val)
 
     return closure
 
 
-def style(props: List[Tuple[str, str]]) -> Attribute:
+def style(props: List[Attribute]) -> Attribute:
     return "style", " ".join(["{}: {};".format(key, val) for key, val in props])
 
 
