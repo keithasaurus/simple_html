@@ -7,7 +7,7 @@ library.
 
 Some things nice about this library are:
 1. The generated HTML is always valid.
-2. Space if always significant.
+2. Space is always significant.
 3. Formalized types mean MyPy can help avoid certain classes of errors.
 4. It's framework agnostic.
 
