@@ -3,21 +3,18 @@
 from distutils.core import setup
 
 setup(
-    name='simple_html',
-    version='0.3.0',
-    license='MIT',
-    description='Simple HTML generator',
-    author='Keith Philpott',
-    url='https://gitlab.com/keithasaurus/simple_html',
-    packages=['simple_html'],
+    name="simple_html",
+    version="0.3.0",
+    license="MIT",
+    description="Simple HTML generator",
+    author="Keith Philpott",
+    url="https://gitlab.com/keithasaurus/simple_html",
+    packages=["simple_html"],
     classifiers=[
-        'Operating System :: OS Independent',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-
-        'Programming Language :: Python :: 3.7',
+        "Operating System :: OS Independent",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
     ],
-    install_requires=[
-        'typing-extensions>=3.6.2.1,<4'
-    ]
+    install_requires=["typing-extensions>=3.6.2.1,<4"],
 )

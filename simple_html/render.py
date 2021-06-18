@@ -33,5 +33,5 @@ def render_node(node: Node) -> str:
         return node.safe_val
     else:
         raise TypeError(
-            'Expected `Tag`, `SafeString` or `str` but got `{}`'.format(type(node))
+            "Expected `Tag`, `SafeString` or `str` but got `{}`".format(type(node))
         )
