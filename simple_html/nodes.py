@@ -17,19 +17,19 @@ class TagProtocol(Protocol):
 
     @property
     def name(self) -> str:
-        return ""
+        ...
 
     @property
     def attrs(self) -> List[Attribute]:
-        return []
+        ...
 
     @property
     def nodes(self) -> Tuple[Node, ...]:
-        return tuple()
+        ...
 
     @property
     def self_closes(self) -> bool:
-        return False
+        ...
 
 
 @dataclass
