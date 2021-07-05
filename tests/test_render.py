@@ -30,7 +30,7 @@ import json
 
 
 def test_renders_no_children():
-    node = a([])
+    node = a()
 
     assert render_node(node) == "<a></a>"
 
@@ -38,13 +38,15 @@ def test_renders_no_children():
 def test_renders_children():
     node = p(
         [class_("pclass")],
-        "hey!",
-        a(
-            [href("http://google.com"), class_("aclass")],
-            "link text",
-            span([], "whatever"),
-        ),
-        br([]),
+        ["hey!",
+         a(
+             [href("http://google.com"), class_("aclass")],
+             ["link text",
+              span([], "whatever")
+              ],
+         ),
+         br([]),
+         ]
     )
 
     assert render_node(node) == (
@@ -55,7 +57,17 @@ def test_renders_children():
 
 
 def test_hello_world():
-    node = html([], head([]), body([], p([("class", "some-class")], "Hello World!")))
+    node = html(
+        children=[
+            head(),
+            body(children=[p(
+                [("class", "some-class")],
+                ["Hello World!"]
+            )
+            ]
+            )
+        ]
+    )
 
     assert render_node(node) == (
         '<html><head></head><body><p class="some-class">Hello World!</p>'
@@ -81,12 +93,20 @@ def test_safe_strings_are_not_escaped():
 def test_simple_form():
     node = form(
         [method("POST"), enctype("multipart/form-data")],
-        label(
-            [],
-            "Name",
-            input_([type_("text"), value("some_value"), placeholder("example text")]),
-        ),
-        div([class_("button-container")], button([], "Submit")),
+        [
+            label(
+                children=["Name",
+                          input_(
+                              [type_("text"),
+                               value("some_value"),
+                               placeholder("example text")]),
+                          ]
+            ),
+            div(
+                [class_("button-container")],
+                [button([], ["Submit"])]
+            ),
+        ]
     )
 
     assert render_node(node) == (
@@ -102,7 +122,13 @@ def test_simple_form():
 
 
 def test_safestring_in_tag():
-    node = script([type_("ld+json")], SafeString(json.dumps({"some_key": "some_val"})))
+    node = script(
+        [type_("ld+json")],
+        [SafeString(
+            json.dumps({"some_key": "some_val"})
+        )
+        ]
+    )
 
     assert render_node(node) == (
         '<script type="ld+json">{"some_key": "some_val"}</script>'

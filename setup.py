@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(
     name="simple_html",
-    version="0.3.0",
+    version="1.0.0",
     license="MIT",
     description="Simple HTML generator",
     author="Keith Philpott",
@@ -12,9 +12,9 @@ setup(
     packages=["simple_html"],
     classifiers=[
         "Operating System :: OS Independent",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
     ],
-    install_requires=["typing-extensions>=3.6.2.1,<4"],
+    install_requires=[],
 )

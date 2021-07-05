@@ -4,20 +4,20 @@ from simple_html.nodes import Node, SafeString, TagProtocol
 
 def render_tag(tag: TagProtocol) -> str:
     # todo: rewrite with while loop to avoid recursion limit
-    tag_start = "<{}".format(tag.name)
-    attrs = " ".join(['{}="{}"'.format(key, val) for key, val in tag.attrs])
+    tag_start = f"<{tag.name}"
+    attrs = " ".join([f'{key}="{val}"' for key, val in tag.attrs])
 
-    tag_with_attrs = " ".join([a for a in [tag_start, attrs] if len(a) > 0])
+    tag_with_attrs = tag_start if len(attrs) == 0 else f"{tag_start} {attrs}"
 
-    children_str = "".join([render_node(node) for node in tag.nodes])
+    if len(tag.nodes) > 0:
+        children_str = "".join([render_node(node) for node in tag.nodes])
 
-    if len(children_str) > 0:
-        return "{}>{}</{}>".format(tag_with_attrs, children_str, tag.name)
+        return f"{tag_with_attrs}>{children_str}</{tag.name}>"
     else:
         if tag.self_closes:
-            return "{}/>".format(tag_with_attrs)
+            return f"{tag_with_attrs}/>"
         else:
-            return "{}></{}>".format(tag_with_attrs, tag.name)
+            return f"{tag_with_attrs}></{tag.name}>"
 
 
 def escape_str(val: str) -> str:

@@ -1,10 +1,14 @@
 from dataclasses import dataclass
 
 from .attributes import Attribute
-from typing import Callable, List, NamedTuple, Tuple, Union
+from typing import Callable, List, Union, Optional
 from typing_extensions import Protocol, runtime
 
-SafeString = NamedTuple("SafeString", [("safe_val", str)])
+
+@dataclass
+class SafeString:
+    safe_val: str
+
 
 Node = Union[str, SafeString, "TagProtocol"]
 
@@ -24,7 +28,7 @@ class TagProtocol(Protocol):
         ...
 
     @property
-    def nodes(self) -> Tuple[Node, ...]:
+    def nodes(self) -> List[Node]:
         ...
 
     @property
@@ -36,15 +40,22 @@ class TagProtocol(Protocol):
 class Tag:
     name: str
     attrs: List[Attribute]
-    nodes: Tuple[Node, ...]
+    nodes: List[Node]
     self_closes: bool
 
 
-def named_tag(tag_name: str, self_closes: bool = False) -> Callable[..., Tag]:
-    def closure(attrs: List[Attribute], *nodes: Node) -> Tag:
-        return Tag(tag_name, attrs, nodes, self_closes)
+def named_tag(tag_name: str,
+              self_closes: bool = False
+              ) -> Callable[[List[Attribute], List[Node]], Tag]:
+    def inner(attrs: Optional[List[Attribute]] = None,
+              children: Optional[List[Node]] = None) -> Tag:
+        if attrs is None:
+            attrs = []
+        if children is None:
+            children = []
+        return Tag(tag_name, attrs, children, self_closes)
 
-    return closure
+    return inner
 
 
 a = named_tag("a")
