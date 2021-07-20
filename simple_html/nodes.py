@@ -12,7 +12,7 @@ class SafeString:
 Node = Union[str, SafeString, "Tag"]
 
 
-@dataclass(frozen=True)
+@dataclass
 class Tag:
     name: str
     attributes: Tuple[Attribute, ...] = tuple()
