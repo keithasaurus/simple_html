@@ -2,7 +2,6 @@ from dataclasses import dataclass
 
 from .attributes import Attribute
 from typing import Callable, List, Union, Optional
-from typing_extensions import Protocol, runtime
 
 
 @dataclass
@@ -10,30 +9,7 @@ class SafeString:
     safe_val: str
 
 
-Node = Union[str, SafeString, "TagProtocol"]
-
-
-@runtime
-class TagProtocol(Protocol):
-    """
-    protocols allow us to check recursive types in mypy
-    """
-
-    @property
-    def name(self) -> str:
-        ...
-
-    @property
-    def attrs(self) -> List[Attribute]:
-        ...
-
-    @property
-    def nodes(self) -> List[Node]:
-        ...
-
-    @property
-    def self_closes(self) -> bool:
-        ...
+Node = Union[str, SafeString, "Tag"]
 
 
 @dataclass
@@ -46,7 +22,7 @@ class Tag:
 
 def named_tag(tag_name: str,
               self_closes: bool = False
-              ) -> Callable[[List[Attribute], List[Node]], Tag]:
+              ) -> Callable[[Optional[List[Attribute]], Optional[List[Node]]], Tag]:
     def inner(attrs: Optional[List[Attribute]] = None,
               children: Optional[List[Node]] = None) -> Tag:
         if attrs is None:

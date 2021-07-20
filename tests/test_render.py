@@ -29,13 +29,13 @@ from simple_html.render import render_node
 import json
 
 
-def test_renders_no_children():
+def test_renders_no_children() -> None:
     node = a()
 
     assert render_node(node) == "<a></a>"
 
 
-def test_renders_children():
+def test_renders_children() -> None:
     node = p(
         [class_("pclass")],
         ["hey!",
@@ -56,7 +56,7 @@ def test_renders_children():
     )
 
 
-def test_hello_world():
+def test_hello_world() -> None:
     node = html(
         children=[
             head(),
@@ -75,22 +75,22 @@ def test_hello_world():
     )
 
 
-def test_string_attrs_work_as_expected():
+def test_string_attrs_work_as_expected() -> None:
     node = div([("class", "dinosaur"), ("some-random-attr", "spam")])
     assert render_node(node) == ('<div class="dinosaur" some-random-attr="spam"></div>')
 
 
-def test_escapes_normal_strings():
+def test_escapes_normal_strings() -> None:
     node = "some < string"
 
     assert render_node(node) == "some &lt; string"
 
 
-def test_safe_strings_are_not_escaped():
+def test_safe_strings_are_not_escaped() -> None:
     assert render_node(SafeString("some < string")) == "some < string"
 
 
-def test_simple_form():
+def test_simple_form() -> None:
     node = form(
         [method("POST"), enctype("multipart/form-data")],
         [
@@ -121,7 +121,7 @@ def test_simple_form():
     )
 
 
-def test_safestring_in_tag():
+def test_safestring_in_tag() -> None:
     node = script(
         [type_("ld+json")],
         [SafeString(
@@ -135,7 +135,7 @@ def test_safestring_in_tag():
     )
 
 
-def test_script_tag_doesnt_self_close():
+def test_script_tag_doesnt_self_close() -> None:
     example_script_url = "http://example.com/main.js"
 
     node = script([src(example_script_url)])

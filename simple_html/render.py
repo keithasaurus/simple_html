@@ -1,8 +1,8 @@
 from html import escape
-from simple_html.nodes import Node, SafeString, TagProtocol
+from simple_html.nodes import Node, SafeString, Tag
 
 
-def render_tag(tag: TagProtocol) -> str:
+def render_tag(tag: Tag) -> str:
     # todo: rewrite with while loop to avoid recursion limit
     tag_start = f"<{tag.name}"
     attrs = " ".join([f'{key}="{val}"' for key, val in tag.attrs])
@@ -25,7 +25,7 @@ def escape_str(val: str) -> str:
 
 
 def render_node(node: Node) -> str:
-    if isinstance(node, TagProtocol):
+    if isinstance(node, Tag):
         return render_tag(node)
     elif isinstance(node, str):
         return escape(node)
