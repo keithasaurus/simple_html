@@ -27,10 +27,12 @@ class Tag:
             self.self_closes
         )
 
-    def attrs(self, *attributes: Attribute) -> "Tag":
+    def attrs(self,
+              *attributes: Attribute,
+              **kw_attributes: str) -> "Tag":
         return Tag(
             self.name,
-            attributes,
+            attributes + tuple(kw_attributes.items()),
             self.children,
             self.self_closes
         )

@@ -128,3 +128,12 @@ def test_script_tag_doesnt_self_close() -> None:
 
     node = script.attrs(src(example_script_url))
     assert render_node(node) == f'<script src="{example_script_url}"></script>'
+
+
+def test_kw_attributes() -> None:
+    node = div.attrs(class_("first"),
+                     name="some_name",
+                     style="color:blue;")("okok")
+
+    assert render_node(node) == \
+           '<div class="first" name="some_name" style="color:blue;">okok</div>'
