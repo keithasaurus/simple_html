@@ -36,21 +36,18 @@ def test_renders_no_children() -> None:
 
 
 def test_renders_children() -> None:
-    node = p(
-        [class_("pclass")],
-        ["hey!",
-         a(
-             [href("http://google.com"), class_("aclass")],
-             ["link text",
-              span([], "whatever")
-              ],
-         ),
-         br([]),
-         ]
+    node = p.attrs(class_("pclass"))(
+        "hey!",
+        a.attrs(href("https://google.com"),
+                class_("aclass"))(
+            "link text",
+            span("whatever")
+        ),
+        br,
     )
 
     assert render_node(node) == (
-        '<p class="pclass">hey!<a href="http://google.com" '
+        '<p class="pclass">hey!<a href="https://google.com" '
         'class="aclass">link text<span>whatever</span></a>'
         "<br/></p>"
     )
@@ -58,15 +55,12 @@ def test_renders_children() -> None:
 
 def test_hello_world() -> None:
     node = html(
-        children=[
-            head(),
-            body(children=[p(
-                [("class", "some-class")],
-                ["Hello World!"]
+        head,
+        body(
+            p.attrs(("class", "some-class"))(
+                "Hello World!"
             )
-            ]
-            )
-        ]
+        )
     )
 
     assert render_node(node) == (
@@ -76,8 +70,9 @@ def test_hello_world() -> None:
 
 
 def test_string_attrs_work_as_expected() -> None:
-    node = div([("class", "dinosaur"), ("some-random-attr", "spam")])
-    assert render_node(node) == ('<div class="dinosaur" some-random-attr="spam"></div>')
+    node = div.attrs(("class", "dinosaur"),
+                     ("some-random-attr", "spam"))
+    assert render_node(node) == '<div class="dinosaur" some-random-attr="spam"></div>'
 
 
 def test_escapes_normal_strings() -> None:
@@ -91,22 +86,17 @@ def test_safe_strings_are_not_escaped() -> None:
 
 
 def test_simple_form() -> None:
-    node = form(
-        [method("POST"), enctype("multipart/form-data")],
-        [
-            label(
-                children=["Name",
-                          input_(
-                              [type_("text"),
-                               value("some_value"),
-                               placeholder("example text")]),
-                          ]
-            ),
-            div(
-                [class_("button-container")],
-                [button([], ["Submit"])]
-            ),
-        ]
+    node = form.attrs(method("POST"),
+                      enctype("multipart/form-data"))(
+        label(
+            "Name",
+            input_.attrs(type_("text"),
+                         value("some_value"),
+                         placeholder("example text"))
+        ),
+        div.attrs(class_("button-container"))(
+            button("Submit")
+        ),
     )
 
     assert render_node(node) == (
@@ -122,12 +112,10 @@ def test_simple_form() -> None:
 
 
 def test_safestring_in_tag() -> None:
-    node = script(
-        [type_("ld+json")],
-        [SafeString(
+    node = script.attrs(type_("ld+json"))(
+        SafeString(
             json.dumps({"some_key": "some_val"})
         )
-        ]
     )
 
     assert render_node(node) == (
@@ -136,7 +124,7 @@ def test_safestring_in_tag() -> None:
 
 
 def test_script_tag_doesnt_self_close() -> None:
-    example_script_url = "http://example.com/main.js"
+    example_script_url = "https://example.com/main.js"
 
-    node = script([src(example_script_url)])
-    assert render_node(node) == '<script src="{}"></script>'.format(example_script_url)
+    node = script.attrs(src(example_script_url))
+    assert render_node(node) == f'<script src="{example_script_url}"></script>'

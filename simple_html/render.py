@@ -5,12 +5,12 @@ from simple_html.nodes import Node, SafeString, Tag
 def render_tag(tag: Tag) -> str:
     # todo: rewrite with while loop to avoid recursion limit
     tag_start = f"<{tag.name}"
-    attrs = " ".join([f'{key}="{val}"' for key, val in tag.attrs])
+    attrs = " ".join([f'{key}="{val}"' for key, val in tag.attributes])
 
     tag_with_attrs = tag_start if len(attrs) == 0 else f"{tag_start} {attrs}"
 
-    if len(tag.nodes) > 0:
-        children_str = "".join([render_node(node) for node in tag.nodes])
+    if len(tag.children) > 0:
+        children_str = "".join([render_node(node) for node in tag.children])
 
         return f"{tag_with_attrs}>{children_str}</{tag.name}>"
     else:
