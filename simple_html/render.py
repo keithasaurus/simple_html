@@ -3,11 +3,12 @@ from simple_html.nodes import Node, SafeString, Tag
 
 
 def render_tag(tag: Tag) -> str:
-    # todo: rewrite with while loop to avoid recursion limit
     tag_start = f"<{tag.name}"
-    attrs = " ".join([f'{key}="{val}"' for key, val in tag.attributes])
-
-    tag_with_attrs = tag_start if len(attrs) == 0 else f"{tag_start} {attrs}"
+    if len(tag.attributes) > 0:
+        attrs = " ".join([f'{key}="{val}"' for key, val in tag.attributes])
+        tag_with_attrs: str = f"{tag_start} {attrs}"
+    else:
+        tag_with_attrs = tag_start
 
     if len(tag.children) > 0:
         children_str = "".join([render_node(node) for node in tag.children])
@@ -18,10 +19,6 @@ def render_tag(tag: Tag) -> str:
             return f"{tag_with_attrs}/>"
         else:
             return f"{tag_with_attrs}></{tag.name}>"
-
-
-def escape_str(val: str) -> str:
-    return escape(val)
 
 
 def render_node(node: Node) -> str:
