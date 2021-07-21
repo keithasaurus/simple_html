@@ -13,6 +13,10 @@ Node = Union[str, SafeString, "Tag", "TagBase"]
 
 
 class Tag:
+    """
+    Not a dataclass, nor immutable because of observed
+    performance increase when using mypyc
+    """
     def __init__(self,
                  tag_base: "TagBase",
                  attributes: Tuple[Attribute, ...] = tuple(),
