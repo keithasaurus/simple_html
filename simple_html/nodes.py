@@ -9,137 +9,149 @@ class SafeString:
     safe_val: str
 
 
-Node = Union[str, SafeString, "Tag"]
+Node = Union[str, SafeString, "Tag", "TagBase"]
 
 
-@dataclass
 class Tag:
-    name: str
-    attributes: Tuple[Attribute, ...] = tuple()
-    children: Tuple[Node, ...] = tuple()
-    self_closes: bool = False
+    def __init__(self,
+                 tag_base: "TagBase",
+                 attributes: Tuple[Attribute, ...] = tuple(),
+                 children: Tuple[Node, ...] = tuple()
+                 ) -> None:
+        self.tag_base = tag_base
+        self.attributes = attributes
+        self.children = children
 
     def __call__(self, *children: Node) -> "Tag":
-        return Tag(
-            self.name,
-            self.attributes,
-            children,
-            self.self_closes
-        )
+        self.children = children
+        return self
 
     def attrs(self,
               *attributes: Attribute,
               **kw_attributes: str) -> "Tag":
-        return Tag(
-            self.name,
-            attributes + tuple(kw_attributes.items()),
-            self.children,
-            self.self_closes
-        )
+        self.attributes = attributes + tuple(kw_attributes.items())
+        return self
 
 
-a = Tag("a")
-abbr = Tag("abbr")
-address = Tag("address")
-area = Tag("area", self_closes=True)
-article = Tag("article")
-aside = Tag("aside")
-audio = Tag("audio")
-b = Tag("b")
-base = Tag("base", self_closes=True)
-bdi = Tag("bdi")
-bdo = Tag("bdo")
-body = Tag("body")
-canvas = Tag("canvas")
-blockquote = Tag("blockquote")
-br = Tag("br", self_closes=True)
-button = Tag("button")
-datalist = Tag("datalist")
-dd = Tag("dd")
-details = Tag("details")
-dfn = Tag("dfn")
-dl = Tag("dl")
-dt = Tag("dt")
-caption = Tag("caption")
-cite = Tag("cite")
-code = Tag("code")
-col = Tag("col")
-colgroup = Tag("colgroup")
-del_ = Tag("del")
-div = Tag("div")
-em = Tag("em")
-embed = Tag("embed", self_closes=True)
-fieldset = Tag("fieldset")
-figure = Tag("figure")
-figcaption = Tag("figcaption")
-footer = Tag("footer")
-form = Tag("form")
-head = Tag("head")
-header = Tag("header")
-h1 = Tag("h1")
-h2 = Tag("h2")
-h3 = Tag("h3")
-h4 = Tag("h4")
-h5 = Tag("h5")
-h6 = Tag("h6")
-hr = Tag("hr", self_closes=True)
-html = Tag("html")
-i = Tag("i")
-iframe = Tag("iframe", self_closes=True)
-img = Tag("img", self_closes=True)
-input_ = Tag("input", self_closes=True)
-ins = Tag("ins")
-kbd = Tag("kbd")
-label = Tag("label")
-legend = Tag("legend")
-li = Tag("li")
-link = Tag("link", self_closes=True)
-main = Tag("main")
-mark = Tag("mark")
-math = Tag("math")
-menu = Tag("menu")
-menuitem = Tag("menuitem")
-meta = Tag("meta", self_closes=True)
-meter = Tag("meter")
-nav = Tag("nav")
-object_ = Tag("object")
-noscript = Tag("noscript")
-ol = Tag("ol")
-optgroup = Tag("optgroup")
-option = Tag("option")
-p = Tag("p")
-param = Tag("param", self_closes=True)
-pre = Tag("pre")
-progress = Tag("progress")
-q = Tag("q")
-rp = Tag("rp")
-rt = Tag("rt")
-ruby = Tag("ruby")
-s = Tag("s")
-samp = Tag("samp")
-script = Tag("script")
-section = Tag("section")
-select = Tag("select")
-small = Tag("small")
-source = Tag("source", self_closes=True)
-span = Tag("span")
-strong = Tag("strong")
-style = Tag("style")
-sub = Tag("sub")
-summary = Tag("summary")
-sup = Tag("sup")
-table = Tag("table")
-tbody = Tag("tbody")
-thead = Tag("thead")
-textarea = Tag("textarea")
-td = Tag("td")
-th = Tag("th")
-time = Tag("time")
-title = Tag("title")
-tr = Tag("tr")
-track = Tag("track", self_closes=True)
-u = Tag("u")
-ul = Tag("ul")
-var = Tag("var")
-video = Tag("video")
-wbr = Tag("wbr")
+@dataclass
+class TagBase:
+    name: str
+    self_closes: bool = False
+
+    def __call__(self, *children: Node) -> Tag:
+        return Tag(tag_base=self,
+                   children=children)
+
+    def attrs(self,
+              *attributes: Attribute,
+              **kw_attributes: str
+              ) -> Tag:
+        return Tag(tag_base=self,
+                   attributes=attributes + tuple(kw_attributes.items()))
+
+
+a = TagBase("a")
+abbr = TagBase("abbr")
+address = TagBase("address")
+area = TagBase("area", True)
+article = TagBase("article")
+aside = TagBase("aside")
+audio = TagBase("audio")
+b = TagBase("b")
+base = TagBase("base", True)
+bdi = TagBase("bdi")
+bdo = TagBase("bdo")
+body = TagBase("body")
+canvas = TagBase("canvas")
+blockquote = TagBase("blockquote")
+br = TagBase("br", True)
+button = TagBase("button")
+datalist = TagBase("datalist")
+dd = TagBase("dd")
+details = TagBase("details")
+dfn = TagBase("dfn")
+dl = TagBase("dl")
+dt = TagBase("dt")
+caption = TagBase("caption")
+cite = TagBase("cite")
+code = TagBase("code")
+col = TagBase("col")
+colgroup = TagBase("colgroup")
+del_ = TagBase("del")
+div = TagBase("div")
+em = TagBase("em")
+embed = TagBase("embed", True)
+fieldset = TagBase("fieldset")
+figure = TagBase("figure")
+figcaption = TagBase("figcaption")
+footer = TagBase("footer")
+form = TagBase("form")
+head = TagBase("head")
+header = TagBase("header")
+h1 = TagBase("h1")
+h2 = TagBase("h2")
+h3 = TagBase("h3")
+h4 = TagBase("h4")
+h5 = TagBase("h5")
+h6 = TagBase("h6")
+hr = TagBase("hr", True)
+html = TagBase("html")
+i = TagBase("i")
+iframe = TagBase("iframe", True)
+img = TagBase("img", True)
+input_ = TagBase("input", True)
+ins = TagBase("ins")
+kbd = TagBase("kbd")
+label = TagBase("label")
+legend = TagBase("legend")
+li = TagBase("li")
+link = TagBase("link", True)
+main = TagBase("main")
+mark = TagBase("mark")
+math = TagBase("math")
+menu = TagBase("menu")
+menuitem = TagBase("menuitem")
+meta = TagBase("meta", True)
+meter = TagBase("meter")
+nav = TagBase("nav")
+object_ = TagBase("object")
+noscript = TagBase("noscript")
+ol = TagBase("ol")
+optgroup = TagBase("optgroup")
+option = TagBase("option")
+p = TagBase("p")
+param = TagBase("param", True)
+pre = TagBase("pre")
+progress = TagBase("progress")
+q = TagBase("q")
+rp = TagBase("rp")
+rt = TagBase("rt")
+ruby = TagBase("ruby")
+s = TagBase("s")
+samp = TagBase("samp")
+script = TagBase("script")
+section = TagBase("section")
+select = TagBase("select")
+small = TagBase("small")
+source = TagBase("source", True)
+span = TagBase("span")
+strong = TagBase("strong")
+style = TagBase("style")
+sub = TagBase("sub")
+summary = TagBase("summary")
+sup = TagBase("sup")
+table = TagBase("table")
+tbody = TagBase("tbody")
+thead = TagBase("thead")
+textarea = TagBase("textarea")
+td = TagBase("td")
+th = TagBase("th")
+time = TagBase("time")
+title = TagBase("title")
+tr = TagBase("tr")
+track = TagBase("track", True)
+u = TagBase("u")
+ul = TagBase("ul")
+var = TagBase("var")
+video = TagBase("video")
+wbr = TagBase("wbr")

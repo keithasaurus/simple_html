@@ -17,7 +17,7 @@ Some things nice about this library are:
 
 ```python
 from simple_html.nodes import body, head, html, p
-from simple_html.render import render_node
+from simple_html.render import render
 
 node = html(
     [],
@@ -33,7 +33,7 @@ node = html(
     ),
 )
 
-render_node(node)
+render(node)
 ```
 
 returns
@@ -44,18 +44,19 @@ returns
 
 
 Strings are escaped by default, but you can pass in `SafeString`s to avoid escaping.
+
 ```python
 from simple_html.nodes import br, p, SafeString
-from simple_html.render import render_node
+from simple_html.render import render
 
 node = p(
     [],
     "Escaped & stuff",
     br([]),
     SafeString("Not escaped & stuff")
-) 
+)
 
-render_node(node)
+render(node)
 ```
 
 returns
@@ -64,13 +65,14 @@ returns
 ```
 
 For convenience, many tags have been created, but you can create your own as well:
+
 ```python
 from simple_html.nodes import named_tag
-from simple_html.render import render_node
+from simple_html.render import render
 
 custom_elem = named_tag("custom-elem")
 
-render_node(
+render(
     custom_elem(
         [("id", "some-custom-elem-id")],
         "Cool"
