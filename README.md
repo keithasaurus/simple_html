@@ -1,15 +1,14 @@
 # simple_html
-The idea here is to make HTML easy to generate without using templating.
-It builds on the idea that HTML is comprised of recursive nodes with a list of 
-attributes and a list of child nodes. It's heavily influenced by Elm's Html 
-library.
- 
 
-Some things nice about this library are:
-1. The generated HTML is always valid.
-2. Space if always significant.
-3. Formalized types mean MyPy can help avoid certain classes of errors.
-4. It's framework agnostic.
+Template-less html in Python.
+
+### Type-safe. Minified by default. Fast.
+
+simple_html is built to simplify html rendering in Python. No templates needed. Just create html in 
+normal Python, and, in most cases, the code will be more concise than standard html. Other benefits include:
+- typically renders fewer bytes than template-based rendering
+- types mean your editor and tools can help you write correct code faster
+- no framework needed
 
 
 ### Install
@@ -20,17 +19,12 @@ from simple_html.nodes import body, head, html, p
 from simple_html.render import render
 
 node = html(
-    [],
-    head(
-        []
-    ),
+    head,
     body(
-        [],
-        p(
-            [("class", "some-class")],
+        p.attrs(id="hello")( 
             "Hello World!"
         )
-    ),
+    )
 )
 
 render(node)
@@ -39,7 +33,7 @@ render(node)
 returns
 
 ```html
-<html><head></head><body><p class="some-class">Hello World!</p></body></html>
+<html><head></head><body><p id="hello">Hello World!</p></body></html>
 ```
 
 
@@ -50,9 +44,8 @@ from simple_html.nodes import br, p, SafeString
 from simple_html.render import render
 
 node = p(
-    [],
     "Escaped & stuff",
-    br([]),
+    br,
     SafeString("Not escaped & stuff")
 )
 
@@ -64,17 +57,16 @@ returns
 <p>Escaped &amp; stuff<br/>Not escaped & stuff</p>
 ```
 
-For convenience, many tags have been created, but you can create your own as well:
+For convenience, many tags are provided, but you can create your own as well:
 
 ```python
-from simple_html.nodes import named_tag
+from simple_html.nodes import TagBase 
 from simple_html.render import render
 
-custom_elem = named_tag("custom-elem")
+custom_elem = TagBase("custom-elem")
 
 render(
-    custom_elem(
-        [("id", "some-custom-elem-id")],
+    custom_elem.attrs(id="some-custom-elem-id")(
         "Cool"
     )
 )
@@ -86,41 +78,30 @@ renders
 <custom-elem id="some-custom-elem-id">Cool</custom-elem>
 ```
 
-Likewise, some attributes have been created as presets, to help keep data more consistent. 
+Likewise, some attributes have been created as type-safe presets. Note that there are multiple ways to create attributes. 
+The examples below are equivalent:
 
 ```python
+from simple_html.attributes import height, id_
 from simple_html.nodes import div
 
-div(
-    [("class", "some-class"),
-     ("height", "250")],
-    "OK"
-)
+
+# **kwargs: recommended for most cases
+div.attrs(id="some-id", height="100")
+
+# *args: useful for attributes that may be reserved keywords, when type constraints are desired, 
+# or when multiple of the same attribute are needed. Presets and raw tuples can be used interchangeably. 
+div.attrs(("id", "some-id"), height(100))
+div.attrs(id_("some-id"), height(100))
+div.attrs(("id", "some-id"), ("height", "100"))
 ```
 
-is equivalent to
-
-```python
-from simple_html.nodes import div
-from simple_html.attributes import class_, height
-
-div(
-    [class_("some-class"), height(250)],
-    "OK"
-)
-```
-
-And you can build your own, using `str_attr`, `int_attr`, or `bool_attr`. For instance, here are
+You can build your own presets, using `str_attr`, `int_attr`, or `bool_attr`. For instance, here are
 several of the attribute preset definitions
 
 ```python
+from simple_html.attributes import bool_attr, int_attr, str_attr
 checked = bool_attr('checked')
 class_ = str_attr('class')
 cols = int_attr('cols')
 ```
-
-#### Status
-Very early development. Feel free to contribute.
-
-#### Requirements
-Python 3.5+
