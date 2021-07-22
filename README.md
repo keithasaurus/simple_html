@@ -5,7 +5,7 @@ Template-less html in Python.
 ### Type-safe. Minified by default. Fast.
 
 simple_html is built to simplify html rendering in Python. No templates needed. Just create html in 
-normal Python, and, in most cases, the code will be more concise than standard html. Other benefits include:
+normal Python. In most cases, the code will be more concise than standard html. Other benefits include:
 - typically renders fewer bytes than template-based rendering
 - types mean your editor and tools can help you write correct code faster
 - no framework needed
