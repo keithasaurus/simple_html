@@ -1,19 +1,19 @@
 # simple_html
 
-Template-less html in Python.
+### Template-less. Type-safe. Minified by default.
 
-### Type-safe. Minified by default. Fast.
-
-simple_html is built to simplify html rendering in Python. No templates needed. Just create html in 
-normal Python. In most cases, the code will be more concise than standard html. Other benefits include:
+simple_html is built to simplify html rendering in Python. No templates needed. Just create HTML in 
+normal Python. In most cases, the code will be more concise than standard HTML. Other benefits include:
 - typically renders fewer bytes than template-based rendering
 - types mean your editor and tools can help you write correct code faster
 - no framework needed
 
 
-### Install
+### Installation
 `pip install simple_html`
 
+
+### Usage
 ```python
 from simple_html.nodes import body, head, html, p
 from simple_html.render import render
@@ -27,13 +27,7 @@ node = html(
     )
 )
 
-render(node)
-```
-
-returns
-
-```html
-<html><head></head><body><p id="hello">Hello World!</p></body></html>
+render(node)  # returns: <html><head></head><body><p id="hello">Hello World!</p></body></html> 
 ```
 
 
@@ -49,12 +43,7 @@ node = p(
     SafeString("Not escaped & stuff")
 )
 
-render(node)
-```
-
-returns
-```html
-<p>Escaped &amp; stuff<br/>Not escaped & stuff</p>
+render(node)  # returns: <p>Escaped &amp; stuff<br/>Not escaped & stuff</p> 
 ```
 
 For convenience, many tags are provided, but you can create your own as well:
@@ -67,19 +56,13 @@ custom_elem = TagBase("custom-elem")
 
 render(
     custom_elem.attrs(id="some-custom-elem-id")(
-        "Cool"
+        "Wow"
     )
-)
-```
-
-renders
-
-```html
-<custom-elem id="some-custom-elem-id">Cool</custom-elem>
+)  # returns: <custom-elem id="some-custom-elem-id">Cool</custom-elem> 
 ```
 
 Likewise, some attributes have been created as type-safe presets. Note that there are multiple ways to create attributes. 
-The examples below are equivalent:
+The examples below are all equivalent:
 
 ```python
 from simple_html.attributes import height, id_
@@ -92,8 +75,12 @@ div.attrs(id="some-id", height="100")
 # *args: useful for attributes that may be reserved keywords, when type constraints are desired, 
 # or when multiple of the same attribute are needed. Presets and raw tuples can be used interchangeably. 
 div.attrs(("id", "some-id"), height(100))
+
 div.attrs(id_("some-id"), height(100))
+
 div.attrs(("id", "some-id"), ("height", "100"))
+
+# each would render to: <div id="some-id" height="100"></div> 
 ```
 
 You can build your own presets, using `str_attr`, `int_attr`, or `bool_attr`. For instance, here are
@@ -101,7 +88,9 @@ several of the attribute preset definitions
 
 ```python
 from simple_html.attributes import bool_attr, int_attr, str_attr
+
 checked = bool_attr('checked')
 class_ = str_attr('class')
 cols = int_attr('cols')
 ```
+But anything that renders to the type of `Attribute` will work.
