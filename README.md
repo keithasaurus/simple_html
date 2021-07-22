@@ -7,6 +7,7 @@ normal Python. In most cases, the code will be more concise than standard HTML. 
 - typically renders fewer bytes than template-based rendering
 - types mean your editor and tools can help you write correct code faster
 - no framework needed
+- lightweight
 
 
 ### Installation
