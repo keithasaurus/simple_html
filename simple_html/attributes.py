@@ -1,31 +1,35 @@
-from typing import Callable, List, Tuple
+from typing import Callable, List, Tuple, Optional
 
-Attribute = Tuple[str, str]
+Attribute = Tuple[str, Optional[str]]
 
 
-def bool_attr(name: str) -> Attribute:
+def bool_attr(attr_name: str) -> Attribute:
     """
     e.g. required="required", selected="selected"
     """
-    return name, name
+    return attr_name, attr_name
 
 
-def int_attr(name: str) -> Callable[[int], Attribute]:
+def int_attr(attr_name: str) -> Callable[[int], Attribute]:
     def closure(val: int) -> Attribute:
-        return name, str(val)
+        return attr_name, str(val)
 
     return closure
 
 
-def str_attr(name: str) -> Callable[[str], Attribute]:
+def str_attr(attr_name: str) -> Callable[[str], Attribute]:
     def closure(val: str) -> Attribute:
-        return name, val
+        return attr_name, val
 
     return closure
 
 
 def style(props: List[Tuple[str, str]]) -> Attribute:
     return "style", " ".join([f"{key}: {val};" for key, val in props])
+
+
+def no_value(attr_name: str) -> Attribute:
+    return attr_name, None
 
 
 alt = str_attr("alt")
@@ -121,7 +125,6 @@ use_map = str_attr("useMap")
 value = str_attr("value")
 width = int_attr("width")
 wrap = str_attr("wrap")
-
 
 # events
 onblur = str_attr("onblur")

@@ -3,16 +3,9 @@
 <body><h1 class="great header" other_attr="5" id="header1"></h1>
 <div><p>{content}</p>
     <ul>
-        <li class="item-stuff">okokok</li>
-        <li class="item-stuff">okokok</li>
-        <li class="item-stuff">okokok</li>
-        <li class="item-stuff">okokok</li>
-        <li class="item-stuff">okokok</li>
-        <li class="item-stuff">okokok</li>
-        <li class="item-stuff">okokok</li>
-        <li class="item-stuff">okokok</li>
-        <li class="item-stuff">okokok</li>
-        <li class="item-stuff">okokok</li>
+        {% for item in oks %}
+        <li class="item-stuff">{{ item }}}</li>
+        {% endfor %}
     </ul>
 </div>
 </body>

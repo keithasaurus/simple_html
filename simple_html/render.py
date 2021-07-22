@@ -5,7 +5,10 @@ from simple_html.nodes import Node, SafeString, Tag, TagBase
 def render_tag(tag: Tag) -> str:
     tag_start = f"<{tag.tag_base.name}"
     if len(tag.attributes) > 0:
-        attrs = " ".join([f'{key}="{val}"' for key, val in tag.attributes])
+        attrs = " ".join([
+            key if val is None else f'{key}="{val}"'
+            for key, val in tag.attributes
+        ])
         tag_with_attrs: str = f"{tag_start} {attrs}"
     else:
         tag_with_attrs = tag_start

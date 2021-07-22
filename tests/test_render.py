@@ -6,7 +6,7 @@ from simple_html.attributes import (
     placeholder,
     src,
     type_,
-    value,
+    value, no_value,
 )
 from simple_html.nodes import (
     a,
@@ -142,3 +142,7 @@ def test_kw_attributes() -> None:
 def test_uncalled_tag_renders() -> None:
     assert render(a) == "<a></a>"
     assert render(br) == "<br/>"
+
+
+def test_attribute_without_value_rendered_as_expected() -> None:
+    assert render(a.attrs(no_value("something"))) == "<a something></a>"
