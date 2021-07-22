@@ -73,12 +73,12 @@ from simple_html.nodes import div
 div.attrs(id="some-id", height="100")
 
 # *args: useful for attributes that may be reserved keywords, when type constraints are desired, 
-# or when multiple of the same attribute are needed. Presets and raw tuples can be used interchangeably. 
+# or when multiple of the same attribute are needed. Presets and raw tuples can be used interchangeably.
+div.attrs(("id", "some-id"), ("height", "100"))
+
 div.attrs(("id", "some-id"), height(100))
 
 div.attrs(id_("some-id"), height(100))
-
-div.attrs(("id", "some-id"), ("height", "100"))
 
 # each would render to: <div id="some-id" height="100"></div> 
 ```
