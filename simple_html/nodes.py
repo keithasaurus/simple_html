@@ -15,7 +15,8 @@ Node = Union[str, SafeString, "Tag", "TagBase"]
 class Tag:
     """
     Not a dataclass, nor immutable because of observed
-    performance increase when using mypyc
+    performance increase. The recommended means of using
+    this class results in not mutating objects in any case.
     """
     def __init__(self,
                  tag_base: "TagBase",
@@ -27,14 +28,16 @@ class Tag:
         self.children = children
 
     def __call__(self, *children: Node) -> "Tag":
-        self.children = children
-        return self
+        return Tag(tag_base=self.tag_base,
+                   attributes=self.attributes,
+                   children=children)
 
     def attrs(self,
               *attributes: Attribute,
               **kw_attributes: str) -> "Tag":
-        self.attributes = attributes + tuple(kw_attributes.items())
-        return self
+        return Tag(tag_base=self.tag_base,
+                   attributes=attributes + tuple(kw_attributes.items()),
+                   children=self.children)
 
 
 @dataclass(frozen=True)
