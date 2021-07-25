@@ -73,13 +73,15 @@ from simple_html.nodes import div
 # **kwargs: recommended for most cases
 div.attrs(id="some-id", height="100")
 
-# *args: useful for attributes that may be reserved keyword or when type constraints are desired, 
-# Presets and raw tuples can be used interchangeably.
+# *args: useful for attributes that may be reserved keywords or when type constraints are desired.
+# Presets, raw tuples, and kwargs can be used interchangeably.
 div.attrs(("id", "some-id"), ("height", "100"))
 
 div.attrs(("id", "some-id"), height(100))
 
 div.attrs(id_("some-id"), height(100))
+
+div.attrs(id_("some-id"), height="100")
 
 # each would render to: <div id="some-id" height="100"></div> 
 ```
