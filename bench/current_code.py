@@ -2,7 +2,7 @@ import time
 
 from simple_html.attributes import class_
 from simple_html.nodes import html, head, title, body, h1, p, div, ul, SafeString, li
-from simple_html.render import render
+from simple_html.render import render_with_doctype
 
 time_start = time.time()
 
@@ -24,6 +24,6 @@ for i in range(10000):
             )
         )
     )
-    x = render(node)
+    x = render_with_doctype(node)
 
 print(time.time() - time_start, "seconds")
