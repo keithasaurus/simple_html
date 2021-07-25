@@ -37,7 +37,7 @@ class Tag:
         return self
 
 
-@dataclass
+@dataclass(frozen=True)
 class TagBase:
     name: str
     self_closes: bool = False
