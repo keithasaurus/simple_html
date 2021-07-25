@@ -1,4 +1,6 @@
 from html import escape
+
+from simple_html.doctype import doctype
 from simple_html.nodes import Node, SafeString, Tag, TagBase
 
 
@@ -40,3 +42,7 @@ def render(node: Node) -> str:
         raise TypeError(
             "Expected `Tag`, `SafeString` or `str` but got `{}`".format(type(node))
         )
+
+
+def render_with_doctype(node: Node, doc_type_details: str = "html") -> str:
+    return f"{doctype(doc_type_details)}{render(node)}"

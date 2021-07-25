@@ -24,7 +24,7 @@ from simple_html.nodes import (
     script,
     span,
 )
-from simple_html.render import render
+from simple_html.render import render, render_with_doctype
 
 import json
 
@@ -146,3 +146,8 @@ def test_uncalled_tag_renders() -> None:
 
 def test_attribute_without_value_rendered_as_expected() -> None:
     assert render(a.attrs(no_value("something"))) == "<a something></a>"
+
+
+def test_render_with_doctype() -> None:
+    assert render_with_doctype(html) == "<!doctype html><html></html>"
+    assert render_with_doctype(html, "other info") == "<!doctype other info><html></html>"
