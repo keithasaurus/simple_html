@@ -5,8 +5,10 @@ description = "Template-less html rendering in Python"
 authors = []
 license = "MIT"
 
+
 [tool.poetry.dependencies]
 python = "^3.7"
+typed-ast = { version = "1.4.3", python = "~3.7" }
 
 [tool.poetry.dev-dependencies]
 flake8 = "3.9.2"
