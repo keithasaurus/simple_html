@@ -1,9 +1,12 @@
 [tool.poetry]
 name = "simple_html"
-version = "0.4.0"
+version = "0.4.2"
+readme = "README.md"
 description = "Template-less html rendering in Python"
-authors = []
+authors = ["Keith Philpott <fakekeith@example.org>"]
 license = "MIT"
+homepage = "https://github.com/keithasaurus/simple_html"
+keywords = ["html"]
 
 
 [tool.poetry.dependencies]
