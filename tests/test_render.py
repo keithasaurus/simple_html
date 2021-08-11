@@ -150,4 +150,16 @@ def test_attribute_without_value_rendered_as_expected() -> None:
 
 def test_render_with_doctype() -> None:
     assert render_with_doctype(html) == "<!doctype html><html></html>"
-    assert render_with_doctype(html, "other info") == "<!doctype other info><html></html>"
+    assert render_with_doctype(html, "other info") == \
+           "<!doctype other info><html></html>"
+
+
+def test_can_render_none() -> None:
+    assert render(None) == ""
+    assert render(
+        div(None,
+            "hello ",
+            None,
+            span("World!"),
+            None)
+    ) == "<div>hello <span>World!</span></div>"

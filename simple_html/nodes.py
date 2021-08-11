@@ -9,7 +9,7 @@ class SafeString:
     safe_val: str
 
 
-Node = Union[str, SafeString, "Tag", "TagBase"]
+Node = Union[str, SafeString, "Tag", "TagBase", None]
 
 
 class Tag:

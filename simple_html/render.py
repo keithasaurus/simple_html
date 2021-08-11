@@ -36,6 +36,8 @@ def render(node: Node) -> str:
             return f"<{node.name}></{node.name}>"
     elif isinstance(node, str):
         return escape(node)
+    elif node is None:
+        return ""
     elif isinstance(node, SafeString):
         return node.safe_val
     else:
