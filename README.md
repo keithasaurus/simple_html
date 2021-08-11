@@ -11,7 +11,7 @@ normal Python. In most cases, the code will be more concise than standard HTML. 
 
 
 ### Installation
-`pip install simple_html`
+`pip install simple-html`
 
 
 ### Usage
