@@ -1,32 +1,11 @@
-from simple_html.attributes import (
-    class_,
-    enctype,
-    href,
-    method,
-    placeholder,
-    src,
-    type_,
-    value, no_value,
-)
-from simple_html.nodes import (
-    a,
-    body,
-    br,
-    button,
-    div,
-    form,
-    head,
-    html,
-    input_,
-    label,
-    p,
-    SafeString,
-    script,
-    span, FlatGroup,
-)
-from simple_html.render import render, render_with_doctype
-
 import json
+
+from simple_html.attributes import (class_, enctype, href, method, no_value,
+                                    placeholder, src, type_, value)
+from simple_html.nodes import (FlatGroup, SafeString, a, body, br, button, div,
+                               form, head, html, input_, label, p, script,
+                               span)
+from simple_html.render import render, render_with_doctype
 
 
 def test_renders_no_children() -> None:
@@ -165,3 +144,14 @@ def test_render_flat_group() -> None:
 
 def test_render_kw_attribute_with_none() -> None:
     assert render(script.attrs(defer=None)) == "<script defer></script>"
+
+
+def test_can_render_none() -> None:
+    assert render(None) == ""
+    assert render(
+        div(None,
+            "hello ",
+            None,
+            span("World!"),
+            None)
+    ) == "<div>hello <span>World!</span></div>"

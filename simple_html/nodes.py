@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Union, Tuple, Optional
+from typing import Tuple, Union
 
 from .attributes import Attribute, AttributeValue
 
@@ -9,13 +9,13 @@ class SafeString:
     safe_val: str
 
 
-Node = Union[str, SafeString, "Tag", "TagBase", "FlatGroup"]
+Node = Union[str, SafeString, "Tag", "TagBase", "FlatGroup", None]
 
 
 class FlatGroup:
     """
-    The intention is to be able to group a number of nodes without enveloping them in a container. Same idea
-    as React's fragments
+    The intention is to be able to group a number of nodes without enveloping them
+    in a container. Same idea as React's fragments.
     """
     def __init__(self, *nodes: Node) -> None:
         self.nodes = nodes

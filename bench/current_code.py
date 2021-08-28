@@ -1,7 +1,8 @@
 import time
 
 from simple_html.attributes import class_
-from simple_html.nodes import html, head, title, body, h1, p, div, ul, SafeString, li
+from simple_html.nodes import (SafeString, body, div, h1, head, html, li, p,
+                               title, ul)
 from simple_html.render import render_with_doctype
 
 time_start = time.time()
