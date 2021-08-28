@@ -1,6 +1,8 @@
 from typing import Callable, List, Tuple, Optional
 
-Attribute = Tuple[str, Optional[str]]
+
+AttributeValue = Optional[str]
+Attribute = Tuple[str, AttributeValue]
 
 
 def bool_attr(attr_name: str) -> Attribute:

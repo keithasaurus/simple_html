@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from typing import Union, Tuple
+from typing import Union, Tuple, Optional
 
-from .attributes import Attribute
+from .attributes import Attribute, AttributeValue
 
 
 @dataclass
@@ -9,7 +9,16 @@ class SafeString:
     safe_val: str
 
 
-Node = Union[str, SafeString, "Tag", "TagBase"]
+Node = Union[str, SafeString, "Tag", "TagBase", "FlatGroup"]
+
+
+class FlatGroup:
+    """
+    The intention is to be able to group a number of nodes without enveloping them in a container. Same idea
+    as React's fragments
+    """
+    def __init__(self, *nodes: Node) -> None:
+        self.nodes = nodes
 
 
 class Tag:
@@ -34,7 +43,7 @@ class Tag:
 
     def attrs(self,
               *attributes: Attribute,
-              **kw_attributes: str) -> "Tag":
+              **kw_attributes: AttributeValue) -> "Tag":
         return Tag(tag_base=self.tag_base,
                    attributes=attributes + tuple(kw_attributes.items()),
                    children=self.children)
@@ -51,7 +60,7 @@ class TagBase:
 
     def attrs(self,
               *attributes: Attribute,
-              **kw_attributes: str
+              **kw_attributes: AttributeValue
               ) -> Tag:
         return Tag(tag_base=self,
                    attributes=attributes + tuple(kw_attributes.items()))

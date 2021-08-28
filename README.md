@@ -75,15 +75,12 @@ div.attrs(id="some-id", height="100")
 
 # *args: useful for attributes that may be reserved keywords or when type constraints are desired.
 # Presets, raw tuples, and kwargs can be used interchangeably.
-div.attrs(("id", "some-id"), ("height", "100"))
+div.attrs(id_("some-id"), 
+          height(100),
+          ("class", "100"), 
+          width="100")
 
-div.attrs(("id", "some-id"), height(100))
-
-div.attrs(id_("some-id"), height(100))
-
-div.attrs(id_("some-id"), height="100")
-
-# each would render to: <div id="some-id" height="100"></div> 
+# renders to: <div id="some-id" height="100" class="100" width="100"></div>
 ```
 
 You can build your own presets, using `str_attr`, `int_attr`, or `bool_attr`. For instance, here are

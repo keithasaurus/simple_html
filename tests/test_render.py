@@ -22,7 +22,7 @@ from simple_html.nodes import (
     p,
     SafeString,
     script,
-    span,
+    span, FlatGroup,
 )
 from simple_html.render import render, render_with_doctype
 
@@ -151,3 +151,17 @@ def test_attribute_without_value_rendered_as_expected() -> None:
 def test_render_with_doctype() -> None:
     assert render_with_doctype(html) == "<!doctype html><html></html>"
     assert render_with_doctype(html, "other info") == "<!doctype other info><html></html>"
+
+
+def test_render_flat_group() -> None:
+    assert render(
+        FlatGroup(br,
+                  "ok",
+                  div("great"))
+    ) == "<br/>ok<div>great</div>"
+
+    assert render(FlatGroup()) == ""
+
+
+def test_render_kw_attribute_with_none() -> None:
+    assert render(script.attrs(defer=None)) == "<script defer></script>"

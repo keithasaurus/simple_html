@@ -1,7 +1,7 @@
 from html import escape
 
 from simple_html.doctype import doctype
-from simple_html.nodes import Node, SafeString, Tag, TagBase
+from simple_html.nodes import Node, SafeString, Tag, TagBase, FlatGroup
 
 
 def render_tag(tag: Tag) -> str:
@@ -34,6 +34,8 @@ def render(node: Node) -> str:
             return f"<{node.name}/>"
         else:
             return f"<{node.name}></{node.name}>"
+    if isinstance(node, FlatGroup):
+        return "".join(render(n) for n in node.nodes)
     elif isinstance(node, str):
         return escape(node)
     elif isinstance(node, SafeString):
