@@ -77,10 +77,10 @@ div.attrs(id="some-id", height="100")
 # Presets, raw tuples, and kwargs can be used interchangeably.
 div.attrs(id_("some-id"), 
           height(100),
-          ("class", "100"), 
+          ("class", "abc"), 
           width="100")
 
-# renders to: <div id="some-id" height="100" class="100" width="100"></div>
+# renders to: <div id="some-id" height="100" class="abc" width="100"></div>
 ```
 
 You can build your own presets, using `str_attr`, `int_attr`, or `bool_attr`. For instance, here are
