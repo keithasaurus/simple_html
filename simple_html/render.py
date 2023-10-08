@@ -21,21 +21,22 @@ def render_tag_base(tag: TagBase) -> str:
 
 
 def render_tag(tag: Tag) -> str:
+    tag_base = tag.tag_base
     if tag.children:
         children_str = "".join([render(node) for node in tag.children])
         if tag.attributes:
-            return f"<{tag.tag_base.name} {stringify_attributes(tag.attributes)}>{children_str}</{tag.tag_base.name}>"
+            return f"<{tag_base.name} {stringify_attributes(tag.attributes)}>{children_str}</{tag_base.name}>"
         else:
-            return f"<{tag.tag_base.name}>{children_str}</{tag.tag_base.name}>"
+            return f"<{tag_base.name}>{children_str}</{tag.tag_base.name}>"
 
     elif tag.attributes:
         return (
-            f"<{tag.tag_base.name} {stringify_attributes(tag.attributes)}/>"
-            if tag.tag_base.self_closes
-            else f"<{tag.tag_base.name} {stringify_attributes(tag.attributes)}></{tag.tag_base.name}>"
+            f"<{tag_base.name} {stringify_attributes(tag.attributes)}/>"
+            if tag_base.self_closes
+            else f"<{tag_base.name} {stringify_attributes(tag.attributes)}></{tag_base.name}>"
         )
     else:
-        return render_tag_base(tag.tag_base)
+        return render_tag_base(tag_base)
 
 
 def render(node: Node) -> str:
