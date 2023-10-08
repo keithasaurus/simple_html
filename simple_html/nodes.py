@@ -29,11 +29,12 @@ class Tag:
     this class results in not mutating objects in any case.
     """
 
-    def __init__(self,
-                 tag_base: "TagBase",
-                 attributes: Tuple[Attribute, ...] = tuple(),
-                 children: Tuple[Node, ...] = tuple()
-                 ) -> None:
+    def __init__(
+        self,
+        tag_base: "TagBase",
+        attributes: Tuple[Attribute, ...] = tuple(),
+        children: Tuple[Node, ...] = tuple(),
+    ) -> None:
         self.tag_base = tag_base
         self.attributes = attributes
         self.children = children
@@ -41,12 +42,10 @@ class Tag:
     def __call__(self, *children: Node) -> "Tag":
         return Tag(self.tag_base, self.attributes, children)
 
-    def attrs(self,
-              *attributes: Attribute,
-              **kw_attributes: AttributeValue) -> "Tag":
-        return Tag(self.tag_base,
-                   attributes + tuple(kw_attributes.items()),
-                   self.children)
+    def attrs(self, *attributes: Attribute, **kw_attributes: AttributeValue) -> "Tag":
+        return Tag(
+            self.tag_base, attributes + tuple(kw_attributes.items()), self.children
+        )
 
 
 @dataclass(frozen=True)
@@ -62,10 +61,7 @@ class TagBase:
         else:
             return Tag(self)
 
-    def attrs(self,
-              *attributes: Attribute,
-              **kw_attributes: AttributeValue
-              ) -> Tag:
+    def attrs(self, *attributes: Attribute, **kw_attributes: AttributeValue) -> Tag:
         if attributes:
             if kw_attributes:
                 return Tag(self, attributes + tuple(kw_attributes.items()))

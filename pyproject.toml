@@ -18,6 +18,7 @@ flake8 = "6.1.0"
 mypy = "1.5.1"
 pytest = "7.4.2"
 setuptools = "^68.2.2"
+black = "^23.9.1"
 
 
 [build-system]

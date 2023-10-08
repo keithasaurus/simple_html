@@ -1,5 +1,7 @@
 from html import escape
+from typing import Tuple
 
+from simple_html.attributes import Attribute
 from simple_html.nodes import FlatGroup, Node, SafeString, Tag, TagBase
 
 
@@ -7,25 +9,30 @@ def doctype(details: str) -> str:
     return f"<!doctype {details}>"
 
 
-def render_tag(tag: Tag) -> str:
-    if tag.attributes:
-        attrs = " ".join([
-            key if val is None else f'{key}="{val}"'
-            for key, val in tag.attributes
-        ])
-        tag_with_attrs: str = f"<{tag.tag_base.name} {attrs}"
-    else:
-        tag_with_attrs = f"<{tag.tag_base.name}"
+def stringify_attributes(attrs: Tuple[Attribute, ...]) -> str:
+    return " ".join([key if val is None else f'{key}="{val}"' for key, val in attrs])
 
+
+def render_tag(tag: Tag) -> str:
     if tag.children:
         children_str = "".join([render(node) for node in tag.children])
-
-        return f"{tag_with_attrs}>{children_str}</{tag.tag_base.name}>"
-    else:
-        if tag.tag_base.self_closes:
-            return f"{tag_with_attrs}/>"
+        if tag.attributes:
+            return f"<{tag.tag_base.name} {stringify_attributes(tag.attributes)}>{children_str}</{tag.tag_base.name}>"
         else:
-            return f"{tag_with_attrs}></{tag.tag_base.name}>"
+            return f"<{tag.tag_base.name}>{children_str}</{tag.tag_base.name}>"
+
+    elif tag.attributes:
+        return (
+            f"<{tag.tag_base.name} {stringify_attributes(tag.attributes)}/>"
+            if tag.tag_base.self_closes
+            else f"<{tag.tag_base.name} {stringify_attributes(tag.attributes)}></{tag.tag_base.name}>"
+        )
+    else:
+        return (
+            f"<{tag.tag_base.name}/>"
+            if tag.tag_base.self_closes
+            else f"<{tag.tag_base.name}></{tag.tag_base.name}>"
+        )
 
 
 def render(node: Node) -> str:
