@@ -13,6 +13,13 @@ def stringify_attributes(attrs: Tuple[Attribute, ...]) -> str:
     return " ".join([key if val is None else f'{key}="{val}"' for key, val in attrs])
 
 
+def render_tag_base(tag: TagBase) -> str:
+    if tag.self_closes:
+        return f"<{tag.name}/>"
+    else:
+        return f"<{tag.name}></{tag.name}>"
+
+
 def render_tag(tag: Tag) -> str:
     if tag.children:
         children_str = "".join([render(node) for node in tag.children])
@@ -28,11 +35,7 @@ def render_tag(tag: Tag) -> str:
             else f"<{tag.tag_base.name} {stringify_attributes(tag.attributes)}></{tag.tag_base.name}>"
         )
     else:
-        return (
-            f"<{tag.tag_base.name}/>"
-            if tag.tag_base.self_closes
-            else f"<{tag.tag_base.name}></{tag.tag_base.name}>"
-        )
+        return render_tag_base(tag.tag_base)
 
 
 def render(node: Node) -> str:
@@ -47,10 +50,7 @@ def render(node: Node) -> str:
     elif isinstance(node, SafeString):
         return node.safe_val
     elif isinstance(node, TagBase):
-        if node.self_closes:
-            return f"<{node.name}/>"
-        else:
-            return f"<{node.name}></{node.name}>"
+        return render_tag_base(node)
     else:
         raise TypeError(
             "Expected `Tag`, `SafeString` or `str` but got `{}`".format(type(node))
