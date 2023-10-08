@@ -39,16 +39,14 @@ class Tag:
         self.children = children
 
     def __call__(self, *children: Node) -> "Tag":
-        return Tag(tag_base=self.tag_base,
-                   attributes=self.attributes,
-                   children=children)
+        return Tag(self.tag_base, self.attributes, children)
 
     def attrs(self,
               *attributes: Attribute,
               **kw_attributes: AttributeValue) -> "Tag":
-        return Tag(tag_base=self.tag_base,
-                   attributes=attributes + tuple(kw_attributes.items()),
-                   children=self.children)
+        return Tag(self.tag_base,
+                   attributes + tuple(kw_attributes.items()),
+                   self.children)
 
 
 @dataclass(frozen=True)
@@ -59,15 +57,13 @@ class TagBase:
     self_closes: bool = False
 
     def __call__(self, *children: Node) -> Tag:
-        return Tag(tag_base=self,
-                   children=children)
+        return Tag(self, tuple(), children)
 
     def attrs(self,
               *attributes: Attribute,
               **kw_attributes: AttributeValue
               ) -> Tag:
-        return Tag(tag_base=self,
-                   attributes=attributes + tuple(kw_attributes.items()))
+        return Tag(self, attributes + tuple(kw_attributes.items()))
 
 
 a = TagBase("a")
