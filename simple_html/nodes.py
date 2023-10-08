@@ -24,28 +24,33 @@ class FlatGroup:
 
 class Tag:
     """
-    Not a dataclass, nor immutable because of observed
-    performance increase. The recommended means of using
-    this class results in not mutating objects in any case.
+    This is mutable largely for performance.
     """
+    __slots__ = ('tag_base', 'attributes', 'children')
 
     def __init__(
-        self,
-        tag_base: "TagBase",
-        attributes: Tuple[Attribute, ...] = tuple(),
-        children: Tuple[Node, ...] = tuple(),
+            self,
+            tag_base: "TagBase",
+            attributes: Tuple[Attribute, ...] = tuple(),
+            children: Tuple[Node, ...] = tuple(),
     ) -> None:
         self.tag_base = tag_base
         self.attributes = attributes
         self.children = children
 
     def __call__(self, *children: Node) -> "Tag":
-        return Tag(self.tag_base, self.attributes, children)
+        self.children = children
+        return self
 
     def attrs(self, *attributes: Attribute, **kw_attributes: AttributeValue) -> "Tag":
-        return Tag(
-            self.tag_base, attributes + tuple(kw_attributes.items()), self.children
-        )
+        if attributes:
+            if kw_attributes:
+                self.attributes = attributes + tuple(kw_attributes.items())
+            else:
+                self.attributes = attributes
+        elif kw_attributes:
+            self.attributes = tuple(kw_attributes.items())
+        return self
 
 
 @dataclass(frozen=True)
