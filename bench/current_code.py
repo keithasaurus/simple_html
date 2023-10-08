@@ -7,7 +7,7 @@ from simple_html.render import render_with_doctype
 
 time_start = time.time()
 
-for i in range(10000):
+for i in range(20000):
     node = html(
         head(
             title("some title")

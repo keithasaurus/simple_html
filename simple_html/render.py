@@ -6,7 +6,7 @@ from simple_html.nodes import FlatGroup, Node, SafeString, Tag, TagBase
 
 def render_tag(tag: Tag) -> str:
     tag_start = f"<{tag.tag_base.name}"
-    if len(tag.attributes) > 0:
+    if tag.attributes:
         attrs = " ".join([
             key if val is None else f'{key}="{val}"'
             for key, val in tag.attributes
@@ -15,7 +15,7 @@ def render_tag(tag: Tag) -> str:
     else:
         tag_with_attrs = tag_start
 
-    if len(tag.children) > 0:
+    if tag.children:
         children_str = "".join([render(node) for node in tag.children])
 
         return f"{tag_with_attrs}>{children_str}</{tag.tag_base.name}>"

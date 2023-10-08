@@ -4,9 +4,9 @@ from typing import Tuple, Union
 from .attributes import Attribute, AttributeValue
 
 
-@dataclass
 class SafeString:
-    safe_val: str
+    def __init__(self, safe_val: str) -> None:
+        self.safe_val = safe_val
 
 
 Node = Union[str, SafeString, "Tag", "TagBase", "FlatGroup", None]
@@ -17,6 +17,7 @@ class FlatGroup:
     The intention is to be able to group a number of nodes without enveloping them
     in a container. Same idea as React's fragments.
     """
+
     def __init__(self, *nodes: Node) -> None:
         self.nodes = nodes
 
@@ -27,6 +28,7 @@ class Tag:
     performance increase. The recommended means of using
     this class results in not mutating objects in any case.
     """
+
     def __init__(self,
                  tag_base: "TagBase",
                  attributes: Tuple[Attribute, ...] = tuple(),
@@ -51,6 +53,8 @@ class Tag:
 
 @dataclass(frozen=True)
 class TagBase:
+    # we want these to be frozen because the same TagBase is used for all elements with
+    # the same tag
     name: str
     self_closes: bool = False
 
