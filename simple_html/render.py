@@ -29,19 +29,19 @@ def render_tag(tag: Tag) -> str:
 def render(node: Node) -> str:
     if isinstance(node, Tag):
         return render_tag(node)
-    if isinstance(node, TagBase):
-        if node.self_closes:
-            return f"<{node.name}/>"
-        else:
-            return f"<{node.name}></{node.name}>"
-    if isinstance(node, FlatGroup):
-        return "".join(render(n) for n in node.nodes)
     elif isinstance(node, str):
         return escape(node)
     elif node is None:
         return ""
+    elif isinstance(node, FlatGroup):
+        return "".join(render(n) for n in node.nodes)
     elif isinstance(node, SafeString):
         return node.safe_val
+    elif isinstance(node, TagBase):
+        if node.self_closes:
+            return f"<{node.name}/>"
+        else:
+            return f"<{node.name}></{node.name}>"
     else:
         raise TypeError(
             "Expected `Tag`, `SafeString` or `str` but got `{}`".format(type(node))
