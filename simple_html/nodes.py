@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Tuple, Union
+from typing import Tuple, Union, Final
 
 from .attributes import Attribute, AttributeValue
 
@@ -57,13 +57,24 @@ class TagBase:
     self_closes: bool = False
 
     def __call__(self, *children: Node) -> Tag:
-        return Tag(self, tuple(), children)
+        if children:
+            return Tag(self, tuple(), children)
+        else:
+            return Tag(self)
 
     def attrs(self,
               *attributes: Attribute,
               **kw_attributes: AttributeValue
               ) -> Tag:
-        return Tag(self, attributes + tuple(kw_attributes.items()))
+        if attributes:
+            if kw_attributes:
+                return Tag(self, attributes + tuple(kw_attributes.items()))
+            else:
+                return Tag(self, attributes)
+        elif kw_attributes:
+            return Tag(self, tuple(kw_attributes.items()))
+        else:
+            return Tag(self)
 
 
 a = TagBase("a")

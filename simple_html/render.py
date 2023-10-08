@@ -1,19 +1,21 @@
 from html import escape
 
-from simple_html.doctype import doctype
 from simple_html.nodes import FlatGroup, Node, SafeString, Tag, TagBase
 
 
+def doctype(details: str) -> str:
+    return f"<!doctype {details}>"
+
+
 def render_tag(tag: Tag) -> str:
-    tag_start = f"<{tag.tag_base.name}"
     if tag.attributes:
         attrs = " ".join([
             key if val is None else f'{key}="{val}"'
             for key, val in tag.attributes
         ])
-        tag_with_attrs: str = f"{tag_start} {attrs}"
+        tag_with_attrs: str = f"<{tag.tag_base.name} {attrs}"
     else:
-        tag_with_attrs = tag_start
+        tag_with_attrs = f"<{tag.tag_base.name}"
 
     if tag.children:
         children_str = "".join([render(node) for node in tag.children])
