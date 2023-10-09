@@ -19,7 +19,7 @@ def render_tag(tag: Tag) -> str:
     if tag.attributes:
         attrs_ = " ".join([
             key if val is None else f'{key}="{val}"'
-            for key, val in tag.attributes
+            for key, val in tag.attributes.items()
         ])
     else:
         attrs_ = None

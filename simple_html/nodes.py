@@ -31,7 +31,7 @@ class Tag:
     def __init__(
             self,
             tag_base: "TagBase",
-            attributes: Tuple[Attribute, ...],
+            attributes: dict[str, str | None],
             children: Tuple[Node, ...],
     ) -> None:
         self.tag_base = tag_base
@@ -52,12 +52,10 @@ class TagBase:
     self_closes: bool = False
 
     def __call__(self, *children: Node) -> Tag:
-        return Tag(self, tuple(), children)
+        return Tag(self, {}, children)
 
-    def attrs(self, *attributes: Attribute, **kw_attributes: AttributeValue) -> Tag:
-        return Tag(self,
-                   (attributes + tuple(kw_attributes.items())) if kw_attributes else attributes,
-                   tuple())
+    def attrs(self, attributes: dict[str, AttributeValue]) -> Tag:
+        return Tag(self, attributes, tuple())
 
 
 a = TagBase("a")
