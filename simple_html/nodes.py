@@ -55,10 +55,9 @@ class TagBase:
         return Tag(self, tuple(), children)
 
     def attrs(self, *attributes: Attribute, **kw_attributes: AttributeValue) -> Tag:
-        if kw_attributes:
-            return Tag(self, attributes + tuple(kw_attributes.items()), tuple())
-        else:
-            return Tag(self, attributes, tuple())
+        return Tag(self,
+                   (attributes + tuple(kw_attributes.items())) if kw_attributes else attributes,
+                   tuple())
 
 
 a = TagBase("a")
