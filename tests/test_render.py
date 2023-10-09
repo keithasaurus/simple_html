@@ -43,10 +43,10 @@ def test_renders_children() -> None:
 
 
 def test_hello_world() -> None:
-    node = html(head, body(p.attrs({"class": "some-class"})("Hello World!")))
+    node = html(head, body(p.attrs({"class": "some-class"})("Hello, World!")))
 
     assert render(node) == (
-        '<html><head></head><body><p class="some-class">Hello World!</p>'
+        '<html><head></head><body><p class="some-class">Hello, World!</p>'
         "</body></html>"
     )
 

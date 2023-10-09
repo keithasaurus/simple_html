@@ -18,8 +18,8 @@ class FlatGroup:
     in a container. Same idea as React's fragments.
     """
 
-    def __init__(self, *nodes: Node) -> None:
-        self.nodes = nodes
+    def __init__(self, *children: Node) -> None:
+        self.children = children
 
 
 class Tag:
