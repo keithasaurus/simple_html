@@ -39,17 +39,8 @@ class Tag:
         self.children = children
 
     def __call__(self, *children: Node) -> "Tag":
+        """This exists purely for ergonomics"""
         self.children = children
-        return self
-
-    def attrs(self, *attributes: Attribute, **kw_attributes: AttributeValue) -> "Tag":
-        if attributes:
-            if kw_attributes:
-                self.attributes = attributes + tuple(kw_attributes.items())
-            else:
-                self.attributes = attributes
-        elif kw_attributes:
-            self.attributes = tuple(kw_attributes.items())
         return self
 
 
