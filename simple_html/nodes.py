@@ -31,8 +31,8 @@ class Tag:
     def __init__(
             self,
             tag_base: "TagBase",
-            attributes: Tuple[Attribute, ...] = tuple(),
-            children: Tuple[Node, ...] = tuple(),
+            attributes: Tuple[Attribute, ...],
+            children: Tuple[Node, ...],
     ) -> None:
         self.tag_base = tag_base
         self.attributes = attributes
@@ -52,21 +52,13 @@ class TagBase:
     self_closes: bool = False
 
     def __call__(self, *children: Node) -> Tag:
-        if children:
-            return Tag(self, tuple(), children)
-        else:
-            return Tag(self)
+        return Tag(self, tuple(), children)
 
     def attrs(self, *attributes: Attribute, **kw_attributes: AttributeValue) -> Tag:
-        if attributes:
-            if kw_attributes:
-                return Tag(self, attributes + tuple(kw_attributes.items()))
-            else:
-                return Tag(self, attributes)
-        elif kw_attributes:
-            return Tag(self, tuple(kw_attributes.items()))
+        if kw_attributes:
+            return Tag(self, attributes + tuple(kw_attributes.items()), tuple())
         else:
-            return Tag(self)
+            return Tag(self, attributes, tuple())
 
 
 a = TagBase("a")
