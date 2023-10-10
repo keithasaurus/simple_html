@@ -1,15 +1,18 @@
 from dataclasses import dataclass
-from typing import Tuple, Union
+from typing import Tuple, Union, Dict
 
-from .attributes import Attribute, AttributeValue
+Attribute = Tuple[str, str]
 
-
-@dataclass
-class SafeString:
-    safe_val: str
+SafeStringAlias = Tuple[str]
 
 
-Node = Union[str, SafeString, "Tag", "TagBase", "FlatGroup", None]
+def SafeString(x: str) -> SafeStringAlias:
+    return (x,)
+
+
+Node = Union[
+    str, SafeStringAlias, "Tag", "TagBase", "AttrsTag", "TagNoAttrs", "FlatGroup", None
+]
 
 
 class FlatGroup:
@@ -17,53 +20,38 @@ class FlatGroup:
     The intention is to be able to group a number of nodes without enveloping them
     in a container. Same idea as React's fragments.
     """
+
     def __init__(self, *nodes: Node) -> None:
         self.nodes = nodes
 
 
-class Tag:
-    """
-    Not a dataclass, nor immutable because of observed
-    performance increase. The recommended means of using
-    this class results in not mutating objects in any case.
-    """
-    def __init__(self,
-                 tag_base: "TagBase",
-                 attributes: Tuple[Attribute, ...] = tuple(),
-                 children: Tuple[Node, ...] = tuple()
-                 ) -> None:
+Tag = Tuple["TagBase", Dict[str, str], Tuple[Node, ...]]
+TagNoAttrs = Tuple["TagBase", Tuple[Node, ...]]
+
+
+class AttrsTag:
+    __slots__ = ("tag_base", "attributes")
+
+    def __init__(self, tag_base: "TagBase", attributes: Dict[str, str]) -> None:
         self.tag_base = tag_base
         self.attributes = attributes
-        self.children = children
 
-    def __call__(self, *children: Node) -> "Tag":
-        return Tag(tag_base=self.tag_base,
-                   attributes=self.attributes,
-                   children=children)
-
-    def attrs(self,
-              *attributes: Attribute,
-              **kw_attributes: AttributeValue) -> "Tag":
-        return Tag(tag_base=self.tag_base,
-                   attributes=attributes + tuple(kw_attributes.items()),
-                   children=self.children)
+    def __call__(self, *children: Node) -> Tag:
+        return self.tag_base, self.attributes, children
 
 
 @dataclass(frozen=True)
 class TagBase:
+    # we want these to be frozen because the same TagBase is used for all elements with
+    # the same tag
     name: str
     self_closes: bool = False
 
-    def __call__(self, *children: Node) -> Tag:
-        return Tag(tag_base=self,
-                   children=children)
+    def __call__(self, *children: Node) -> TagNoAttrs:
+        return self, children
 
-    def attrs(self,
-              *attributes: Attribute,
-              **kw_attributes: AttributeValue
-              ) -> Tag:
-        return Tag(tag_base=self,
-                   attributes=attributes + tuple(kw_attributes.items()))
+    def attrs(self, attributes: Dict[str, str]) -> AttrsTag:
+        return AttrsTag(self, attributes)
 
 
 a = TagBase("a")

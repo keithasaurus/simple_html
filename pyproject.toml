@@ -10,14 +10,43 @@ keywords = ["html"]
 
 
 [tool.poetry.dependencies]
-python = "^3.7"
-typed-ast = { version = "1.4.3", python = "~3.7" }
+python = "^3.8.1"
 
-[tool.poetry.dev-dependencies]
-flake8 = "4.0.1"
-mypy = "0.931"
-pytest = "6.2.5"
+[tool.poetry.group.dev.dependencies]
+jinja2 = "^3.1.2"
+flake8 = "6.1.0"
+mypy = "1.5.1"
+pytest = "7.4.2"
+setuptools = "^68.2.2"
+black = "^23.9.1"
+
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+allow_redefinition = false
+allow_untyped_globals = false
+check_untyped_defs = true
+disallow_any_expr = false # currently need this for generics
+disallow_any_generics = true
+disallow_any_unimported = true
+disallow_incomplete_defs = true
+disallow_subclassing_any = true
+disallow_untyped_calls = true
+disallow_untyped_decorators = true
+disallow_untyped_defs = true
+ignore_errors = false
+ignore_missing_imports = false
+local_partial_types = true
+no_implicit_optional = true
+no_implicit_reexport = true
+strict_optional = true
+strict_equality = true
+warn_no_return = true
+warn_redundant_casts = true
+warn_return_any = true
+warn_unused_configs = true
+warn_unused_ignores = true
+warn_unreachable = true
