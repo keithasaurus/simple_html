@@ -49,8 +49,8 @@ def render(node: Node) -> str:
         return ""
     elif isinstance(node, FlatGroup):
         return "".join([render(n) for n in node.nodes])
-    elif isinstance(node, SafeString):
-        return node.safe_val
+    elif type(node) is tuple:
+        return node[0]
     elif isinstance(node, TagBase):
         return render_tag_base(node)
     else:

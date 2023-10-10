@@ -1,15 +1,17 @@
 from dataclasses import dataclass
-from typing import Tuple, Union, Final
+from typing import Tuple, Union, Optional
 
-from .attributes import Attribute, AttributeValue
+AttributeValue = Optional[str]
+Attribute = Tuple[str, AttributeValue]
 
-
-class SafeString:
-    def __init__(self, safe_val: str) -> None:
-        self.safe_val = safe_val
+SafeStringAlias = Tuple[str]
 
 
-Node = Union[str, SafeString, "Tag", "TagBase", "FlatGroup", None]
+def SafeString(x: str) -> SafeStringAlias:
+    return (x,)
+
+
+Node = Union[str, SafeStringAlias, "Tag", "TagBase", "FlatGroup", None]
 
 
 class FlatGroup:
