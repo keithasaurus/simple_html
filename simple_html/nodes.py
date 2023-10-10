@@ -11,7 +11,7 @@ def SafeString(x: str) -> SafeStringAlias:
     return (x,)
 
 
-Node = Union[str, SafeStringAlias, "Tag", "TagBase", "FlatGroup", None]
+Node = Union[str, SafeStringAlias, "Tag", "TagBase", "AttrsTag", "TagNoAttrs", "FlatGroup", None]
 
 
 class FlatGroup:
@@ -24,26 +24,19 @@ class FlatGroup:
         self.nodes = nodes
 
 
-class Tag:
-    """
-    This is mutable largely for performance.
-    """
-    __slots__ = ('tag_base', 'attributes', 'children')
+Tag = Tuple["TagBase", dict[str, AttributeValue], Tuple[Node, ...]]
+TagNoAttrs = Tuple["TagBase", Tuple[Node, ...]]
 
-    def __init__(
-            self,
-            tag_base: "TagBase",
-            attributes: dict[str, str | None],
-            children: Tuple[Node, ...],
-    ) -> None:
+
+class AttrsTag:
+    def __init__(self,
+                 tag_base: "TagBase",
+                 attributes: dict[str, AttributeValue]) -> None:
         self.tag_base = tag_base
         self.attributes = attributes
-        self.children = children
 
     def __call__(self, *children: Node) -> "Tag":
-        """This exists purely for ergonomics"""
-        self.children = children
-        return self
+        return self.tag_base, self.attributes, children
 
 
 @dataclass(frozen=True)
@@ -53,11 +46,11 @@ class TagBase:
     name: str
     self_closes: bool = False
 
-    def __call__(self, *children: Node) -> Tag:
-        return Tag(self, {}, children)
+    def __call__(self, *children: Node) -> TagNoAttrs:
+        return self, children
 
-    def attrs(self, attributes: dict[str, AttributeValue]) -> Tag:
-        return Tag(self, attributes, tuple())
+    def attrs(self, attributes: dict[str, AttributeValue]) -> AttrsTag:
+        return AttrsTag(self, attributes)
 
 
 a = TagBase("a")
