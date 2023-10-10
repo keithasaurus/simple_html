@@ -124,7 +124,7 @@ def test_uncalled_tag_renders() -> None:
 
 
 def test_attribute_without_value_rendered_as_expected() -> None:
-    assert render(a.attrs({"something": None})) == "<a something></a>"
+    assert render(a.attrs({"something": ""})) == "<a something></a>"
 
 
 def test_render_with_doctype() -> None:
@@ -141,7 +141,7 @@ def test_render_flat_group() -> None:
 
 
 def test_render_kw_attribute_with_none() -> None:
-    assert render(script.attrs({"defer": None})) == "<script defer></script>"
+    assert render(script.attrs({"defer": ""})) == "<script defer></script>"
 
 
 def test_can_render_none() -> None:

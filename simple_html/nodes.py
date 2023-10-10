@@ -1,8 +1,7 @@
 from dataclasses import dataclass
 from typing import Tuple, Union, Optional
 
-AttributeValue = Optional[str]
-Attribute = Tuple[str, AttributeValue]
+Attribute = Tuple[str, str]
 
 SafeStringAlias = Tuple[str]
 
@@ -24,18 +23,20 @@ class FlatGroup:
         self.nodes = nodes
 
 
-Tag = Tuple["TagBase", dict[str, AttributeValue], Tuple[Node, ...]]
+Tag = Tuple["TagBase", dict[str, str], Tuple[Node, ...]]
 TagNoAttrs = Tuple["TagBase", Tuple[Node, ...]]
 
 
 class AttrsTag:
+    __slots__ = ("tag_base", "attributes")
+
     def __init__(self,
                  tag_base: "TagBase",
-                 attributes: dict[str, AttributeValue]) -> None:
+                 attributes: dict[str, str]) -> None:
         self.tag_base = tag_base
         self.attributes = attributes
 
-    def __call__(self, *children: Node) -> "Tag":
+    def __call__(self, *children: Node) -> Tag:
         return self.tag_base, self.attributes, children
 
 
@@ -49,7 +50,7 @@ class TagBase:
     def __call__(self, *children: Node) -> TagNoAttrs:
         return self, children
 
-    def attrs(self, attributes: dict[str, AttributeValue]) -> AttrsTag:
+    def attrs(self, attributes: dict[str, str]) -> AttrsTag:
         return AttrsTag(self, attributes)
 
 

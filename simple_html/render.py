@@ -1,16 +1,16 @@
 from html import escape
 from typing import cast, TYPE_CHECKING
 
-from simple_html.nodes import FlatGroup, Node, Tag, TagBase, AttrsTag, TagNoAttrs, SafeStringAlias, AttributeValue
+from simple_html.nodes import FlatGroup, Node, Tag, TagBase, AttrsTag, TagNoAttrs, SafeStringAlias
 
 
 def doctype(details: str) -> str:
     return f"<!doctype {details}>"
 
 
-def attrs_to_str(attributes: dict[str, AttributeValue]) -> str:
+def attrs_to_str(attributes: dict[str, str]) -> str:
     return " ".join([
-        key if val is None else f'{key}="{val}"'
+        f'{key}="{val}"' if val else key
         for key, val in attributes.items()
     ])
 
@@ -18,7 +18,7 @@ def attrs_to_str(attributes: dict[str, AttributeValue]) -> str:
 def render(node: Node) -> str:
     if type(node) is tuple:
         tup_len = len(node)
-        if tup_len == 2:
+        if len(node) == 2:
             # TagNoAttrs
             if TYPE_CHECKING:
                 node = cast(TagNoAttrs, node)
