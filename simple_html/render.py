@@ -18,13 +18,12 @@ def attrs_to_str(attributes: dict[str, str]) -> str:
 def render(node: Node) -> str:
     if type(node) is tuple:
         tup_len = len(node)
-        if len(node) == 2:
+        if tup_len == 2:
             # TagNoAttrs
             if TYPE_CHECKING:
                 node = cast(TagNoAttrs, node)
             children_str = "".join([render(child) for child in node[1]])
-            tag_base = node[0]
-            return f"<{tag_base.name}>{children_str}</{tag_base.name}>"
+            return f"<{node[0].name}>{children_str}</{node[0].name}>"
         elif tup_len == 3:
             if TYPE_CHECKING:
                 node = cast(Tag, node)
