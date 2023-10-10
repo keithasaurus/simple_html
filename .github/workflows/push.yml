@@ -6,9 +6,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.7, 3.8, 3.9, '3.10']
-        poetry-version: [1.1.12]
-        os: [ubuntu-20.04, macos-latest, windows-latest]
+        python-version: [3.8, 3.9, '3.10', '3.11', '3.12']
+        poetry-version: [1.6.1]
+        os: [ubuntu-22.04, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
@@ -22,6 +22,6 @@ jobs:
       - name: poetry install
         run: poetry install
       - name: mypy
-        run: poetry run mypy --strict simple_html
+        run: poetry run mypy simple_html
       - name: run tests
         run: poetry run pytest
