@@ -41,16 +41,19 @@ def render_tag(tag: Tag) -> str:
 
 
 def render(node: Node) -> str:
-    if isinstance(node, Tag):
+    # note that the first two checks here are so much faster than the isinstance
+    # checks that it's still better to put them first, even if they aren't the most common
+    if type(node) is tuple:
+        # SafeString
+        return node[0]
+    elif node is None:
+        return ""
+    elif isinstance(node, Tag):
         return render_tag(node)
     elif isinstance(node, str):
         return escape(node)
-    elif node is None:
-        return ""
     elif isinstance(node, FlatGroup):
         return "".join([render(n) for n in node.nodes])
-    elif type(node) is tuple:
-        return node[0]
     elif isinstance(node, TagBase):
         return render_tag_base(node)
     else:
