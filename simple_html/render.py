@@ -1,18 +1,21 @@
 from html import escape
 from typing import cast, TYPE_CHECKING
 
-from simple_html.nodes import FlatGroup, Node, Tag, TagBase, AttrsTag, TagNoAttrs, SafeStringAlias
-
-
-def doctype(details: str) -> str:
-    return f"<!doctype {details}>"
+from simple_html.nodes import (
+    FlatGroup,
+    Node,
+    Tag,
+    TagBase,
+    AttrsTag,
+    TagNoAttrs,
+    SafeStringAlias,
+)
 
 
 def attrs_to_str(attributes: dict[str, str]) -> str:
-    return " ".join([
-        f'{key}="{val}"' if val else key
-        for key, val in attributes.items()
-    ])
+    return " ".join(
+        [f'{key}="{val}"' if val else key for key, val in attributes.items()]
+    )
 
 
 def render(node: Node) -> str:
@@ -45,7 +48,9 @@ def render(node: Node) -> str:
         if tag_base.self_closes:
             return f"<{tag_base.name} {attrs_to_str(node.attributes)}/>"
         else:
-            return f"<{tag_base.name} {attrs_to_str(node.attributes)}></{tag_base.name}>"
+            return (
+                f"<{tag_base.name} {attrs_to_str(node.attributes)}></{tag_base.name}>"
+            )
     elif isinstance(node, FlatGroup):
         return "".join([render(n) for n in node.nodes])
     elif isinstance(node, TagBase):
@@ -60,4 +65,4 @@ def render(node: Node) -> str:
 
 
 def render_with_doctype(node: Node, doc_type_details: str = "html") -> str:
-    return f"{doctype(doc_type_details)}{render(node)}"
+    return f"<!doctype {doc_type_details}>{render(node)}"

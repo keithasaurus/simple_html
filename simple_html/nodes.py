@@ -10,7 +10,9 @@ def SafeString(x: str) -> SafeStringAlias:
     return (x,)
 
 
-Node = Union[str, SafeStringAlias, "Tag", "TagBase", "AttrsTag", "TagNoAttrs", "FlatGroup", None]
+Node = Union[
+    str, SafeStringAlias, "Tag", "TagBase", "AttrsTag", "TagNoAttrs", "FlatGroup", None
+]
 
 
 class FlatGroup:
@@ -30,9 +32,7 @@ TagNoAttrs = Tuple["TagBase", Tuple[Node, ...]]
 class AttrsTag:
     __slots__ = ("tag_base", "attributes")
 
-    def __init__(self,
-                 tag_base: "TagBase",
-                 attributes: dict[str, str]) -> None:
+    def __init__(self, tag_base: "TagBase", attributes: dict[str, str]) -> None:
         self.tag_base = tag_base
         self.attributes = attributes
 
