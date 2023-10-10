@@ -1,5 +1,5 @@
 from html import escape
-from typing import cast, TYPE_CHECKING
+from typing import cast, TYPE_CHECKING, Dict
 
 from simple_html.nodes import (
     FlatGroup,
@@ -12,7 +12,7 @@ from simple_html.nodes import (
 )
 
 
-def attrs_to_str(attributes: dict[str, str]) -> str:
+def attrs_to_str(attributes: Dict[str, str]) -> str:
     return " ".join(
         [f'{key}="{val}"' if val else key for key, val in attributes.items()]
     )
