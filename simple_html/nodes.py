@@ -1,8 +1,6 @@
 from dataclasses import dataclass
 from typing import Tuple, Union, Dict
 
-Attribute = Tuple[str, str]
-
 SafeStringAlias = Tuple[str]
 
 
