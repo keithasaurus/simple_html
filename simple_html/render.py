@@ -20,14 +20,14 @@ def render(node: Node) -> str:
             if TYPE_CHECKING:
                 node = cast(TagNoAttrs, node)
             children_str = "".join([render(child) for child in node[1]])
-            return f"<{node[0].name}>{children_str}</{node[0].name}>"
+            return f"<{node[0]}>{children_str}</{node[0]}>"
         elif tup_len == 3:
             if TYPE_CHECKING:
                 node = cast(Tag, node)
 
-            tag_base, attributes, children = node
+            tag_name, attributes, children = node
             children_str = "".join([render(child) for child in children])
-            return f"<{tag_base.name} {attributes}>{children_str}</{tag_base.name}>"
+            return f"<{tag_name} {attributes}>{children_str}</{tag_name}>"
         else:
             # SafeString
             if TYPE_CHECKING:
