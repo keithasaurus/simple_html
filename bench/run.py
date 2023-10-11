@@ -58,9 +58,14 @@ if __name__ == "__main__":
         help="which tests to run",
     )
     parser.add_argument(
+        "--sources",
+        type=str,
+        nargs="*",
+    )
+    parser.add_argument(
         "--iterations",
         type=int,
-        default=50,
+        default=5,
     )
     parser.add_argument(
         "--chunk-size",
@@ -76,6 +81,9 @@ if __name__ == "__main__":
         if args.tests == [] or name in args.tests:
             print(f"----- BEGIN {name} -----\n")
             for subject_name, test in compare_bench.comparisons.items():
+                if args.sources and subject_name not in args.sources:
+                    continue
+
                 print(subject_name)
                 run_bench(args.iterations, args.chunk_size, compare_bench.gen, test)
 

@@ -25,14 +25,14 @@ class FlatGroup:
         self.nodes = nodes
 
 
-Tag = Tuple["TagBase", Dict[str, str], Tuple[Node, ...]]
+Tag = Tuple["TagBase", str, Tuple[Node, ...]]
 TagNoAttrs = Tuple["TagBase", Tuple[Node, ...]]
 
 
 class AttrsTag:
     __slots__ = ("tag_base", "attributes")
 
-    def __init__(self, tag_base: "TagBase", attributes: Dict[str, str]) -> None:
+    def __init__(self, tag_base: "TagBase", attributes: str) -> None:
         self.tag_base = tag_base
         self.attributes = attributes
 
@@ -51,7 +51,9 @@ class TagBase:
         return self, children
 
     def attrs(self, attributes: Dict[str, str]) -> AttrsTag:
-        return AttrsTag(self, attributes)
+        return AttrsTag(self, " ".join(
+            [f'{key}="{val}"' if val else key for key, val in attributes.items()]
+        ))
 
 
 a = TagBase("a")

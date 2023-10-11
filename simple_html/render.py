@@ -1,5 +1,5 @@
 from html import escape
-from typing import cast, TYPE_CHECKING, Dict
+from typing import cast, TYPE_CHECKING, Dict, Tuple
 
 from simple_html.nodes import (
     FlatGroup,
@@ -10,12 +10,6 @@ from simple_html.nodes import (
     TagNoAttrs,
     SafeStringAlias,
 )
-
-
-def attrs_to_str(attributes: Dict[str, str]) -> str:
-    return " ".join(
-        [f'{key}="{val}"' if val else key for key, val in attributes.items()]
-    )
 
 
 def render(node: Node) -> str:
@@ -33,7 +27,7 @@ def render(node: Node) -> str:
 
             tag_base, attributes, children = node
             children_str = "".join([render(child) for child in children])
-            return f"<{tag_base.name} {attrs_to_str(attributes)}>{children_str}</{tag_base.name}>"
+            return f"<{tag_base.name} {attributes}>{children_str}</{tag_base.name}>"
         else:
             # SafeString
             if TYPE_CHECKING:
@@ -46,10 +40,10 @@ def render(node: Node) -> str:
     elif isinstance(node, AttrsTag):
         tag_base = node.tag_base
         if tag_base.self_closes:
-            return f"<{tag_base.name} {attrs_to_str(node.attributes)}/>"
+            return f"<{tag_base.name} {node.attributes}/>"
         else:
             return (
-                f"<{tag_base.name} {attrs_to_str(node.attributes)}></{tag_base.name}>"
+                f"<{tag_base.name} {node.attributes}></{tag_base.name}>"
             )
     elif isinstance(node, FlatGroup):
         return "".join([render(n) for n in node.nodes])

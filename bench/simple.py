@@ -20,10 +20,11 @@ def basic(objs: List[Tuple[str, str, List[str]]]) -> None:
                 div(
                     p(obj[1]),
                     ul(
-                        *[
+                        *(
                             li.attrs({"class": "item-stuff"})(SafeString(ss))
                             for ss in obj[2]
-                        ]
+                        )
+
                     ),
                 ),
             ),

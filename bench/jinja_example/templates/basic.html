@@ -5,7 +5,7 @@
 <div><p>{content}</p>
     <ul>
         {% for item in oks %}
-        <li class="item-stuff">{{ item }}}</li>
+        <li class="item-stuff">{{ item|safe }}}</li>
         {% endfor %}
     </ul>
 </div>
