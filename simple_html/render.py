@@ -1,5 +1,5 @@
 from html import escape
-from typing import cast, TYPE_CHECKING, Dict, Tuple
+from typing import cast, TYPE_CHECKING
 
 from simple_html.nodes import (
     FlatGroup,
