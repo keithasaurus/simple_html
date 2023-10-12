@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Tuple, Union, Dict
 
 SafeStringAlias = Tuple[str]
