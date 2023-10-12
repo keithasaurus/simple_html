@@ -15,9 +15,8 @@ from simple_html.nodes import (
     label,
     p,
     script,
-    span,
+    span, render, render_with_doctype,
 )
-from simple_html.render import render, render_with_doctype
 
 
 def test_renders_no_children() -> None:

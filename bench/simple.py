@@ -1,7 +1,7 @@
 from typing import List, Tuple
 
-from simple_html.nodes import h1, html, title, head, body, div, p, ul, li, SafeString, br
-from simple_html.render import render, render_with_doctype
+from simple_html.nodes import h1, html, title, head, body, div, p, ul, li, SafeString, br, \
+    render, render_with_doctype
 
 
 def hello_world_empty(objs) -> None:
