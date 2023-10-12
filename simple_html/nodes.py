@@ -44,7 +44,6 @@ class TagBase:
     # the same tag
     name: str
     self_closes: bool
-    tag_closing: str
     rendered: str
 
     def __init__(self, name: str, self_closes: bool = False) -> None:

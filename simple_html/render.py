@@ -5,44 +5,61 @@ from simple_html.nodes import Node, TagNoAttrs, Tag, SafeStringAlias, AttrsTag, 
     TagBase
 
 
-def render(node: Node) -> str:
+def _render(node: Node, strs: list[str]) -> None:
+    """
+    mutate a list instead of constantly rendering strings
+    """
     if type(node) is tuple:
         tup_len = len(node)
         if tup_len == 2:
             # TagNoAttrs
             if TYPE_CHECKING:
                 node = cast(TagNoAttrs, node)
-            return f"<{node[0]}>{''.join([render(child) for child in node[1]])}</{node[0]}>"
+            strs.append(f"<{node[0]}>")
+            for child in node[1]:
+                _render(child, strs)
+            strs.append(f"</{node[0]}>")
         elif tup_len == 3:
             if TYPE_CHECKING:
                 node = cast(Tag, node)
             tag_name = node[0]
-            return f"<{tag_name} {node[1]}>{''.join([render(child) for child in node[2]])}</{tag_name}>"
+            strs.append(f"<{tag_name} {node[1]}>")
+            for child in node[2]:
+                _render(child, strs)
+            strs.append(f"</{tag_name}>")
         else:
             # SafeString
             if TYPE_CHECKING:
                 node = cast(SafeStringAlias, node)
-            return node[0]
+            strs.append(node[0])
     elif node is None:
-        return ""
+        pass
     elif isinstance(node, str):
-        return escape(node)
+        strs.append(escape(node))
     elif isinstance(node, AttrsTag):
         tag_base = node.tag_base
         if tag_base.self_closes:
-            return f"<{tag_base.name} {node.attributes}/>"
+            strs.append(f"<{tag_base.name} {node.attributes}/>")
         else:
-            return (
+            strs.append(
                 f"<{tag_base.name} {node.attributes}></{tag_base.name}>"
             )
     elif isinstance(node, FlatGroup):
-        return "".join([render(n) for n in node.nodes])
+        for n in node.nodes:
+            _render(n, strs)
     elif isinstance(node, TagBase):
-        return node.rendered
+        strs.append(node.rendered)
     else:
         raise TypeError(
             "Expected `Tag`, `SafeString` or `str` but got `{}`".format(type(node))
         )
+
+
+def render(node: Node) -> str:
+    results: list[str] = []
+    _render(node, results)
+
+    return "".join(results) if results else ""
 
 
 def render_with_doctype(node: Node, doc_type_details: str = "html") -> str:
