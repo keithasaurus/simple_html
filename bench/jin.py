@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from typing import List
 
 from jinja2 import Environment, PackageLoader, select_autoescape
 
@@ -18,10 +19,10 @@ def hello_world_empty(objs) -> None:
 basic_template = env.get_template("basic.html")
 
 
-def basic(objs: list[tuple[str, str, list[str]]]) -> None:
-    for obj in objs:
+def basic(objs: List[tuple[str, str, List[str]]]) -> None:
+    for title, content, oks in objs:
         basic_template.render(
-            title=obj[0],
-            content=obj[1],
-            oks=[obj[2]]
+            title=title,
+            content=content,
+            oks=oks
         )
