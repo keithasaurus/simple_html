@@ -32,23 +32,22 @@ def _render(node: Node, strs: list[str]) -> None:
             if TYPE_CHECKING:
                 node = cast(SafeStringAlias, node)
             strs.append(node[0])
-    elif node is None:
-        pass
     elif isinstance(node, str):
         strs.append(escape(node))
     elif isinstance(node, AttrsTag):
         tag_base = node.tag_base
-        if tag_base.self_closes:
-            strs.append(f"<{tag_base.name} {node.attributes}/>")
-        else:
-            strs.append(
-                f"<{tag_base.name} {node.attributes}></{tag_base.name}>"
-            )
+        strs.append(
+            f"<{tag_base.name} {node.attributes}/>"
+            if tag_base.self_closes
+            else f"<{tag_base.name} {node.attributes}></{tag_base.name}>"
+        )
+    elif isinstance(node, TagBase):
+        strs.append(node.rendered)
     elif isinstance(node, FlatGroup):
         for n in node.nodes:
             _render(n, strs)
-    elif isinstance(node, TagBase):
-        strs.append(node.rendered)
+    elif node is None:
+        pass
     else:
         raise TypeError(
             "Expected `Tag`, `SafeString` or `str` but got `{}`".format(type(node))
