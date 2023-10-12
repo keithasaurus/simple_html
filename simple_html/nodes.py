@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Tuple, Union, Dict
 
 SafeStringAlias = Tuple[str]
@@ -38,12 +38,21 @@ class AttrsTag:
         return self.tag_base.name, self.attributes, children
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, init=False, slots=True)
 class TagBase:
     # we want these to be frozen because the same TagBase is used for all elements with
     # the same tag
     name: str
-    self_closes: bool = False
+    self_closes: bool
+    tag_closing: str
+    rendered: str
+
+    def __init__(self, name: str, self_closes: bool = False) -> None:
+        object.__setattr__(self, 'name', name)
+        object.__setattr__(self, 'self_closes', self_closes)
+        object.__setattr__(self, 'rendered',
+                           f"<{name}/>" if self.self_closes else f"<{name}></{name}>"
+                           )
 
     def __call__(self, *children: Node) -> TagNoAttrs:
         return self.name, children
@@ -166,5 +175,3 @@ ul = TagBase("ul")
 var = TagBase("var")
 video = TagBase("video")
 wbr = TagBase("wbr")
-
-

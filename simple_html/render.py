@@ -12,15 +12,12 @@ def render(node: Node) -> str:
             # TagNoAttrs
             if TYPE_CHECKING:
                 node = cast(TagNoAttrs, node)
-            children_str = "".join([render(child) for child in node[1]])
-            return f"<{node[0]}>{children_str}</{node[0]}>"
+            return f"<{node[0]}>{''.join([render(child) for child in node[1]])}</{node[0]}>"
         elif tup_len == 3:
             if TYPE_CHECKING:
                 node = cast(Tag, node)
-
-            tag_name, attributes, children = node
-            children_str = "".join([render(child) for child in children])
-            return f"<{tag_name} {attributes}>{children_str}</{tag_name}>"
+            tag_name = node[0]
+            return f"<{tag_name} {node[1]}>{''.join([render(child) for child in node[2]])}</{tag_name}>"
         else:
             # SafeString
             if TYPE_CHECKING:
@@ -41,10 +38,7 @@ def render(node: Node) -> str:
     elif isinstance(node, FlatGroup):
         return "".join([render(n) for n in node.nodes])
     elif isinstance(node, TagBase):
-        if node.self_closes:
-            return f"<{node.name}/>"
-        else:
-            return f"<{node.name}></{node.name}>"
+        return node.rendered
     else:
         raise TypeError(
             "Expected `Tag`, `SafeString` or `str` but got `{}`".format(type(node))
