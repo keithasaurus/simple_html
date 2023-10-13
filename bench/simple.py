@@ -29,6 +29,62 @@ def basic(objs: List[Tuple[str, str, List[str]]]) -> None:
                             ]
                         ),
                     ),
+                    h1.attrs({"class": "great header",
+                              "other_attr": "5",
+                              "id": "header1"}),
+                    div(
+                        p(content,
+                          br,
+                          br),
+                        ul(
+                            *[
+                                li.attrs({"class": "item-stuff"})(SafeString(ss))
+                                for ss in oks
+                            ]
+                        ),
+                    ),
+                    h1.attrs({"class": "great header",
+                              "other_attr": "5",
+                              "id": "header1"}),
+                    div(
+                        p(content,
+                          br,
+                          br),
+                        ul(
+                            *[
+                                li.attrs({"class": "item-stuff"})(SafeString(ss))
+                                for ss in oks
+                            ]
+                        ),
+                    ),
+                    h1.attrs({"class": "great header",
+                              "other_attr": "5",
+                              "id": "header1"}),
+                    div(
+                        p(content,
+                          br,
+                          br),
+                        ul(
+                            *[
+                                li.attrs({"class": "item-stuff"})(SafeString(ss))
+                                for ss in oks
+                            ]
+                        ),
+                    ),
+                    h1.attrs({"class": "great header",
+                              "other_attr": "5",
+                              "id": "header1"}),
+                    div(
+                        p(content,
+                          br,
+                          br),
+                        ul(
+                            *[
+                                li.attrs({"class": "item-stuff"})(SafeString(ss))
+                                for ss in oks
+                            ]
+                        ),
+                    ),
                 ),
             )
         )

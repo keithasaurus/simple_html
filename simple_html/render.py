@@ -1,7 +1,7 @@
 from html import escape
 from typing import TYPE_CHECKING, cast
 
-from simple_html.nodes import Node, TagNoAttrs, Tag, SafeStringAlias, AttrsTag, FlatGroup, \
+from simple_html.nodes import Node, Tag, SafeStringAlias, AttrsTag, FlatGroup, \
     TagBase
 
 
@@ -10,23 +10,13 @@ def _render(node: Node, strs: list[str]) -> None:
     mutate a list instead of constantly rendering strings
     """
     if type(node) is tuple:
-        tup_len = len(node)
-        if tup_len == 2:
-            # TagNoAttrs
-            if TYPE_CHECKING:
-                node = cast(TagNoAttrs, node)
-            strs.append(f"<{node[0]}>")
-            for child in node[1]:
-                _render(child, strs)
-            strs.append(f"</{node[0]}>")
-        elif tup_len == 3:
+        if len(node) == 3:
             if TYPE_CHECKING:
                 node = cast(Tag, node)
-            tag_name = node[0]
-            strs.append(f"<{tag_name} {node[1]}>")
-            for child in node[2]:
+            strs.append(node[0])
+            for child in node[1]:
                 _render(child, strs)
-            strs.append(f"</{tag_name}>")
+            strs.append(node[2])
         else:
             # SafeString
             if TYPE_CHECKING:

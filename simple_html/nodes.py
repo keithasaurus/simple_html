@@ -9,7 +9,7 @@ def SafeString(x: str) -> SafeStringAlias:
 
 
 Node = Union[
-    str, SafeStringAlias, "Tag", "TagBase", "AttrsTag", "TagNoAttrs", "FlatGroup", None
+    str, SafeStringAlias, "Tag", "TagBase", "AttrsTag", "FlatGroup", None
 ]
 
 
@@ -23,8 +23,7 @@ class FlatGroup:
         self.nodes = nodes
 
 
-Tag = Tuple[str, str, Tuple[Node, ...]]
-TagNoAttrs = Tuple[str, Tuple[Node, ...]]
+Tag = Tuple[str, Tuple[Node, ...], str]
 
 
 class AttrsTag:
@@ -35,7 +34,7 @@ class AttrsTag:
         self.attributes = attributes
 
     def __call__(self, *children: Node) -> Tag:
-        return self.tag_base.name, self.attributes, children
+        return f"<{self.tag_base.name} {self.attributes}>", children, f"</{self.tag_base.name}>"
 
 
 @dataclass(frozen=True, init=False, slots=True)
@@ -53,8 +52,8 @@ class TagBase:
                            f"<{name}/>" if self.self_closes else f"<{name}></{name}>"
                            )
 
-    def __call__(self, *children: Node) -> TagNoAttrs:
-        return self.name, children
+    def __call__(self, *children: Node) -> Tag:
+        return f"<{self.name}>", children, f"</{self.name}>"
 
     def attrs(self, attributes: Dict[str, str]) -> AttrsTag:
         return AttrsTag(self, " ".join(
