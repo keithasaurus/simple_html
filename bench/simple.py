@@ -29,6 +29,31 @@ def basic(objs: List[Tuple[str, str, List[str]]]) -> None:
                             ]
                         ),
                     ),
+                ),
+            )
+        )
+
+
+def basic_long(objs: List[Tuple[str, str, List[str]]]) -> None:
+    for title_, content, oks in objs:
+        render_with_doctype(
+            html(
+                head(title(title_)),
+                body(
+                    h1.attrs({"class": "great header",
+                              "other_attr": "5",
+                              "id": "header1"}),
+                    div(
+                        p(content,
+                          br,
+                          br),
+                        ul(
+                            *[
+                                li.attrs({"class": "item-stuff"})(safe_string(ss))
+                                for ss in oks
+                            ]
+                        ),
+                    ),
                     h1.attrs({"class": "great header",
                               "other_attr": "5",
                               "id": "header1"}),

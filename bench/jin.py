@@ -8,20 +8,24 @@ sys.path.append(str(Path(__file__).parent))
 
 env = Environment(loader=PackageLoader("jinja_example"), autoescape=select_autoescape())
 
-hello_world_template = env.get_template("hello_world.html")
-
 
 def hello_world_empty(objs: list[None]) -> None:
     for _ in objs:
-        hello_world_template.render()
-
-
-basic_template = env.get_template("basic.html")
+        env.get_template("hello_world.html").render()
 
 
 def basic(objs: List[tuple[str, str, List[str]]]) -> None:
     for title, content, oks in objs:
-        basic_template.render(
+        env.get_template("basic.html").render(
+            title=title,
+            content=content,
+            oks=oks
+        )
+
+
+def basic_long(objs: List[tuple[str, str, List[str]]]) -> None:
+    for title, content, oks in objs:
+        env.get_template("basic_long.html").render(
             title=title,
             content=content,
             oks=oks
