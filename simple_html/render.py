@@ -1,7 +1,7 @@
 from html import escape
 from typing import TYPE_CHECKING, cast
 
-from simple_html.nodes import Node, Tag, SafeStringAlias, AttrsTag, FlatGroup, \
+from simple_html.nodes import Node, Tag, SafeString, AttrsTag, FlatGroup, \
     TagBase
 
 
@@ -20,7 +20,7 @@ def _render(node: Node, strs: list[str]) -> None:
         else:
             # SafeString
             if TYPE_CHECKING:
-                node = cast(SafeStringAlias, node)
+                node = cast(SafeString, node)
             strs.append(node[0])
     elif isinstance(node, str):
         strs.append(escape(node))
@@ -33,15 +33,13 @@ def _render(node: Node, strs: list[str]) -> None:
         )
     elif isinstance(node, TagBase):
         strs.append(node.rendered)
+    elif node is None:
+        pass
     elif isinstance(node, FlatGroup):
         for n in node.nodes:
             _render(n, strs)
-    elif node is None:
-        pass
     else:
-        raise TypeError(
-            "Expected `Tag`, `SafeString` or `str` but got `{}`".format(type(node))
-        )
+        raise TypeError(f"Got unknown type: `{type(node)}`")
 
 
 def render(node: Node) -> str:

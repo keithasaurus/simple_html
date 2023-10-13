@@ -2,7 +2,7 @@ import json
 
 from simple_html.nodes import (
     FlatGroup,
-    SafeString,
+    safe_string,
     a,
     body,
     br,
@@ -63,7 +63,7 @@ def test_escapes_normal_strings() -> None:
 
 
 def test_safe_strings_are_not_escaped() -> None:
-    assert render(SafeString("some < string")) == "some < string"
+    assert render(safe_string("some < string")) == "some < string"
 
 
 def test_simple_form() -> None:
@@ -93,7 +93,7 @@ def test_simple_form() -> None:
 
 def test_safestring_in_tag() -> None:
     node = script.attrs({"type": "ld+json"})(
-        SafeString(json.dumps({"some_key": "some_val"}))
+        safe_string(json.dumps({"some_key": "some_val"}))
     )
 
     assert render(node) == ('<script type="ld+json">{"some_key": "some_val"}</script>')

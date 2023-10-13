@@ -37,13 +37,13 @@ render(
 Strings are escaped by default, but you can pass in `SafeString`s to avoid escaping.
 
 ```python
-from simple_html.nodes import br, p, SafeString
+from simple_html.nodes import br, p, safe_string
 from simple_html.render import render
 
 node = p(
     "Escaped & stuff",
     br,
-    SafeString("Not escaped & stuff")
+    safe_string("Not escaped & stuff")
 )
 
 render(node)  # returns: <p>Escaped &amp; stuff<br/>Not escaped & stuff</p> 

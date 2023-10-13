@@ -1,15 +1,15 @@
 from dataclasses import dataclass
 from typing import Tuple, Union, Dict
 
-SafeStringAlias = Tuple[str]
+SafeString = Tuple[str]
 
 
-def SafeString(x: str) -> SafeStringAlias:
+def safe_string(x: str) -> SafeString:
     return (x,)
 
 
 Node = Union[
-    str, SafeStringAlias, "Tag", "TagBase", "AttrsTag", "FlatGroup", None
+    str, SafeString, "Tag", "TagBase", "AttrsTag", "FlatGroup", None
 ]
 
 

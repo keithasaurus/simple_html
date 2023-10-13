@@ -1,6 +1,6 @@
 from typing import List, Tuple
 
-from simple_html.nodes import h1, html, title, head, body, div, p, ul, li, SafeString, br
+from simple_html.nodes import h1, html, title, head, body, div, p, ul, li, safe_string, br
 from simple_html.render import render, render_with_doctype
 
 
@@ -24,7 +24,7 @@ def basic(objs: List[Tuple[str, str, List[str]]]) -> None:
                           br),
                         ul(
                             *[
-                                li.attrs({"class": "item-stuff"})(SafeString(ss))
+                                li.attrs({"class": "item-stuff"})(safe_string(ss))
                                 for ss in oks
                             ]
                         ),
@@ -38,7 +38,7 @@ def basic(objs: List[Tuple[str, str, List[str]]]) -> None:
                           br),
                         ul(
                             *[
-                                li.attrs({"class": "item-stuff"})(SafeString(ss))
+                                li.attrs({"class": "item-stuff"})(safe_string(ss))
                                 for ss in oks
                             ]
                         ),
@@ -52,7 +52,7 @@ def basic(objs: List[Tuple[str, str, List[str]]]) -> None:
                           br),
                         ul(
                             *[
-                                li.attrs({"class": "item-stuff"})(SafeString(ss))
+                                li.attrs({"class": "item-stuff"})(safe_string(ss))
                                 for ss in oks
                             ]
                         ),
@@ -66,7 +66,7 @@ def basic(objs: List[Tuple[str, str, List[str]]]) -> None:
                           br),
                         ul(
                             *[
-                                li.attrs({"class": "item-stuff"})(SafeString(ss))
+                                li.attrs({"class": "item-stuff"})(safe_string(ss))
                                 for ss in oks
                             ]
                         ),
@@ -80,7 +80,7 @@ def basic(objs: List[Tuple[str, str, List[str]]]) -> None:
                           br),
                         ul(
                             *[
-                                li.attrs({"class": "item-stuff"})(SafeString(ss))
+                                li.attrs({"class": "item-stuff"})(safe_string(ss))
                                 for ss in oks
                             ]
                         ),
