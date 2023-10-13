@@ -11,7 +11,7 @@ env = Environment(loader=PackageLoader("jinja_example"), autoescape=select_autoe
 hello_world_template = env.get_template("hello_world.html")
 
 
-def hello_world_empty(objs) -> None:
+def hello_world_empty(objs: list[None]) -> None:
     for _ in objs:
         hello_world_template.render()
 

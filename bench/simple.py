@@ -4,7 +4,7 @@ from simple_html.nodes import h1, html, title, head, body, div, p, ul, li, SafeS
 from simple_html.render import render, render_with_doctype
 
 
-def hello_world_empty(objs) -> None:
+def hello_world_empty(objs: list[None]) -> None:
     for _ in objs:
         render(h1("Hello, World!"))
 

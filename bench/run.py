@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 from dataclasses import dataclass
 from time import perf_counter
-from typing import Callable, Dict, Generic, List, TypeVar
+from typing import Callable, Dict, Generic, List, TypeVar, Any
 
 from bench import simple, jin
 
@@ -17,7 +17,7 @@ class BenchCompare(Generic[A]):
 SIMPLE_HTML = "SIMPLE_HTML"
 JINJA2 = "JINJA2"
 
-benches = {
+benches: dict[str, BenchCompare[Any]] = {
     "hello world": BenchCompare(
         lambda i: None,
         {
