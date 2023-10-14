@@ -1,10 +1,10 @@
 from html import escape
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, cast, List
 
 from simple_html.nodes import Node, Tag, SafeString, AttrsTag, TagBase
 
 
-def _render(node: Node, strs: list[str]) -> None:
+def _render(node: Node, strs: List[str]) -> None:
     """
     mutate a list instead of constantly rendering strings
     """
@@ -41,7 +41,7 @@ def _render(node: Node, strs: list[str]) -> None:
 
 
 def render(node: Node) -> str:
-    results: list[str] = []
+    results: List[str] = []
     _render(node, results)
 
     return "".join(results)

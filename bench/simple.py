@@ -11,11 +11,12 @@ from simple_html.nodes import (
     ul,
     li,
     safe_string,
-    br, )
+    br
+)
 from simple_html.render import render, render_with_doctype
 
 
-def hello_world_empty(objs: list[None]) -> None:
+def hello_world_empty(objs: List[None]) -> None:
     for _ in objs:
         render(h1("Hello, World!"))
 

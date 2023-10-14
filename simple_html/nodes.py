@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from typing import Tuple, Union, Dict, List
 
 SafeString = Tuple[str]
@@ -25,7 +24,7 @@ Tag = Tuple[str, Tuple[Node, ...], str]
 class AttrsTag:
     __slots__ = ("tag_base", "attributes")
 
-    def __init__(self, tag_base: "TagBase", attributes: list[str]) -> None:
+    def __init__(self, tag_base: "TagBase", attributes: List[str]) -> None:
         self.tag_base = tag_base
         self.attributes = attributes
 
@@ -37,20 +36,13 @@ class AttrsTag:
         )
 
 
-@dataclass(frozen=True, init=False, slots=True)
 class TagBase:
-    # we want these to be frozen because the same TagBase is used for all elements with
-    # the same tag
-    name: str
-    self_closes: bool
-    rendered: str
+    __slots__ = ('name', 'self_closes', 'rendered')
 
     def __init__(self, name: str, self_closes: bool = False) -> None:
-        object.__setattr__(self, "name", name)
-        object.__setattr__(self, "self_closes", self_closes)
-        object.__setattr__(
-            self, "rendered", f"<{name}/>" if self.self_closes else f"<{name}></{name}>"
-        )
+        self.name = name
+        self.self_closes = self_closes
+        self.rendered = f"<{name}/>" if self.self_closes else f"<{name}></{name}>"
 
     def __call__(self, *children: Node) -> Tag:
         return f"<{self.name}>", children, f"</{self.name}>"
