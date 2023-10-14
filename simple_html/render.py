@@ -18,7 +18,6 @@ def _render(node: Node, strs: list[str]) -> None:
                 _render(child, strs)
             strs.append(node[2])
         else:
-            # SafeString
             if TYPE_CHECKING:
                 node = cast(SafeString, node)
             strs.append(node[0])
