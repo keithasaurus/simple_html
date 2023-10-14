@@ -37,7 +37,7 @@ def _render(node: Node, strs: list[str]) -> None:
     elif node is None:
         pass
     else:
-        raise TypeError(f"Got unknown type: `{type(node)}`")
+        raise TypeError(f"Got unknown type: {type(node)}")
 
 
 def render(node: Node) -> str:
