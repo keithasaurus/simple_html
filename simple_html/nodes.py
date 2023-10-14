@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Tuple, Union, Dict
+from typing import Tuple, Union, Dict, List
 
 SafeString = Tuple[str]
 
@@ -8,17 +8,15 @@ def safe_string(x: str) -> SafeString:
     return (x,)
 
 
-Node = Union[str, SafeString, "Tag", "TagBase", "AttrsTag", "FlatGroup", None]
-
-
-class FlatGroup:
-    """
-    The intention is to be able to group a number of nodes without enveloping them
-    in a container. Same idea as React's fragments.
-    """
-
-    def __init__(self, *nodes: Node) -> None:
-        self.nodes = nodes
+Node = Union[
+    str,
+    SafeString,
+    "Tag",
+    "TagBase",
+    "AttrsTag",
+    List["Node"],
+    None,
+]
 
 
 Tag = Tuple[str, Tuple[Node, ...], str]

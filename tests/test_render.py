@@ -1,7 +1,6 @@
 import json
 
 from simple_html.nodes import (
-    FlatGroup,
     safe_string,
     a,
     body,
@@ -132,9 +131,9 @@ def test_render_with_doctype() -> None:
 
 
 def test_render_flat_group() -> None:
-    assert render(FlatGroup(br, "ok", div("great"))) == "<br/>ok<div>great</div>"
+    assert render([br, "ok", div("great")]) == "<br/>ok<div>great</div>"
 
-    assert render(FlatGroup()) == ""
+    assert render([]) == ""
 
 
 def test_render_kw_attribute_with_none() -> None:

@@ -1,7 +1,7 @@
 from html import escape
 from typing import TYPE_CHECKING, cast
 
-from simple_html.nodes import Node, Tag, SafeString, AttrsTag, FlatGroup, TagBase
+from simple_html.nodes import Node, Tag, SafeString, AttrsTag, TagBase
 
 
 def _render(node: Node, strs: list[str]) -> None:
@@ -31,11 +31,11 @@ def _render(node: Node, strs: list[str]) -> None:
         )
     elif isinstance(node, TagBase):
         strs.append(node.rendered)
+    elif isinstance(node, list):
+        for n in node:
+            _render(n, strs)
     elif node is None:
         pass
-    elif isinstance(node, FlatGroup):
-        for n in node.nodes:
-            _render(n, strs)
     else:
         raise TypeError(f"Got unknown type: `{type(node)}`")
 
@@ -44,7 +44,7 @@ def render(node: Node) -> str:
     results: list[str] = []
     _render(node, results)
 
-    return "".join(results) if results else ""
+    return "".join(results)
 
 
 def render_with_doctype(node: Node, doc_type_details: str = "html") -> str:
