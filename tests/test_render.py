@@ -15,7 +15,8 @@ from simple_html.nodes import (
     label,
     p,
     script,
-    span, )
+    span,
+)
 from simple_html.render import render, render_with_doctype
 
 
@@ -51,8 +52,7 @@ def test_hello_world() -> None:
 
 
 def test_string_attrs_work_as_expected() -> None:
-    node = div.attrs({"class": "dinosaur",
-                      "some-random-attr": "spam"})
+    node = div.attrs({"class": "dinosaur", "some-random-attr": "spam"})
     assert render(node) == '<div class="dinosaur" some-random-attr="spam"></div>'
 
 
@@ -70,11 +70,9 @@ def test_simple_form() -> None:
     node = form.attrs({"method": "POST", "enctype": "multipart/form-data"})(
         label(
             "Name",
-            input_.attrs({
-                "type": "text",
-                "value": "some_value",
-                "placeholder": "example text"
-            }),
+            input_.attrs(
+                {"type": "text", "value": "some_value", "placeholder": "example text"}
+            ),
         ),
         div.attrs({"class": "button-container"})(button("Submit")),
     )
@@ -107,13 +105,13 @@ def test_script_tag_doesnt_self_close() -> None:
 
 
 def test_kw_attributes() -> None:
-    node = div.attrs({"class": "first",
-                      "name": "some_name",
-                      "style": "color:blue;"})("okok")
+    node = div.attrs({"class": "first", "name": "some_name", "style": "color:blue;"})(
+        "okok"
+    )
 
     assert (
-            render(node)
-            == '<div class="first" name="some_name" style="color:blue;">okok</div>'
+        render(node)
+        == '<div class="first" name="some_name" style="color:blue;">okok</div>'
     )
 
 
@@ -129,7 +127,7 @@ def test_attribute_without_value_rendered_as_expected() -> None:
 def test_render_with_doctype() -> None:
     assert render_with_doctype(html) == "<!doctype html><html></html>"
     assert (
-            render_with_doctype(html, "other info") == "<!doctype other info><html></html>"
+        render_with_doctype(html, "other info") == "<!doctype other info><html></html>"
     )
 
 
@@ -146,6 +144,6 @@ def test_render_kw_attribute_with_none() -> None:
 def test_can_render_none() -> None:
     assert render(None) == ""
     assert (
-            render(div(None, "hello ", None, span("World!"), None))
-            == "<div>hello <span>World!</span></div>"
+        render(div(None, "hello ", None, span("World!"), None))
+        == "<div>hello <span>World!</span></div>"
     )

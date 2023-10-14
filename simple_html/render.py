@@ -1,8 +1,7 @@
 from html import escape
 from typing import TYPE_CHECKING, cast
 
-from simple_html.nodes import Node, Tag, SafeString, AttrsTag, FlatGroup, \
-    TagBase
+from simple_html.nodes import Node, Tag, SafeString, AttrsTag, FlatGroup, TagBase
 
 
 def _render(node: Node, strs: list[str]) -> None:
@@ -26,9 +25,9 @@ def _render(node: Node, strs: list[str]) -> None:
     elif isinstance(node, AttrsTag):
         tag_base = node.tag_base
         strs.append(
-            f"<{tag_base.name} {node.attributes}/>"
+            f"<{tag_base.name} {' '.join(node.attributes)}/>"
             if tag_base.self_closes
-            else f"<{tag_base.name} {node.attributes}></{tag_base.name}>"
+            else f"<{tag_base.name} {' '.join(node.attributes)}></{tag_base.name}>"
         )
     elif isinstance(node, TagBase):
         strs.append(node.rendered)

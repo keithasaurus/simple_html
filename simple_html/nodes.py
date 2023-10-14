@@ -8,9 +8,7 @@ def safe_string(x: str) -> SafeString:
     return (x,)
 
 
-Node = Union[
-    str, SafeString, "Tag", "TagBase", "AttrsTag", "FlatGroup", None
-]
+Node = Union[str, SafeString, "Tag", "TagBase", "AttrsTag", "FlatGroup", None]
 
 
 class FlatGroup:
@@ -29,12 +27,16 @@ Tag = Tuple[str, Tuple[Node, ...], str]
 class AttrsTag:
     __slots__ = ("tag_base", "attributes")
 
-    def __init__(self, tag_base: "TagBase", attributes: str) -> None:
+    def __init__(self, tag_base: "TagBase", attributes: list[str]) -> None:
         self.tag_base = tag_base
         self.attributes = attributes
 
     def __call__(self, *children: Node) -> Tag:
-        return f"<{self.tag_base.name} {self.attributes}>", children, f"</{self.tag_base.name}>"
+        return (
+            f"<{self.tag_base.name} {' '.join(self.attributes)}>",
+            children,
+            f"</{self.tag_base.name}>",
+        )
 
 
 @dataclass(frozen=True, init=False, slots=True)
@@ -46,19 +48,19 @@ class TagBase:
     rendered: str
 
     def __init__(self, name: str, self_closes: bool = False) -> None:
-        object.__setattr__(self, 'name', name)
-        object.__setattr__(self, 'self_closes', self_closes)
-        object.__setattr__(self, 'rendered',
-                           f"<{name}/>" if self.self_closes else f"<{name}></{name}>"
-                           )
+        object.__setattr__(self, "name", name)
+        object.__setattr__(self, "self_closes", self_closes)
+        object.__setattr__(
+            self, "rendered", f"<{name}/>" if self.self_closes else f"<{name}></{name}>"
+        )
 
     def __call__(self, *children: Node) -> Tag:
         return f"<{self.name}>", children, f"</{self.name}>"
 
     def attrs(self, attributes: Dict[str, str]) -> AttrsTag:
-        return AttrsTag(self, " ".join(
-            [f'{key}="{val}"' if val else key for key, val in attributes.items()]
-        ))
+        return AttrsTag(
+            self, [f'{key}="{val}"' if val else key for key, val in attributes.items()]
+        )
 
 
 a = TagBase("a")

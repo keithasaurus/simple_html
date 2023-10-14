@@ -5,7 +5,7 @@ from typing import Callable, Dict, Generic, List, TypeVar, Any
 
 from bench import simple, jin
 
-A = TypeVar('A')
+A = TypeVar("A")
 
 
 @dataclass
@@ -20,27 +20,21 @@ JINJA2 = "JINJA2"
 benches: dict[str, BenchCompare[Any]] = {
     "hello world": BenchCompare(
         lambda i: None,
-        {
-            SIMPLE_HTML: simple.hello_world_empty,
-            JINJA2: jin.hello_world_empty
-        },
+        {SIMPLE_HTML: simple.hello_world_empty, JINJA2: jin.hello_world_empty},
     ),
     "basic": BenchCompare(
         lambda i: (str(i), f"some content {i}", ["ok" for _ in range(i % 50)]),
-        {SIMPLE_HTML: simple.basic,
-         JINJA2: jin.basic}
+        {SIMPLE_HTML: simple.basic, JINJA2: jin.basic},
     ),
     "basic_long": BenchCompare(
         lambda i: (str(i), f"some content {i}", ["ok" for _ in range(i % 50)]),
-        {SIMPLE_HTML: simple.basic_long,
-         JINJA2: jin.basic_long}
-    )
+        {SIMPLE_HTML: simple.basic_long, JINJA2: jin.basic_long},
+    ),
 }
 
 
 def run_bench(
-        chunks: int, chunk_size: int, gen: Callable[[int], A],
-        fn: Callable[[List[A]], None]
+    chunks: int, chunk_size: int, gen: Callable[[int], A], fn: Callable[[List[A]], None]
 ) -> None:
     total_time: float = 0.0
     for i in range(chunks):

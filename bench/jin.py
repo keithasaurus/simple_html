@@ -16,17 +16,11 @@ def hello_world_empty(objs: list[None]) -> None:
 
 def basic(objs: List[tuple[str, str, List[str]]]) -> None:
     for title, content, oks in objs:
-        env.get_template("basic.html").render(
-            title=title,
-            content=content,
-            oks=oks
-        )
+        env.get_template("basic.html").render(title=title, content=content, oks=oks)
 
 
 def basic_long(objs: List[tuple[str, str, List[str]]]) -> None:
     for title, content, oks in objs:
         env.get_template("basic_long.html").render(
-            title=title,
-            content=content,
-            oks=oks
+            title=title, content=content, oks=oks
         )
