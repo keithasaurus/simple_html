@@ -1,4 +1,4 @@
-from typing import Tuple, Union, Dict, List
+from typing import Tuple, Union, Dict, List, Generator
 
 SafeString = Tuple[str]
 
@@ -14,6 +14,7 @@ Node = Union[
     "TagBase",
     "AttrsTag",
     List["Node"],
+    Generator["Node", None, None],
     None,
 ]
 

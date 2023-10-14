@@ -1,4 +1,5 @@
 from html import escape
+from types import GeneratorType
 from typing import TYPE_CHECKING, cast, List
 
 from simple_html.nodes import Node, Tag, SafeString, AttrsTag, TagBase
@@ -31,7 +32,7 @@ def _render(node: Node, strs: List[str]) -> None:
         )
     elif isinstance(node, TagBase):
         strs.append(node.rendered)
-    elif isinstance(node, list):
+    elif isinstance(node, (list, GeneratorType)):
         for n in node:
             _render(n, strs)
     elif node is None:

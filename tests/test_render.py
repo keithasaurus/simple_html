@@ -1,4 +1,5 @@
 import json
+from typing import Generator
 
 from simple_html.nodes import (
     safe_string,
@@ -14,7 +15,7 @@ from simple_html.nodes import (
     label,
     p,
     script,
-    span,
+    span, Node,
 )
 from simple_html.render import render, render_with_doctype
 
@@ -109,8 +110,8 @@ def test_kw_attributes() -> None:
     )
 
     assert (
-        render(node)
-        == '<div class="first" name="some_name" style="color:blue;">okok</div>'
+            render(node)
+            == '<div class="first" name="some_name" style="color:blue;">okok</div>'
     )
 
 
@@ -126,14 +127,25 @@ def test_attribute_without_value_rendered_as_expected() -> None:
 def test_render_with_doctype() -> None:
     assert render_with_doctype(html) == "<!doctype html><html></html>"
     assert (
-        render_with_doctype(html, "other info") == "<!doctype other info><html></html>"
+            render_with_doctype(html,
+                                "other info") == "<!doctype other info><html></html>"
     )
 
 
-def test_render_flat_group() -> None:
+def test_render_list() -> None:
     assert render([br, "ok", div("great")]) == "<br/>ok<div>great</div>"
 
     assert render([]) == ""
+
+
+def test_render_generator() -> None:
+    assert render(div for _ in range(2)) == "<div></div><div></div>"
+
+    def some_func() -> Generator[Node, None, None]:
+        yield ["abc", br]
+        yield "123"
+
+    assert render(some_func()) == "abc<br/>123"
 
 
 def test_render_kw_attribute_with_none() -> None:
@@ -143,6 +155,6 @@ def test_render_kw_attribute_with_none() -> None:
 def test_can_render_none() -> None:
     assert render(None) == ""
     assert (
-        render(div(None, "hello ", None, span("World!"), None))
-        == "<div>hello <span>World!</span></div>"
+            render(div(None, "hello ", None, span("World!"), None))
+            == "<div>hello <span>World!</span></div>"
     )
