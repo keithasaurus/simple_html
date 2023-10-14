@@ -17,7 +17,7 @@ class BenchCompare(Generic[A]):
 SIMPLE_HTML = "SIMPLE_HTML"
 JINJA2 = "JINJA2"
 
-benches: dict[str, BenchCompare[Any]] = {
+benches: Dict[str, BenchCompare[Any]] = {
     "hello world": BenchCompare(
         lambda i: None,
         {SIMPLE_HTML: simple.hello_world_empty, JINJA2: jin.hello_world_empty},
