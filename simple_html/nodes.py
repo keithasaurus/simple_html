@@ -1,4 +1,4 @@
-from typing import Tuple, Union, Dict, List, Generator, Callable
+from typing import Tuple, Union, Dict, List, Generator, Callable, Optional
 
 SafeString = Tuple[str]
 
@@ -28,10 +28,10 @@ class Tag:
         self.rendered = f"<{name}/>" if self.self_closes else f"<{name}></{name}>"
 
     def __call__(
-        self, attributes: Dict[str, str], *children: Node
+        self, attributes: Dict[str, Optional[str]], *children: Node
     ) -> Union[TagTuple, SafeString]:
         if attributes:
-            attrs = [f'{key}="{val}"' if val else key for key, val in attributes.items()]
+            attrs = [(key if val is None else f'{key}="{val}"') for key, val in attributes.items()]
             if children:
                 return f"<{self.name} {' '.join(attrs)}>", children, f"</{self.name}>"
             else:
