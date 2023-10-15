@@ -52,10 +52,10 @@ render(node)  # returns: <p>Escaped &amp; stuff<br/>Not escaped & stuff</p>
 For convenience, many tags are provided, but you can create your own as well:
 
 ```python
-from simple_html.nodes import TagBase
+from simple_html.nodes import Tag
 from simple_html.render import render
 
-custom_elem = TagBase("custom-elem")
+custom_elem = Tag("custom-elem")
 
 render(
     custom_elem.attrs(id="some-custom-elem-id")(

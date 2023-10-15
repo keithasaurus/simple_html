@@ -2,7 +2,7 @@ from html import escape
 from types import GeneratorType
 from typing import TYPE_CHECKING, cast, List
 
-from simple_html.nodes import Node, Tag, SafeString, TagBase
+from simple_html.nodes import Node, TagTuple, SafeString, Tag
 
 
 def _render(node: Node, strs: List[str]) -> None:
@@ -12,7 +12,7 @@ def _render(node: Node, strs: List[str]) -> None:
     if type(node) is tuple:
         if len(node) == 3:
             if TYPE_CHECKING:
-                node = cast(Tag, node)
+                node = cast(TagTuple, node)
             strs.append(node[0])
             for child in node[1]:
                 _render(child, strs)
@@ -23,7 +23,7 @@ def _render(node: Node, strs: List[str]) -> None:
             strs.append(node[0])
     elif isinstance(node, str):
         strs.append(escape(node))
-    elif isinstance(node, TagBase):
+    elif isinstance(node, Tag):
         strs.append(node.rendered)
     elif isinstance(node, (list, GeneratorType)):
         for n in node:
