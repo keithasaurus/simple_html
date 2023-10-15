@@ -12,7 +12,6 @@ Node = Union[
     SafeString,
     "Tag",
     "TagBase",
-    "AttrsTag",
     List["Node"],
     Generator["Node", None, None],
     None,
