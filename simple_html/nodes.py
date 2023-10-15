@@ -20,6 +20,8 @@ TagTuple = Tuple[str, Tuple[Node, ...], str]
 
 
 class Tag:
+    __slots__ = ('name', 'self_closes', 'rendered')
+
     def __init__(self, name: str, self_closes: bool = False) -> None:
         self.name = name
         self.self_closes = self_closes
