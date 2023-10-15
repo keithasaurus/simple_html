@@ -15,7 +15,8 @@ from simple_html.nodes import (
     label,
     p,
     script,
-    span, Node,
+    span,
+    Node,
 )
 from simple_html.render import render, render_with_doctype
 
@@ -27,13 +28,16 @@ def test_renders_no_children() -> None:
 
 
 def test_renders_children() -> None:
-    node = p({"class": "pclass"},
-             "hey!",
-             a({"href": "https://google.com", "class": "aclass"},
-               "link text",
-               span("whatever")),
-             br,
-             )
+    node = p(
+        {"class": "pclass"},
+        "hey!",
+        a(
+            {"href": "https://google.com", "class": "aclass"},
+            "link text",
+            span("whatever"),
+        ),
+        br,
+    )
 
     assert render(node) == (
         '<p class="pclass">hey!<a href="https://google.com" '
@@ -43,13 +47,7 @@ def test_renders_children() -> None:
 
 
 def test_hello_world() -> None:
-    node = html(
-        head,
-        body(
-            p({"class": "some-class"},
-              "Hello World!")
-        )
-    )
+    node = html(head, body(p({"class": "some-class"}, "Hello World!")))
 
     assert render(node) == (
         '<html><head></head><body><p class="some-class">Hello World!</p>'
@@ -81,8 +79,7 @@ def test_simple_form() -> None:
                 {"type": "text", "value": "some_value", "placeholder": "example text"}
             ),
         ),
-        div({"class": "button-container"},
-            button("Submit")),
+        div({"class": "button-container"}, button("Submit")),
     )
 
     assert render(node) == (
@@ -98,9 +95,9 @@ def test_simple_form() -> None:
 
 
 def test_safestring_in_tag() -> None:
-    node = script({"type": "ld+json"},
-                  safe_string(json.dumps({"some_key": "some_val"}))
-                  )
+    node = script(
+        {"type": "ld+json"}, safe_string(json.dumps({"some_key": "some_val"}))
+    )
 
     assert render(node) == ('<script type="ld+json">{"some_key": "some_val"}</script>')
 
@@ -113,13 +110,11 @@ def test_script_tag_doesnt_self_close() -> None:
 
 
 def test_kw_attributes() -> None:
-    node = div({"class": "first", "name": "some_name", "style": "color:blue;"},
-               "okok"
-               )
+    node = div({"class": "first", "name": "some_name", "style": "color:blue;"}, "okok")
 
     assert (
-            render(node)
-            == '<div class="first" name="some_name" style="color:blue;">okok</div>'
+        render(node)
+        == '<div class="first" name="some_name" style="color:blue;">okok</div>'
     )
 
 
@@ -135,8 +130,7 @@ def test_attribute_without_value_rendered_as_expected() -> None:
 def test_render_with_doctype() -> None:
     assert render_with_doctype(html) == "<!doctype html><html></html>"
     assert (
-            render_with_doctype(html,
-                                "other info") == "<!doctype other info><html></html>"
+        render_with_doctype(html, "other info") == "<!doctype other info><html></html>"
     )
 
 
@@ -163,6 +157,6 @@ def test_render_kw_attribute_with_none() -> None:
 def test_can_render_empty() -> None:
     assert render([]) == ""
     assert (
-            render(div([], "hello ", [], span("World!"), []))
-            == "<div>hello <span>World!</span></div>"
+        render(div([], "hello ", [], span("World!"), []))
+        == "<div>hello <span>World!</span></div>"
     )

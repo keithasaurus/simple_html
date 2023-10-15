@@ -25,21 +25,22 @@ class TagBase:
         self.self_closes = self_closes
         self.rendered = f"<{name}/>" if self.self_closes else f"<{name}></{name}>"
 
-    def __call__(self, attrs_or_first_child: Union[Dict[str, str], Node],
-                 *children: Node) -> Union[Tag, SafeString]:
-        if isinstance(attrs_or_first_child, dict):
-            attrs = ' '.join([f'{key}="{val}"' if val else key for key, val in
-                              attrs_or_first_child.items()])
+    def __call__(
+        self, attributes: Dict[str, str], *children: Node
+    ) -> Union[Tag, SafeString]:
+        if attributes:
+            attrs = " ".join(
+                [f'{key}="{val}"' if val else key for key, val in attributes.items()]
+            )
             if children:
-                return (f"<{self.name} {attrs}>",
-                        children,
-                        f"</{self.name}>")
+                return (f"<{self.name} {attrs}>", children, f"</{self.name}>")
             else:
-                return (f"<{self.name} {attrs}/>"
-                        if self.self_closes
-                        else f"<{self.name} {attrs}></{self.name}>"
-                        ,)
-        return f"<{self.name}>", (attrs_or_first_child,) + children, f"</{self.name}>"
+                return (
+                    f"<{self.name} {attrs}/>"
+                    if self.self_closes
+                    else f"<{self.name} {attrs}></{self.name}>",
+                )
+        return f"<{self.name}>", children, f"</{self.name}>"
 
 
 a = TagBase("a")
