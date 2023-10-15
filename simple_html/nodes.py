@@ -18,6 +18,8 @@ Node = Union[
 
 TagTuple = Tuple[str, Tuple[Node, ...], str]
 
+EMPTY_STR = ""
+
 
 class Tag:
     __slots__ = ('name', 'self_closes', 'rendered', 'open_tag', "close_tag")
@@ -25,15 +27,21 @@ class Tag:
     def __init__(self, name: str, self_closes: bool = False) -> None:
         self.name = name
         self.self_closes = self_closes
-        self.rendered = f"<{name}/>" if self.self_closes else f"<{name}></{name}>"
-        self.open_tag = f"<{self.name}>"
-        self.close_tag = f"</{self.name}>"
+        if self.self_closes:
+            self.rendered = f"<{name}/>"
+            self.open_tag = EMPTY_STR
+            self.close_tag = EMPTY_STR
+        else:
+            self.open_tag = f"<{self.name}>"
+            self.close_tag = f"</{self.name}>"
+            self.rendered = self.open_tag + self.close_tag
 
     def __call__(
-        self, attributes: Dict[str, Optional[str]], *children: Node
+            self, attributes: Dict[str, Optional[str]], *children: Node
     ) -> Union[TagTuple, SafeString]:
         if attributes:
-            attrs = [(key if val is None else f'{key}="{val}"') for key, val in attributes.items()]
+            attrs = [(key if val is None else f'{key}="{val}"') for key, val in
+                     attributes.items()]
             if children:
                 return f"<{self.name} {' '.join(attrs)}>", children, self.close_tag
             else:
