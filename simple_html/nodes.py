@@ -20,12 +20,14 @@ TagTuple = Tuple[str, Tuple[Node, ...], str]
 
 
 class Tag:
-    __slots__ = ('name', 'self_closes', 'rendered')
+    __slots__ = ('name', 'self_closes', 'rendered', 'open_tag', "close_tag")
 
     def __init__(self, name: str, self_closes: bool = False) -> None:
         self.name = name
         self.self_closes = self_closes
         self.rendered = f"<{name}/>" if self.self_closes else f"<{name}></{name}>"
+        self.open_tag = f"<{self.name}>"
+        self.close_tag = f"</{self.name}>"
 
     def __call__(
         self, attributes: Dict[str, Optional[str]], *children: Node
@@ -33,14 +35,14 @@ class Tag:
         if attributes:
             attrs = [(key if val is None else f'{key}="{val}"') for key, val in attributes.items()]
             if children:
-                return f"<{self.name} {' '.join(attrs)}>", children, f"</{self.name}>"
+                return f"<{self.name} {' '.join(attrs)}>", children, self.close_tag
             else:
                 return (
                     f"<{self.name} {' '.join(attrs)}/>"
                     if self.self_closes
-                    else f"<{self.name} {' '.join(attrs)}></{self.name}>",
+                    else f"<{self.name} {' '.join(attrs)}>{self.close_tag}",
                 )
-        return f"<{self.name}>", children, f"</{self.name}>"
+        return self.open_tag, children, self.close_tag
 
 
 a = Tag("a")
