@@ -1,4 +1,4 @@
-from typing import Tuple, Union, Dict, List, Generator, Callable, Optional
+from typing import Tuple, Union, Dict, List, Generator, Optional
 
 SafeString = Tuple[str]
 
