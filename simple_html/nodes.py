@@ -20,18 +20,16 @@ Tag = Tuple[str, Tuple[Node, ...], str]
 
 
 class TagBase:
-    __slots__ = ('name', 'self_closes', 'rendered')
-
     def __init__(self, name: str, self_closes: bool = False) -> None:
         self.name = name
         self.self_closes = self_closes
         self.rendered = f"<{name}/>" if self.self_closes else f"<{name}></{name}>"
 
-    def __call__(self, attrs_or_node: Union[Dict[str, str], Node],
+    def __call__(self, attrs_or_first_child: Union[Dict[str, str], Node],
                  *children: Node) -> Tag | SafeString:
-        if isinstance(attrs_or_node, dict):
+        if isinstance(attrs_or_first_child, dict):
             attrs = ' '.join([f'{key}="{val}"' if val else key for key, val in
-                              attrs_or_node.items()])
+                              attrs_or_first_child.items()])
             if children:
                 return (f"<{self.name} {attrs}>",
                         children,
@@ -41,7 +39,7 @@ class TagBase:
                         if self.self_closes
                         else f"<{self.name} {attrs}></{self.name}>"
                         ,)
-        return f"<{self.name}>", (attrs_or_node,) + children, f"</{self.name}>"
+        return f"<{self.name}>", (attrs_or_first_child,) + children, f"</{self.name}>"
 
 
 a = TagBase("a")
