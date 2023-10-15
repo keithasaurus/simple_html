@@ -26,7 +26,11 @@ benches: Dict[str, BenchCompare[Any]] = {
         lambda i: (str(i), f"some content {i}", ["ok" for _ in range(i % 50)]),
         {SIMPLE_HTML: simple.basic, JINJA2: jin.basic},
     ),
-    "basic_long": BenchCompare(
+    "lorem ipsum": BenchCompare(
+        lambda i: f"title {i}",
+        {SIMPLE_HTML: simple.lorem_ipsum, JINJA2: jin.lorem_ipsum},
+    ),
+    "basic long": BenchCompare(
         lambda i: (str(i), f"some content {i}", ["ok" for _ in range(i % 50)]),
         {SIMPLE_HTML: simple.basic_long, JINJA2: jin.basic_long},
     ),

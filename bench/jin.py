@@ -24,3 +24,8 @@ def basic_long(objs: List[Tuple[str, str, List[str]]]) -> None:
         env.get_template("basic_long.html").render(
             title=title, content=content, oks=oks
         )
+
+
+def lorem_ipsum(titles: List[str]) -> None:
+    for t in titles:
+        env.get_template("lorem_ipsum.html").render(title=t)

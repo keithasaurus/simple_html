@@ -11,7 +11,7 @@ from simple_html.nodes import (
     ul,
     li,
     safe_string,
-    br
+    br, meta
 )
 from simple_html.render import render, render_with_doctype
 
@@ -111,5 +111,24 @@ def basic_long(objs: List[Tuple[str, str, List[str]]]) -> None:
                         ),
                     ),
                 ),
+            )
+        )
+
+
+def lorem_ipsum(titles: str) -> None:
+    for t in titles:
+        render_with_doctype(
+            html.attrs({"lang": "en"})(
+                head(
+                    meta.attrs({"charset": "UTF-8"}),
+                    meta.attrs({"name": "viewport",
+                                "content": "width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"}),
+                    meta.attrs({"http-equiv": "X-UA-Compatible",
+                                "content": "ie=edge"}),
+                    title(t)
+                ),
+                body(
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+                )
             )
         )
