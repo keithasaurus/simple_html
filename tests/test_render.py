@@ -34,7 +34,7 @@ def test_renders_children() -> None:
         a(
             {"href": "https://google.com", "class": "aclass"},
             "link text",
-            span("whatever"),
+            span({}, "whatever"),
         ),
         br,
     )
@@ -47,7 +47,7 @@ def test_renders_children() -> None:
 
 
 def test_hello_world() -> None:
-    node = html(head, body(p({"class": "some-class"}, "Hello World!")))
+    node = html({}, head, body({}, p({"class": "some-class"}, "Hello World!")))
 
     assert render(node) == (
         '<html><head></head><body><p class="some-class">Hello World!</p>'
@@ -73,13 +73,13 @@ def test_safe_strings_are_not_escaped() -> None:
 def test_simple_form() -> None:
     node = form(
         {"method": "POST", "enctype": "multipart/form-data"},
-        label(
+        label({},
             "Name",
             input_(
                 {"type": "text", "value": "some_value", "placeholder": "example text"}
             ),
         ),
-        div({"class": "button-container"}, button("Submit")),
+        div({"class": "button-container"}, button({}, "Submit")),
     )
 
     assert render(node) == (
@@ -135,7 +135,7 @@ def test_render_with_doctype() -> None:
 
 
 def test_render_list() -> None:
-    assert render([br, "ok", div("great")]) == "<br/>ok<div>great</div>"
+    assert render([br, "ok", div({}, "great")]) == "<br/>ok<div>great</div>"
 
     assert render([]) == ""
 
@@ -157,6 +157,6 @@ def test_render_kw_attribute_with_none() -> None:
 def test_can_render_empty() -> None:
     assert render([]) == ""
     assert (
-        render(div([], "hello ", [], span("World!"), []))
+        render(div({}, [], "hello ", [], span({}, "World!"), []))
         == "<div>hello <span>World!</span></div>"
     )
