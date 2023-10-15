@@ -33,7 +33,7 @@ class TagBase:
                 [f'{key}="{val}"' if val else key for key, val in attributes.items()]
             )
             if children:
-                return (f"<{self.name} {attrs}>", children, f"</{self.name}>")
+                return f"<{self.name} {attrs}>", children, f"</{self.name}>"
             else:
                 return (
                     f"<{self.name} {attrs}/>"
