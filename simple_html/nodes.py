@@ -18,7 +18,7 @@ Node = Union[
 
 TagTuple = Tuple[str, Tuple[Node, ...], str]
 
-EMPTY_STR = ""
+_EMPTY_STR = ""
 
 
 class Tag:
@@ -29,8 +29,8 @@ class Tag:
         self.self_closes = self_closes
         if self.self_closes:
             self.rendered = f"<{name}/>"
-            self.open_tag = EMPTY_STR
-            self.close_tag = EMPTY_STR
+            self.open_tag = _EMPTY_STR
+            self.close_tag = _EMPTY_STR
         else:
             self.open_tag = f"<{self.name}>"
             self.close_tag = f"</{self.name}>"
