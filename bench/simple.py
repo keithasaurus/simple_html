@@ -27,14 +27,15 @@ def basic(objs: List[Tuple[str, str, List[str]]]) -> None:
             html(
                 head(title(title_)),
                 body(
-                    h1.attrs(
+                    h1(
                         {"class": "great header", "other_attr": "5", "id": "header1"}
                     ),
                     div(
                         p(content, br, br),
                         ul(
                             [
-                                li.attrs({"class": "item-stuff"})(safe_string(ss))
+                                li({"class": "item-stuff"},
+                                   safe_string(ss))
                                 for ss in oks
                             ]
                         ),
@@ -50,62 +51,61 @@ def basic_long(objs: List[Tuple[str, str, List[str]]]) -> None:
             html(
                 head(title(title_)),
                 body(
-                    h1.attrs(
+                    h1(
+                        {"class": "great header", "other_attr": "5", "id": "header1"}
+                    ),
+                    div(
+                        p(content, br, br),
+                        ul([
+                            li({"class": "item-stuff"}, safe_string(ss))
+                            for ss in oks
+                        ]
+                        ),
+                    ),
+                    h1(
                         {"class": "great header", "other_attr": "5", "id": "header1"}
                     ),
                     div(
                         p(content, br, br),
                         ul(
-                            *[
-                                li.attrs({"class": "item-stuff"})(safe_string(ss))
+                            [
+                                li({"class": "item-stuff"}, safe_string(ss))
                                 for ss in oks
                             ]
                         ),
                     ),
-                    h1.attrs(
+                    h1(
                         {"class": "great header", "other_attr": "5", "id": "header1"}
                     ),
                     div(
                         p(content, br, br),
                         ul(
-                            *[
-                                li.attrs({"class": "item-stuff"})(safe_string(ss))
+                            [
+                                li({"class": "item-stuff"}, safe_string(ss))
                                 for ss in oks
                             ]
                         ),
                     ),
-                    h1.attrs(
+                    h1(
                         {"class": "great header", "other_attr": "5", "id": "header1"}
                     ),
                     div(
                         p(content, br, br),
                         ul(
-                            *[
-                                li.attrs({"class": "item-stuff"})(safe_string(ss))
+                            [
+                                li({"class": "item-stuff"}, safe_string(ss))
                                 for ss in oks
                             ]
                         ),
                     ),
-                    h1.attrs(
+                    h1(
                         {"class": "great header", "other_attr": "5", "id": "header1"}
                     ),
                     div(
                         p(content, br, br),
                         ul(
-                            *[
-                                li.attrs({"class": "item-stuff"})(safe_string(ss))
-                                for ss in oks
-                            ]
-                        ),
-                    ),
-                    h1.attrs(
-                        {"class": "great header", "other_attr": "5", "id": "header1"}
-                    ),
-                    div(
-                        p(content, br, br),
-                        ul(
-                            *[
-                                li.attrs({"class": "item-stuff"})(safe_string(ss))
+                            [
+                                li({"class": "item-stuff"}, safe_string(ss))
                                 for ss in oks
                             ]
                         ),
@@ -115,20 +115,20 @@ def basic_long(objs: List[Tuple[str, str, List[str]]]) -> None:
         )
 
 
-def lorem_ipsum(titles: str) -> None:
+def lorem_ipsum(titles: List[str]) -> None:
     for t in titles:
         render_with_doctype(
-            html.attrs({"lang": "en"})(
-                head(
-                    meta.attrs({"charset": "UTF-8"}),
-                    meta.attrs({"name": "viewport",
-                                "content": "width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"}),
-                    meta.attrs({"http-equiv": "X-UA-Compatible",
-                                "content": "ie=edge"}),
-                    title(t)
-                ),
-                body(
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-                )
-            )
+            html({"lang": "en"},
+                 head(
+                     meta({"charset": "UTF-8"}),
+                     meta({"name": "viewport",
+                           "content": "width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"}),
+                     meta({"http-equiv": "X-UA-Compatible",
+                           "content": "ie=edge"}),
+                     title(t)
+                 ),
+                 body(
+                     "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+                 )
+                 )
         )

@@ -2,7 +2,7 @@ from html import escape
 from types import GeneratorType
 from typing import TYPE_CHECKING, cast, List
 
-from simple_html.nodes import Node, Tag, SafeString, AttrsTag, TagBase
+from simple_html.nodes import Node, Tag, SafeString, TagBase
 
 
 def _render(node: Node, strs: List[str]) -> None:
@@ -23,13 +23,6 @@ def _render(node: Node, strs: List[str]) -> None:
             strs.append(node[0])
     elif isinstance(node, str):
         strs.append(escape(node))
-    elif isinstance(node, AttrsTag):
-        tag_base = node.tag_base
-        strs.append(
-            f"<{tag_base.name} {' '.join(node.attributes)}/>"
-            if tag_base.self_closes
-            else f"<{tag_base.name} {' '.join(node.attributes)}></{tag_base.name}>"
-        )
     elif isinstance(node, TagBase):
         strs.append(node.rendered)
     elif isinstance(node, (list, GeneratorType)):

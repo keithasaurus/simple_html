@@ -1,4 +1,4 @@
-from typing import Tuple, Union, Dict, List, Generator
+from typing import Tuple, Union, Dict, List, Generator, Callable
 
 SafeString = Tuple[str]
 
@@ -18,23 +18,7 @@ Node = Union[
     None,
 ]
 
-
 Tag = Tuple[str, Tuple[Node, ...], str]
-
-
-class AttrsTag:
-    __slots__ = ("tag_base", "attributes")
-
-    def __init__(self, tag_base: "TagBase", attributes: List[str]) -> None:
-        self.tag_base = tag_base
-        self.attributes = attributes
-
-    def __call__(self, *children: Node) -> Tag:
-        return (
-            f"<{self.tag_base.name} {' '.join(self.attributes)}>",
-            children,
-            f"</{self.tag_base.name}>",
-        )
 
 
 class TagBase:
@@ -45,13 +29,20 @@ class TagBase:
         self.self_closes = self_closes
         self.rendered = f"<{name}/>" if self.self_closes else f"<{name}></{name}>"
 
-    def __call__(self, *children: Node) -> Tag:
-        return f"<{self.name}>", children, f"</{self.name}>"
-
-    def attrs(self, attributes: Dict[str, str]) -> AttrsTag:
-        return AttrsTag(
-            self, [f'{key}="{val}"' if val else key for key, val in attributes.items()]
-        )
+    def __call__(self, attrs_or_node: Union[Dict[str, str], Node],
+                 *children: Node) -> Tag | SafeString:
+        if isinstance(attrs_or_node, dict):
+            attrs = [f'{key}="{val}"' if val else key for key, val in
+                     attrs_or_node.items()]
+            if children:
+                return (f"<{self.name} {' '.join(attrs)}>",
+                        children,
+                        f"</{self.name}>")
+            return (f"<{self.name} {' '.join(attrs)}/>"
+                    if self.self_closes
+                    else f"<{self.name} {' '.join(attrs)}></{self.name}>"
+                    ,)
+        return f"<{self.name}>", (attrs_or_node,) + children, f"</{self.name}>"
 
 
 a = TagBase("a")
