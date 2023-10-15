@@ -14,7 +14,6 @@ Node = Union[
     "TagBase",
     List["Node"],
     Generator["Node", None, None],
-    None,
 ]
 
 Tag = Tuple[str, Tuple[Node, ...], str]
@@ -31,16 +30,17 @@ class TagBase:
     def __call__(self, attrs_or_node: Union[Dict[str, str], Node],
                  *children: Node) -> Tag | SafeString:
         if isinstance(attrs_or_node, dict):
-            attrs = [f'{key}="{val}"' if val else key for key, val in
-                     attrs_or_node.items()]
+            attrs = ' '.join([f'{key}="{val}"' if val else key for key, val in
+                              attrs_or_node.items()])
             if children:
-                return (f"<{self.name} {' '.join(attrs)}>",
+                return (f"<{self.name} {attrs}>",
                         children,
                         f"</{self.name}>")
-            return (f"<{self.name} {' '.join(attrs)}/>"
-                    if self.self_closes
-                    else f"<{self.name} {' '.join(attrs)}></{self.name}>"
-                    ,)
+            else:
+                return (f"<{self.name} {attrs}/>"
+                        if self.self_closes
+                        else f"<{self.name} {attrs}></{self.name}>"
+                        ,)
         return f"<{self.name}>", (attrs_or_node,) + children, f"</{self.name}>"
 
 

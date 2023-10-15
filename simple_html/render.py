@@ -28,8 +28,6 @@ def _render(node: Node, strs: List[str]) -> None:
     elif isinstance(node, (list, GeneratorType)):
         for n in node:
             _render(n, strs)
-    elif node is None:
-        pass
     else:
         raise TypeError(f"Got unknown type: {type(node)}")
 

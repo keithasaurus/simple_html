@@ -160,9 +160,9 @@ def test_render_kw_attribute_with_none() -> None:
     assert render(script({"defer": ""})) == "<script defer></script>"
 
 
-def test_can_render_none() -> None:
-    assert render(None) == ""
+def test_can_render_empty() -> None:
+    assert render([]) == ""
     assert (
-            render(div(None, "hello ", None, span("World!"), None))
+            render(div([], "hello ", [], span("World!"), []))
             == "<div>hello <span>World!</span></div>"
     )
