@@ -22,19 +22,20 @@ _EMPTY_STR = ""
 
 
 class Tag:
-    __slots__ = ('tag_start', 'self_closes', 'rendered', 'open_tag', "close_tag")
+    __slots__ = ('tag_start', 'rendered', 'opening_tag', "closing_tag", "no_children_close")
 
-    def __init__(self, name: str, self_closes: bool = False) -> None:
+    def __init__(self, name: str, self_closing: bool = False) -> None:
         self.tag_start = f"<{name}"
-        self.self_closes = self_closes
-        if self_closes:
-            self.open_tag = _EMPTY_STR
-            self.close_tag = _EMPTY_STR
+        if self_closing:
+            self.opening_tag = _EMPTY_STR
+            self.closing_tag = _EMPTY_STR
             self.rendered = f"{self.tag_start}/>"
+            self.no_children_close = "/>"
         else:
-            self.open_tag = f"{self.tag_start}>"
-            self.close_tag = f"</{name}>"
-            self.rendered = self.open_tag + self.close_tag
+            self.opening_tag = f"{self.tag_start}>"
+            self.closing_tag = f"</{name}>"
+            self.rendered = self.opening_tag + self.closing_tag
+            self.no_children_close = f">{self.closing_tag}"
 
     def __call__(
             self, attributes: Dict[str, Optional[str]], *children: Node
@@ -45,14 +46,10 @@ class Tag:
                 attributes.items()
             ]
             if children:
-                return f"{self.tag_start} {' '.join(attrs)}>", children, self.close_tag
+                return f"{self.tag_start} {' '.join(attrs)}>", children, self.closing_tag
             else:
-                return (
-                    f"{self.tag_start} {' '.join(attrs)}/>"
-                    if self.self_closes
-                    else f"{self.tag_start} {' '.join(attrs)}>{self.close_tag}",
-                )
-        return self.open_tag, children, self.close_tag
+                return f"{self.tag_start} {' '.join(attrs)}{self.no_children_close}",
+        return self.opening_tag, children, self.closing_tag
 
 
 a = Tag("a")
