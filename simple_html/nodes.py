@@ -27,21 +27,23 @@ class Tag:
     def __init__(self, name: str, self_closes: bool = False) -> None:
         self.name = name
         self.self_closes = self_closes
-        if self.self_closes:
-            self.rendered = f"<{name}/>"
+        if self_closes:
             self.open_tag = _EMPTY_STR
             self.close_tag = _EMPTY_STR
+            self.rendered = f"<{name}/>"
         else:
-            self.open_tag = f"<{self.name}>"
-            self.close_tag = f"</{self.name}>"
+            self.open_tag = f"<{name}>"
+            self.close_tag = f"</{name}>"
             self.rendered = self.open_tag + self.close_tag
 
     def __call__(
             self, attributes: Dict[str, Optional[str]], *children: Node
     ) -> Union[TagTuple, SafeString]:
         if attributes:
-            attrs = [(key if val is None else f'{key}="{val}"') for key, val in
-                     attributes.items()]
+            attrs = [
+                (key if val is None else f'{key}="{val}"') for key, val in
+                attributes.items()
+            ]
             if children:
                 return f"<{self.name} {' '.join(attrs)}>", children, self.close_tag
             else:
