@@ -22,17 +22,17 @@ _EMPTY_STR = ""
 
 
 class Tag:
-    __slots__ = ('name', 'self_closes', 'rendered', 'open_tag', "close_tag")
+    __slots__ = ('tag_start', 'self_closes', 'rendered', 'open_tag', "close_tag")
 
     def __init__(self, name: str, self_closes: bool = False) -> None:
-        self.name = name
+        self.tag_start = f"<{name}"
         self.self_closes = self_closes
         if self_closes:
             self.open_tag = _EMPTY_STR
             self.close_tag = _EMPTY_STR
-            self.rendered = f"<{name}/>"
+            self.rendered = f"{self.tag_start}/>"
         else:
-            self.open_tag = f"<{name}>"
+            self.open_tag = f"{self.tag_start}>"
             self.close_tag = f"</{name}>"
             self.rendered = self.open_tag + self.close_tag
 
@@ -45,12 +45,12 @@ class Tag:
                 attributes.items()
             ]
             if children:
-                return f"<{self.name} {' '.join(attrs)}>", children, self.close_tag
+                return f"{self.tag_start} {' '.join(attrs)}>", children, self.close_tag
             else:
                 return (
-                    f"<{self.name} {' '.join(attrs)}/>"
+                    f"{self.tag_start} {' '.join(attrs)}/>"
                     if self.self_closes
-                    else f"<{self.name} {' '.join(attrs)}>{self.close_tag}",
+                    else f"{self.tag_start} {' '.join(attrs)}>{self.close_tag}",
                 )
         return self.open_tag, children, self.close_tag
 

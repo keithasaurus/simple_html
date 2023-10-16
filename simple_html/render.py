@@ -25,7 +25,10 @@ def _render(node: Node, strs: List[str]) -> None:
         strs.append(escape(node))
     elif isinstance(node, Tag):
         strs.append(node.rendered)
-    elif isinstance(node, (list, GeneratorType)):
+    elif isinstance(node, list):
+        for n in node:
+            _render(n, strs)
+    elif isinstance(node, GeneratorType):
         for n in node:
             _render(n, strs)
     else:
