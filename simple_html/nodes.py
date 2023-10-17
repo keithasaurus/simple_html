@@ -16,7 +16,7 @@ Node = Union[
     Generator["Node", None, None],
 ]
 
-TagTuple = Tuple[str, Tuple[Node, ...], str]
+TagTuple = Tuple[str, Tuple[Node, ...], SafeString]
 
 _EMPTY_STR = ""
 
@@ -28,14 +28,14 @@ class Tag:
         self.tag_start = f"<{name}"
         if self_closing:
             self.opening_tag = _EMPTY_STR
-            self.closing_tag = _EMPTY_STR
+            self.closing_tag = (_EMPTY_STR, )
             self.rendered = f"{self.tag_start}/>"
             self.no_children_close = "/>"
         else:
             self.opening_tag = f"{self.tag_start}>"
-            self.closing_tag = f"</{name}>"
-            self.rendered = self.opening_tag + self.closing_tag
-            self.no_children_close = f">{self.closing_tag}"
+            self.closing_tag = (f"</{name}>",)
+            self.rendered = self.opening_tag + self.closing_tag[0]
+            self.no_children_close = f">{self.closing_tag[0]}"
 
     def __call__(
             self, attributes: Dict[str, Optional[str]], *children: Node
@@ -46,10 +46,10 @@ class Tag:
                 attributes.items()
             ]
             if children:
-                return f"{self.tag_start} {' '.join(attrs)}>", children, self.closing_tag
+                return f"{self.tag_start} {' '.join(attrs)}>", children, self.closing_tag,
             else:
                 return f"{self.tag_start} {' '.join(attrs)}{self.no_children_close}",
-        return self.opening_tag, children, self.closing_tag
+        return self.opening_tag, children, self.closing_tag,
 
 
 a = Tag("a")
