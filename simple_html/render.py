@@ -36,10 +36,38 @@ def _render(node: Node, strs: List[str]) -> None:
 
 
 def render(node: Node) -> str:
-    results: List[str] = []
-    _render(node, results)
-
-    return "".join(results)
+    result_strs: List[str] = []
+    stack = [node]
+    while stack:
+        node = stack.pop(0)
+        if isinstance(node, tuple):
+            if len(node) == 3:
+                if TYPE_CHECKING:
+                    node = cast(Tag, node)
+                # Tag
+                result_strs.append(node[0])
+                stack.insert(0, (node[2],))
+                for c in node[1][::-1]:
+                    stack.insert(0, c)
+            else:
+                if TYPE_CHECKING:
+                    node = cast(SafeString, node)
+                result_strs.append(node[0])
+        elif isinstance(node, str):
+            result_strs.append(escape(node))
+        elif isinstance(node, Tag):
+            result_strs.append(node.rendered)
+        elif isinstance(node, list):
+            for c in node[::-1]:
+                stack.insert(0, c)
+        elif isinstance(node, GeneratorType):
+            for c in list(node)[::-1]:
+                stack.insert(0, c)
+        else:
+            raise TypeError(
+                "Expected `Tag`, `SafeString` or `str` but got `{}`".format(type(node))
+            )
+    return "".join(result_strs)
 
 
 def render_with_doctype(node: Node, doc_type_details: str = "html") -> str:
