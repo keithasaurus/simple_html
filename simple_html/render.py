@@ -2,7 +2,7 @@ from html import escape
 from types import GeneratorType
 from typing import TYPE_CHECKING, cast, List
 
-from simple_html.nodes import Node, SafeString, Tag
+from simple_html.nodes import Node, SafeString, Tag, TagTuple
 
 
 def render(node: Node) -> str:
@@ -13,7 +13,7 @@ def render(node: Node) -> str:
         if isinstance(node, tuple):
             if len(node) == 3:
                 if TYPE_CHECKING:
-                    node = cast(Tag, node)
+                    node = cast(TagTuple, node)
                 # Tag
                 result_strs.append(node[0])
                 stack.append(node[2])
