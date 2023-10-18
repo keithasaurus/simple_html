@@ -9,7 +9,7 @@ def _render(node: Node, strs: List[str]) -> None:
     """
     mutate a list instead of constantly rendering strings
     """
-    if isinstance(node, tuple):
+    if type(node) is tuple:
         if len(node) == 3:
             if TYPE_CHECKING:
                 node = cast(TagTuple, node)
