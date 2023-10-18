@@ -15,6 +15,7 @@ normal Python. In most cases, the code will be more concise than standard HTML. 
 
 
 ### Usage
+
 ```python
 from simple_html.nodes import body, head, html, p
 from simple_html.render import render
@@ -22,26 +23,27 @@ from simple_html.render import render
 node = html(
     head,
     body(
-        p.attrs(id="hello")( 
+        p.attrs(id="hello")(
             "Hello World!"
         )
     )
 )
 
-render(node)  # returns: <html><head></head><body><p id="hello">Hello World!</p></body></html> 
+render(
+    node)  # returns: <html><head></head><body><p id="hello">Hello World!</p></body></html> 
 ```
 
 
 Strings are escaped by default, but you can pass in `SafeString`s to avoid escaping.
 
 ```python
-from simple_html.nodes import br, p, SafeString
+from simple_html.nodes import br, p, safe_string
 from simple_html.render import render
 
 node = p(
     "Escaped & stuff",
     br,
-    SafeString("Not escaped & stuff")
+    safe_string("Not escaped & stuff")
 )
 
 render(node)  # returns: <p>Escaped &amp; stuff<br/>Not escaped & stuff</p> 
@@ -50,10 +52,10 @@ render(node)  # returns: <p>Escaped &amp; stuff<br/>Not escaped & stuff</p>
 For convenience, many tags are provided, but you can create your own as well:
 
 ```python
-from simple_html.nodes import TagBase 
+from simple_html.nodes import Tag
 from simple_html.render import render
 
-custom_elem = TagBase("custom-elem")
+custom_elem = Tag("custom-elem")
 
 render(
     custom_elem.attrs(id="some-custom-elem-id")(

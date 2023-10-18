@@ -1,8 +1,8 @@
 import json
+from typing import Generator
 
 from simple_html.nodes import (
-    FlatGroup,
-    SafeString,
+    safe_string,
     a,
     body,
     br,
@@ -16,21 +16,25 @@ from simple_html.nodes import (
     p,
     script,
     span,
+    Node, DOCTYPE_HTML5,
 )
-from simple_html.render import render, render_with_doctype
+from simple_html.render import render
 
 
 def test_renders_no_children() -> None:
-    node = a()
+    node = a
 
     assert render(node) == "<a></a>"
 
 
 def test_renders_children() -> None:
-    node = p.attrs({"class": "pclass"})(
+    node = p(
+        {"class": "pclass"},
         "hey!",
-        a.attrs({"href": "https://google.com", "class": "aclass"})(
-            "link text", span("whatever")
+        a(
+            {"href": "https://google.com", "class": "aclass"},
+            "link text",
+            span({}, "whatever"),
         ),
         br,
     )
@@ -43,7 +47,7 @@ def test_renders_children() -> None:
 
 
 def test_hello_world() -> None:
-    node = html(head, body(p.attrs({"class": "some-class"})("Hello World!")))
+    node = html({}, head, body({}, p({"class": "some-class"}, "Hello World!")))
 
     assert render(node) == (
         '<html><head></head><body><p class="some-class">Hello World!</p>'
@@ -52,8 +56,7 @@ def test_hello_world() -> None:
 
 
 def test_string_attrs_work_as_expected() -> None:
-    node = div.attrs({"class": "dinosaur",
-                      "some-random-attr": "spam"})
+    node = div({"class": "dinosaur", "some-random-attr": "spam"})
     assert render(node) == '<div class="dinosaur" some-random-attr="spam"></div>'
 
 
@@ -64,20 +67,19 @@ def test_escapes_normal_strings() -> None:
 
 
 def test_safe_strings_are_not_escaped() -> None:
-    assert render(SafeString("some < string")) == "some < string"
+    assert render(safe_string("some < string")) == "some < string"
 
 
 def test_simple_form() -> None:
-    node = form.attrs({"method": "POST", "enctype": "multipart/form-data"})(
-        label(
+    node = form(
+        {"method": "POST", "enctype": "multipart/form-data"},
+        label({},
             "Name",
-            input_.attrs({
-                "type": "text",
-                "value": "some_value",
-                "placeholder": "example text"
-            }),
+            input_(
+                {"type": "text", "value": "some_value", "placeholder": "example text"}
+            ),
         ),
-        div.attrs({"class": "button-container"})(button("Submit")),
+        div({"class": "button-container"}, button({}, "Submit")),
     )
 
     assert render(node) == (
@@ -93,8 +95,8 @@ def test_simple_form() -> None:
 
 
 def test_safestring_in_tag() -> None:
-    node = script.attrs({"type": "ld+json"})(
-        SafeString(json.dumps({"some_key": "some_val"}))
+    node = script(
+        {"type": "ld+json"}, safe_string(json.dumps({"some_key": "some_val"}))
     )
 
     assert render(node) == ('<script type="ld+json">{"some_key": "some_val"}</script>')
@@ -103,18 +105,16 @@ def test_safestring_in_tag() -> None:
 def test_script_tag_doesnt_self_close() -> None:
     example_script_url = "https://example.com/main.js"
 
-    node = script.attrs({"src": example_script_url})
+    node = script({"src": example_script_url})
     assert render(node) == f'<script src="{example_script_url}"></script>'
 
 
 def test_kw_attributes() -> None:
-    node = div.attrs({"class": "first",
-                      "name": "some_name",
-                      "style": "color:blue;"})("okok")
+    node = div({"class": "first", "name": "some_name", "style": "color:blue;"}, "okok")
 
     assert (
-            render(node)
-            == '<div class="first" name="some_name" style="color:blue;">okok</div>'
+        render(node)
+        == '<div class="first" name="some_name" style="color:blue;">okok</div>'
     )
 
 
@@ -124,29 +124,37 @@ def test_uncalled_tag_renders() -> None:
 
 
 def test_attribute_without_value_rendered_as_expected() -> None:
-    assert render(a.attrs({"something": ""})) == "<a something></a>"
+    assert render(a({"something": ""})) == '<a something=""></a>'
+    assert render(a({"something": None})) == "<a something></a>"
 
 
 def test_render_with_doctype() -> None:
-    assert render_with_doctype(html) == "<!doctype html><html></html>"
-    assert (
-            render_with_doctype(html, "other info") == "<!doctype other info><html></html>"
-    )
+    assert render(DOCTYPE_HTML5, html) == "<!doctype html><html></html>"
 
 
-def test_render_flat_group() -> None:
-    assert render(FlatGroup(br, "ok", div("great"))) == "<br/>ok<div>great</div>"
+def test_render_list() -> None:
+    assert render([br, "ok", div({}, "great")]) == "<br/>ok<div>great</div>"
 
-    assert render(FlatGroup()) == ""
+    assert render([]) == ""
+
+
+def test_render_generator() -> None:
+    assert render(div for _ in range(2)) == "<div></div><div></div>"
+
+    def some_func() -> Generator[Node, None, None]:
+        yield ["abc", br]
+        yield "123"
+
+    assert render(some_func()) == "abc<br/>123"
 
 
 def test_render_kw_attribute_with_none() -> None:
-    assert render(script.attrs({"defer": ""})) == "<script defer></script>"
+    assert render(script({"defer": ""})) == '<script defer=""></script>'
 
 
-def test_can_render_none() -> None:
-    assert render(None) == ""
+def test_can_render_empty() -> None:
+    assert render([]) == ""
     assert (
-            render(div(None, "hello ", None, span("World!"), None))
-            == "<div>hello <span>World!</span></div>"
+        render(div({}, [], "hello ", [], span({}, "World!"), []))
+        == "<div>hello <span>World!</span></div>"
     )
