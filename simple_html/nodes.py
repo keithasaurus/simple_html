@@ -26,12 +26,11 @@ class Tag:
         self.tag_start = f"<{name}"
         if self_closing:
             self.closing_tag = ""
-            self.rendered = f"{self.tag_start}/>"
             self.no_children_close = "/>"
         else:
             self.closing_tag = f"</{name}>"
-            self.rendered = f"{self.tag_start}>{self.closing_tag}"
             self.no_children_close = f">{self.closing_tag}"
+        self.rendered = f"{self.tag_start}{self.no_children_close}"
 
     def __call__(
             self, attributes: Dict[str, Optional[str]], *children: Node
