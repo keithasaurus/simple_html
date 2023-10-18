@@ -36,9 +36,10 @@ class Tag:
             self, attributes: Dict[str, Optional[str]], *children: Node
     ) -> Union[TagTuple, SafeString]:
         if attributes:
+            # in this case this is faster than attrs = "".join([...])
             attrs = ""
             for key, val in attributes.items():
-                attrs += " " + (key if val is None else f'{key}="{val}"')
+                attrs += (" " + key if val is None else f' {key}="{val}"')
 
             if children:
                 return f"{self.tag_start}{attrs}>", children, self.closing_tag
@@ -46,6 +47,8 @@ class Tag:
                 return f"{self.tag_start}{attrs}{self.no_children_close}",
         return f"{self.tag_start}>", children, self.closing_tag
 
+
+DOCTYPE_HTML5 = safe_string("<!doctype html>")
 
 a = Tag("a")
 abbr = Tag("abbr")

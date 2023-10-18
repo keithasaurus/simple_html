@@ -35,12 +35,9 @@ def _render(node: Node, strs: List[str]) -> None:
         raise TypeError(f"Got unknown type: {type(node)}")
 
 
-def render(node: Node) -> str:
+def render(*nodes: Node) -> str:
     results: List[str] = []
-    _render(node, results)
+    for node in nodes:
+        _render(node, results)
 
     return "".join(results)
-
-
-def render_with_doctype(node: Node, doc_type_details: str = "html") -> str:
-    return f"<!doctype {doc_type_details}>{render(node)}"

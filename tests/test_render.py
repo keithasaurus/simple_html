@@ -16,9 +16,9 @@ from simple_html.nodes import (
     p,
     script,
     span,
-    Node,
+    Node, DOCTYPE_HTML5,
 )
-from simple_html.render import render, render_with_doctype
+from simple_html.render import render
 
 
 def test_renders_no_children() -> None:
@@ -129,10 +129,7 @@ def test_attribute_without_value_rendered_as_expected() -> None:
 
 
 def test_render_with_doctype() -> None:
-    assert render_with_doctype(html) == "<!doctype html><html></html>"
-    assert (
-        render_with_doctype(html, "other info") == "<!doctype other info><html></html>"
-    )
+    assert render(DOCTYPE_HTML5, html) == "<!doctype html><html></html>"
 
 
 def test_render_list() -> None:

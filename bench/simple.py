@@ -12,9 +12,9 @@ from simple_html.nodes import (
     li,
     safe_string,
     br,
-    meta,
+    meta, DOCTYPE_HTML5,
 )
-from simple_html.render import render, render_with_doctype
+from simple_html.render import render
 
 
 def hello_world_empty(objs: List[None]) -> None:
@@ -24,7 +24,8 @@ def hello_world_empty(objs: List[None]) -> None:
 
 def basic(objs: List[Tuple[str, str, List[str]]]) -> None:
     for title_, content, oks in objs:
-        render_with_doctype(
+        render(
+            DOCTYPE_HTML5,
             html(
                 {},
                 head({}, title({}, title_)),
@@ -49,7 +50,8 @@ def basic(objs: List[Tuple[str, str, List[str]]]) -> None:
 
 def basic_long(objs: List[Tuple[str, str, List[str]]]) -> None:
     for title_, content, oks in objs:
-        render_with_doctype(
+        render(
+            "<!doctype html>",
             html(
                 {},
                 head({}, title({}, title_)),
@@ -122,7 +124,7 @@ def basic_long(objs: List[Tuple[str, str, List[str]]]) -> None:
 
 def lorem_ipsum(titles: List[str]) -> None:
     for t in titles:
-        render_with_doctype(
+        render(
             html(
                 {"lang": "en"},
                 head(
