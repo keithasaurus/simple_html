@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from time import perf_counter
 from typing import Callable, Dict, Generic, List, TypeVar, Any
 
-from bench import simple, jin
+from bench import simple, jin, fast, dom
 
 A = TypeVar("A")
 
@@ -16,15 +16,23 @@ class BenchCompare(Generic[A]):
 
 SIMPLE_HTML = "SIMPLE_HTML"
 JINJA2 = "JINJA2"
+FAST_HTML = "FAST_HTML"
+DOMINATE = "DOMINATE"
 
 benches: Dict[str, BenchCompare[Any]] = {
     "hello world": BenchCompare(
         lambda i: None,
-        {SIMPLE_HTML: simple.hello_world_empty, JINJA2: jin.hello_world_empty},
+        {JINJA2: jin.hello_world_empty,
+         FAST_HTML: fast.hello_world_empty,
+         DOMINATE: dom.hello_world_empty,
+         SIMPLE_HTML: simple.hello_world_empty,
+         },
     ),
     "basic": BenchCompare(
         lambda i: (str(i), f"some content {i}", ["ok" for _ in range(i % 50)]),
-        {SIMPLE_HTML: simple.basic, JINJA2: jin.basic},
+        {SIMPLE_HTML: simple.basic,
+         JINJA2: jin.basic,
+         },
     ),
     "lorem ipsum": BenchCompare(
         lambda i: f"title {i}",

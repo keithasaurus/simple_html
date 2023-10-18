@@ -20,6 +20,8 @@ pytest = "7.4.2"
 setuptools = "68.2.2"
 black = "23.9.1"
 django = "^4.2.6"
+fast-html = "^1.0.3"
+dominate = "^2.8.0"
 
 
 [build-system]

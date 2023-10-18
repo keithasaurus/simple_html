@@ -138,6 +138,17 @@ argon2 = ["argon2-cffi (>=19.1.0)"]
 bcrypt = ["bcrypt"]
 
 [[package]]
+name = "dominate"
+version = "2.8.0"
+description = "Dominate is a Python library for creating and manipulating HTML documents using an elegant DOM API."
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+files = [
+    {file = "dominate-2.8.0-py2.py3-none-any.whl", hash = "sha256:1a916479c45b95fedba0d077b081d77c2d2e0f0f484ac827105087af23661d73"},
+    {file = "dominate-2.8.0.tar.gz", hash = "sha256:4c90c3befaf88e612b71f4b39af7bcbef8977acfa855cec957225a8fbf504007"},
+]
+
+[[package]]
 name = "exceptiongroup"
 version = "1.1.3"
 description = "Backport of PEP 654 (exception groups)"
@@ -150,6 +161,17 @@ files = [
 
 [package.extras]
 test = ["pytest (>=6)"]
+
+[[package]]
+name = "fast-html"
+version = "1.0.3"
+description = "A fast, minimalist HTML generator"
+optional = false
+python-versions = ">=3.7,<4.0"
+files = [
+    {file = "fast_html-1.0.3-py3-none-any.whl", hash = "sha256:781a176a4d70116c1fac9a1bd3431163aca4af82590a1da8ea760f9ff96fbd28"},
+    {file = "fast_html-1.0.3.tar.gz", hash = "sha256:e5a10a548db72975928280dc680e509234fbfc27b0f1ff9043686399114a808d"},
+]
 
 [[package]]
 name = "flake8"
@@ -486,4 +508,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1"
-content-hash = "3c21a5eb97e22cbee8db05ed54e9e95037ba59e34b9f3f82fe810642b93638ae"
+content-hash = "4159ff97884acb4fb7805f2f27ecf57124dc82ef56b0cc4cff04f53b542fa746"
