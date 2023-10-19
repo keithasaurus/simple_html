@@ -10,17 +10,17 @@ def _render(node: Node, strs: List[str]) -> None:
     mutate a list instead of constantly rendering strings
     """
     if type(node) is tuple:
-        if len(node) == 3:
+        if node[0] == ":safe:":
+            if TYPE_CHECKING:
+                node = cast(SafeString, node)
+            strs.append(node[0])
+        else:
             if TYPE_CHECKING:
                 node = cast(TagTuple, node)
             strs.append(node[0])
             for child in node[1]:
                 _render(child, strs)
             strs.append(node[2])
-        else:
-            if TYPE_CHECKING:
-                node = cast(SafeString, node)
-            strs.append(node[0])
     elif isinstance(node, str):
         strs.append(escape(node))
     elif isinstance(node, Tag):

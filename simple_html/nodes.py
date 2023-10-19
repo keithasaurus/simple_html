@@ -1,10 +1,10 @@
-from typing import Tuple, Union, Dict, List, Generator, Optional
+from typing import Tuple, Union, Dict, List, Generator, Optional, Literal
 
-SafeString = Tuple[str]
+SafeString = Tuple[Literal[":safe:"], str]
 
 
-def safe_string(x: str) -> SafeString:
-    return (x,)
+def safe_string(s: str) -> SafeString:
+    return ":safe:", s
 
 
 Node = Union[
@@ -45,7 +45,7 @@ class Tag:
             if children:
                 return f"{self.tag_start}{attrs}>", children, self.closing_tag
             else:
-                return f"{self.tag_start}{attrs}{self.no_children_close}",
+                return ":safe:", f"{self.tag_start}{attrs}{self.no_children_close}"
         return self.opening_tag, children, self.closing_tag
 
 
