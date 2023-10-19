@@ -1,5 +1,7 @@
 from typing import Tuple, Union, Dict, List, Generator, Optional, Literal
 
+# use first tuple slot as a label so it's extremely unlikely someone
+# accidentally makes something safe
 SafeString = Tuple[Literal[":safe:"], str]
 
 
