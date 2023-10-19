@@ -20,10 +20,11 @@ TagTuple = Tuple[str, Tuple[Node, ...], str]
 
 
 class Tag:
-    __slots__ = ('tag_start', 'rendered', "closing_tag", "no_children_close")
+    __slots__ = ('tag_start', 'rendered', "opening_tag", "closing_tag", "no_children_close")
 
     def __init__(self, name: str, self_closing: bool = False) -> None:
         self.tag_start = f"<{name}"
+        self.opening_tag = f"{self.tag_start}>"
         if self_closing:
             self.closing_tag = ""
             self.no_children_close = "/>"
@@ -45,7 +46,7 @@ class Tag:
                 return f"{self.tag_start}{attrs}>", children, self.closing_tag
             else:
                 return f"{self.tag_start}{attrs}{self.no_children_close}",
-        return f"{self.tag_start}>", children, self.closing_tag
+        return self.opening_tag, children, self.closing_tag
 
 
 DOCTYPE_HTML5 = safe_string("<!doctype html>")
@@ -70,7 +71,7 @@ center = Tag("center")
 caption = Tag("caption")
 cite = Tag("cite")
 code = Tag("code")
-col = Tag("col")
+col = Tag("col", True)
 colgroup = Tag("colgroup")
 datalist = Tag("datalist")
 dd = Tag("dd")
@@ -104,6 +105,7 @@ img = Tag("img", True)
 input_ = Tag("input", True)
 ins = Tag("ins")
 kbd = Tag("kbd")
+keygen = Tag("keygen")
 label = Tag("label")
 legend = Tag("legend")
 li = Tag("li")
@@ -161,4 +163,4 @@ u = Tag("u")
 ul = Tag("ul")
 var = Tag("var")
 video = Tag("video")
-wbr = Tag("wbr")
+wbr = Tag("wbr", True)
