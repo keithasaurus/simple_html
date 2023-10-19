@@ -5,8 +5,8 @@ from typing import Tuple, Union, Dict, List, Generator, Optional, Literal
 SafeString = Tuple[Literal[":safe:"], str]
 
 
-def safe_string(s: str) -> SafeString:
-    return ":safe:", s
+def safe_string(s_: str) -> SafeString:
+    return ":safe:", s_
 
 
 Node = Union[
