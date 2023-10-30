@@ -6,7 +6,21 @@ description = "Template-less html rendering in Python"
 authors = ["Keith Philpott <fakekeith@example.org>"]
 license = "MIT"
 homepage = "https://github.com/keithasaurus/simple_html"
-keywords = ["html"]
+keywords = ["html", "type hints"]
+classifiers = [
+    'Development Status :: 5 - Production/Stable',
+    'Environment :: Console',
+    'Environment :: MacOS X',
+    'Environment :: Web Environment',
+    'Intended Audience :: Developers',
+    'Operating System :: MacOS',
+    'Operating System :: Microsoft :: Windows',
+    'Operating System :: POSIX :: Linux',
+    'Operating System :: Unix',
+    'Topic :: Software Development :: Libraries :: Python Modules',
+    'Topic :: Utilities',
+    'Typing :: Typed'
+]
 
 
 [tool.poetry.dependencies]
