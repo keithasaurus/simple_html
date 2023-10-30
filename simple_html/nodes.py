@@ -22,7 +22,13 @@ TagTuple = Tuple[str, Tuple[Node, ...], str]
 
 
 class Tag:
-    __slots__ = ('tag_start', 'rendered', "opening_tag", "closing_tag", "no_children_close")
+    __slots__ = (
+        "tag_start",
+        "rendered",
+        "opening_tag",
+        "closing_tag",
+        "no_children_close",
+    )
 
     def __init__(self, name: str, self_closing: bool = False) -> None:
         self.tag_start = f"<{name}"
@@ -36,13 +42,13 @@ class Tag:
         self.rendered = f"{self.tag_start}{self.no_children_close}"
 
     def __call__(
-            self, attributes: Dict[str, Optional[str]], *children: Node
+        self, attributes: Dict[str, Optional[str]], *children: Node
     ) -> Union[TagTuple, SafeString]:
         if attributes:
             # in this case this is faster than attrs = "".join([...])
             attrs = ""
             for key, val in attributes.items():
-                attrs += (" " + key if val is None else f' {key}="{val}"')
+                attrs += " " + key if val is None else f' {key}="{val}"'
 
             if children:
                 return f"{self.tag_start}{attrs}>", children, self.closing_tag

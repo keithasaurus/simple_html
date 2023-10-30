@@ -22,17 +22,19 @@ DOMINATE = "DOMINATE"
 benches: Dict[str, BenchCompare[Any]] = {
     "hello world": BenchCompare(
         lambda i: None,
-        {JINJA2: jin.hello_world_empty,
-         FAST_HTML: fast.hello_world_empty,
-         DOMINATE: dom.hello_world_empty,
-         SIMPLE_HTML: simple.hello_world_empty,
-         },
+        {
+            JINJA2: jin.hello_world_empty,
+            FAST_HTML: fast.hello_world_empty,
+            DOMINATE: dom.hello_world_empty,
+            SIMPLE_HTML: simple.hello_world_empty,
+        },
     ),
     "basic": BenchCompare(
         lambda i: (str(i), f"some content {i}", ["ok" for _ in range(i % 50)]),
-        {SIMPLE_HTML: simple.basic,
-         JINJA2: jin.basic,
-         },
+        {
+            SIMPLE_HTML: simple.basic,
+            JINJA2: jin.basic,
+        },
     ),
     "lorem ipsum": BenchCompare(
         lambda i: f"title {i}",
