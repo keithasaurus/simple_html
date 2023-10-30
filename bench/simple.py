@@ -1,6 +1,6 @@
 from typing import List, Tuple
 
-from simple_html.nodes import (
+from simple_html import (
     h1,
     html,
     title,
@@ -12,9 +12,10 @@ from simple_html.nodes import (
     li,
     safe_string,
     br,
-    meta, DOCTYPE_HTML5,
+    meta,
+    DOCTYPE_HTML5,
+    render
 )
-from simple_html.render import render
 
 
 def hello_world_empty(objs: List[None]) -> None:

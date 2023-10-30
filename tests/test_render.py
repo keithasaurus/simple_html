@@ -1,7 +1,7 @@
 import json
 from typing import Generator
 
-from simple_html.nodes import (
+from simple_html import (
     safe_string,
     a,
     body,
@@ -16,9 +16,10 @@ from simple_html.nodes import (
     p,
     script,
     span,
-    Node, DOCTYPE_HTML5,
+    Node,
+    DOCTYPE_HTML5,
+    render
 )
-from simple_html.render import render
 
 
 def test_renders_no_children() -> None:
