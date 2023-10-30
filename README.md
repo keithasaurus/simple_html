@@ -104,9 +104,8 @@ custom_elem = Tag("custom-elem")
 
 render(
     custom_elem({"id": "some-custom-elem-id"},
-                "Wow"
-                )
-)  # returns: <custom-elem id="some-custom-elem-id">Wow</custom-elem> 
+                "Wow")
+)  # <custom-elem id="some-custom-elem-id">Wow</custom-elem> 
 ```
 
 Likewise, some attributes have been created as type-safe presets. Note that there are multiple ways to create attributes. 
