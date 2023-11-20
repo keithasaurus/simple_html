@@ -12,7 +12,8 @@ from simple_html.nodes import (
     li,
     safe_string,
     br,
-    meta, DOCTYPE_HTML5,
+    meta,
+    DOCTYPE_HTML5,
 )
 from simple_html.render import render
 
@@ -44,7 +45,7 @@ def basic(objs: List[Tuple[str, str, List[str]]]) -> None:
                         ),
                     ),
                 ),
-            )
+            ),
         )
 
 
@@ -118,7 +119,7 @@ def basic_long(objs: List[Tuple[str, str, List[str]]]) -> None:
                         ),
                     ),
                 ),
-            )
+            ),
         )
 
 
