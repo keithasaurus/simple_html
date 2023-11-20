@@ -74,7 +74,8 @@ def test_safe_strings_are_not_escaped() -> None:
 def test_simple_form() -> None:
     node = form(
         {"method": "POST", "enctype": "multipart/form-data"},
-        label({},
+        label(
+            {},
             "Name",
             input_(
                 {"type": "text", "value": "some_value", "placeholder": "example text"}

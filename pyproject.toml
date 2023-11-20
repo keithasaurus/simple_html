@@ -28,14 +28,13 @@ python = "^3.8.1"
 
 [tool.poetry.group.dev.dependencies]
 jinja2 = "3.1.2"
-flake8 = "6.1.0"
-mypy = "1.6.0"
-pytest = "7.4.2"
-setuptools = "68.2.2"
-black = "23.9.1"
-django = "4.2.6"
-fast-html = "1.0.3"
-dominate = "2.8.0"
+mypy = "1.7.0"
+pytest = "7.4.3"
+setuptools = "69.0.0"
+django = "4.2.7"
+fast-html = "1.0.4"
+dominate = "2.9.0"
+ruff = "0.1.6"
 
 
 [build-system]
@@ -55,7 +54,7 @@ disallow_untyped_calls = true
 disallow_untyped_decorators = true
 disallow_untyped_defs = true
 ignore_errors = false
-ignore_missing_imports = false
+ignore_missing_imports = true
 local_partial_types = true
 no_implicit_optional = true
 no_implicit_reexport = true

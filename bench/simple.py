@@ -45,7 +45,7 @@ def basic(objs: List[Tuple[str, str, List[str]]]) -> None:
                         ),
                     ),
                 ),
-            )
+            ),
         )
 
 
@@ -119,7 +119,7 @@ def basic_long(objs: List[Tuple[str, str, List[str]]]) -> None:
                         ),
                     ),
                 ),
-            )
+            ),
         )
 
 
