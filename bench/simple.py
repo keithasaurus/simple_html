@@ -14,7 +14,7 @@ from simple_html import (
     br,
     meta,
     DOCTYPE_HTML5,
-    render
+    render,
 )
 
 

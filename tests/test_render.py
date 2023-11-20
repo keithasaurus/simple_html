@@ -18,7 +18,7 @@ from simple_html import (
     span,
     Node,
     DOCTYPE_HTML5,
-    render
+    render,
 )
 
 
