@@ -102,10 +102,11 @@ from simple_html import Tag, render
 
 custom_elem = Tag("custom-elem")
 
-render(
-    custom_elem({"id": "some-custom-elem-id"},
-                "Wow")
-)  # <custom-elem id="some-custom-elem-id">Wow</custom-elem> 
-```
+# works the same as any other tag
+node = custom_elem(
+    {"id": "some-custom-elem-id"},
+    "Wow"
+)
 
-Likewise, some attributes have been created as type-safe presets. Note that there are multiple ways to create attributes. 
+render(node)  # <custom-elem id="some-custom-elem-id">Wow</custom-elem>
+```
