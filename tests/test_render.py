@@ -2,7 +2,7 @@ import json
 from typing import Generator
 
 from simple_html import (
-    safe_string,
+    SafeString,
     a,
     body,
     br,
@@ -68,7 +68,7 @@ def test_escapes_normal_strings() -> None:
 
 
 def test_safe_strings_are_not_escaped() -> None:
-    assert render(safe_string("some < string")) == "some < string"
+    assert render(SafeString("some < string")) == "some < string"
 
 
 def test_simple_form() -> None:
@@ -98,7 +98,7 @@ def test_simple_form() -> None:
 
 def test_safestring_in_tag() -> None:
     node = script(
-        {"type": "ld+json"}, safe_string(json.dumps({"some_key": "some_val"}))
+        {"type": "ld+json"}, SafeString(json.dumps({"some_key": "some_val"}))
     )
 
     assert render(node) == ('<script type="ld+json">{"some_key": "some_val"}</script>')

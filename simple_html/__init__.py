@@ -1,12 +1,12 @@
+from dataclasses import dataclass
 from html import escape
 from types import GeneratorType
-from typing import Tuple, Union, Dict, List, Generator, Optional, TYPE_CHECKING, cast
-
-SafeString = Tuple[str]
+from typing import Tuple, Union, Dict, List, Generator, Optional
 
 
-def safe_string(x: str) -> SafeString:
-    return (x,)
+@dataclass(slots=True)
+class SafeString:
+    safe_str: str
 
 
 Node = Union[
@@ -35,8 +35,8 @@ class Tag:
         self.rendered = f"{self.tag_start}{self.no_children_close}"
 
     def __call__(
-        self, attributes: Dict[str, Optional[str]], *children: Node
-    ) -> Union[TagTuple, SafeString]:
+            self, attributes: Dict[str, Optional[str]], *children: Node
+    ) -> TagTuple:
         if attributes:
             # in this case this is faster than attrs = "".join([...])
             attrs = ""
@@ -46,11 +46,11 @@ class Tag:
             if children:
                 return f"{self.tag_start}{attrs}>", children, self.closing_tag
             else:
-                return (f"{self.tag_start}{attrs}{self.no_children_close}",)
+                return f"{self.tag_start}{attrs}{self.no_children_close}", children, ""
         return f"{self.tag_start}>", children, self.closing_tag
 
 
-DOCTYPE_HTML5 = safe_string("<!doctype html>")
+DOCTYPE_HTML5 = SafeString("<!doctype html>")
 
 a = Tag("a")
 abbr = Tag("abbr")
@@ -171,19 +171,14 @@ def _render(node: Node, strs: List[str]) -> None:
     mutate a list instead of constantly rendering strings
     """
     if type(node) is tuple:
-        if len(node) == 3:
-            if TYPE_CHECKING:
-                node = cast(TagTuple, node)
-            strs.append(node[0])
-            for child in node[1]:
-                _render(child, strs)
-            strs.append(node[2])
-        else:
-            if TYPE_CHECKING:
-                node = cast(SafeString, node)
-            strs.append(node[0])
+        strs.append(node[0])
+        for child in node[1]:
+            _render(child, strs)
+        strs.append(node[2])
     elif isinstance(node, str):
         strs.append(escape(node))
+    elif isinstance(node, SafeString):
+        strs.append(node.safe_str)
     elif isinstance(node, Tag):
         strs.append(node.rendered)
     elif isinstance(node, list):
