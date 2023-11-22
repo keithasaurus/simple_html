@@ -42,7 +42,7 @@ class Tag:
             # in this case this is faster than attrs = "".join([...])
             attrs = ""
             for key, val in attributes.items():
-                attrs += " " + key if val is None else f' {key}="{val}"'
+                attrs += f" {key}" if val is None else f' {key}="{val}"'
 
             if children:
                 return f"{self.tag_start}{attrs}>", children, self.closing_tag
@@ -176,7 +176,7 @@ def _render(node: Node, strs: List[str]) -> None:
         for child in node[1]:
             _render(child, strs)
         strs.append(node[2])
-    elif isinstance(node, str):
+    elif type(node) is str:
         strs.append(escape(node))
     elif isinstance(node, SafeString):
         strs.append(node.safe_str)
