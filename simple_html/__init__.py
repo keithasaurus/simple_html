@@ -1,12 +1,13 @@
-from dataclasses import dataclass
 from html import escape
 from types import GeneratorType
 from typing import Tuple, Union, Dict, List, Generator, Optional
 
 
-@dataclass(slots=True)
 class SafeString:
-    safe_str: str
+    __slots__ = ('safe_str',)
+
+    def __init__(self, safe_str: str) -> None:
+        self.safe_str = safe_str
 
 
 Node = Union[
