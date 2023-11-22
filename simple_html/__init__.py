@@ -176,7 +176,7 @@ def _render(node: Node, strs: List[str]) -> None:
         for child in node[1]:
             _render(child, strs)
         strs.append(node[2])
-    elif type(node) is str:
+    elif isinstance(node, str):
         strs.append(escape(node))
     elif isinstance(node, SafeString):
         strs.append(node.safe_str)
