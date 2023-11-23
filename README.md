@@ -1,13 +1,13 @@
 # simple_html
 
-### Template-less. Type-safe. Minified by default.
+### Template-less. Type-safe. Minified by default. Fast.
 
-simple_html is built to simplify HTML rendering in Python. No templates needed. Just create HTML in 
-normal Python. In most cases, the code will be more concise than standard HTML. Other benefits include:
+simple_html allows you to create HTML in standard Python. Benefits include:
+- typically faster than jinja2 -- up to 15x faster
 - typically renders fewer bytes than template-based rendering
-- types mean your editor and tools can help you write correct code faster
-- no framework needed
-- lightweight
+- types let your editor and tools help you write correct code faster
+- lightweight and framework agnostic
+- always renders valid html
 
 
 ### Installation
@@ -17,82 +17,101 @@ normal Python. In most cases, the code will be more concise than standard HTML. 
 ### Usage
 
 ```python
-from simple_html.nodes import body, head, html, p
-from simple_html.render import render
+from simple_html import div, h1, render, p
 
-node = html(
-    head,
-    body(
-        p.attrs(id="hello")(
-            "Hello World!"
-        )
-    )
-)
+node = div({},
+           h1({"id": "hello"},
+              "Hello World!"),
+           p({},
+             "hooray!"))
 
-render(
-    node)  # returns: <html><head></head><body><p id="hello">Hello World!</p></body></html> 
+render(node)  
+# <div><h1 id="hello">Hello World!</h1><p>hooray!</p></div> 
 ```
 
+There are several ways to render nodes:
+```python
+from simple_html import br, div, h1, img, render
+
+# raw node
+render(br)
+# <br/>
+
+# node with attributes only
+render(img({"src": "/some/image/url.jpg", "alt": "a great picture"}))
+# <img src="/some/image/url.jpg" alt="a great picture"/>
+
+# node with children
+render(
+    div({},
+        h1({},
+           "something"))
+)
+# <div><h1>something</h1></div>'
+```
+
+Tag attributes with `None` as the value will only render the attribute name:
+```python
+from simple_html import div, render
+
+render(
+    div({"empty-str-attribute": "", 
+         "key-only-attr": None})
+)
+# <div empty-str-attribute="" key-only-attr></div>
+```
 
 Strings are escaped by default, but you can pass in `SafeString`s to avoid escaping.
 
 ```python
-from simple_html.nodes import br, p, safe_string
-from simple_html.render import render
+from simple_html import br, p, SafeString, render
 
-node = p(
-    "Escaped & stuff",
-    br,
-    safe_string("Not escaped & stuff")
-)
+node = p({},
+         "Escaped & stuff",
+         br,
+         SafeString("Not escaped & stuff"))
 
 render(node)  # returns: <p>Escaped &amp; stuff<br/>Not escaped & stuff</p> 
 ```
 
-For convenience, many tags are provided, but you can create your own as well:
+Lists and generators are both valid collections of nodes:
+```python
+from typing import Generator
+from simple_html import div, render, Node, br
+
+
+def get_list_of_nodes() -> list[Node]:
+    return ["neat", br]
+
+
+render(div({}, get_list_of_nodes()))
+# <div>neat<br/></div>
+
+
+def node_generator() -> Generator[Node, None, None]:
+    yield "neat"
+    yield br
+
+
+render(
+    div({}, node_generator())
+)
+# <div>neat<br/></div>
+```
+
+
+For convenience, many tags are provided, but you can also create your own:
 
 ```python
-from simple_html.nodes import Tag
-from simple_html.render import render
+from simple_html import Tag, render
 
 custom_elem = Tag("custom-elem")
 
-render(
-    custom_elem.attrs(id="some-custom-elem-id")(
-        "Wow"
-    )
-)  # returns: <custom-elem id="some-custom-elem-id">Wow</custom-elem> 
+# works the same as any other tag
+node = custom_elem(
+    {"id": "some-custom-elem-id"},
+    "Wow"
+)
+
+render(node)  # <custom-elem id="some-custom-elem-id">Wow</custom-elem>
 ```
-
-Likewise, some attributes have been created as type-safe presets. Note that there are multiple ways to create attributes. 
-The examples below are all equivalent:
-
-```python
-from simple_html.attributes import height, id_
-from simple_html.nodes import div
-
-
-# **kwargs: recommended for most cases
-div.attrs(id="some-id", height="100")
-
-# *args: useful for attributes that may be reserved keywords or when type constraints are desired.
-# Presets, raw tuples, and kwargs can be used interchangeably.
-div.attrs(id_("some-id"), 
-          height(100),
-          ("class", "abc"), 
-          width="100")
-
-# renders to: <div id="some-id" height="100" class="abc" width="100"></div>
-```
-
-You can build your own presets, using `str_attr`, `int_attr`, or `bool_attr`. For instance, here are
-several of the attribute preset definitions
-
-```python
-from simple_html.attributes import bool_attr, int_attr, str_attr
-
-checked = bool_attr('checked')
-class_ = str_attr('class')
-cols = int_attr('cols')
-```
-But anything that renders to the type of `Attribute` will work.

@@ -1,8 +1,8 @@
 import json
 from typing import Generator
 
-from simple_html.nodes import (
-    safe_string,
+from simple_html import (
+    SafeString,
     a,
     body,
     br,
@@ -18,8 +18,8 @@ from simple_html.nodes import (
     span,
     Node,
     DOCTYPE_HTML5,
+    render,
 )
-from simple_html.render import render
 
 
 def test_renders_no_children() -> None:
@@ -68,7 +68,7 @@ def test_escapes_normal_strings() -> None:
 
 
 def test_safe_strings_are_not_escaped() -> None:
-    assert render(safe_string("some < string")) == "some < string"
+    assert render(SafeString("some < string")) == "some < string"
 
 
 def test_simple_form() -> None:
@@ -98,7 +98,7 @@ def test_simple_form() -> None:
 
 def test_safestring_in_tag() -> None:
     node = script(
-        {"type": "ld+json"}, safe_string(json.dumps({"some_key": "some_val"}))
+        {"type": "ld+json"}, SafeString(json.dumps({"some_key": "some_val"}))
     )
 
     assert render(node) == ('<script type="ld+json">{"some_key": "some_val"}</script>')

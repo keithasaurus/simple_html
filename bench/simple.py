@@ -1,6 +1,6 @@
 from typing import List, Tuple
 
-from simple_html.nodes import (
+from simple_html import (
     h1,
     html,
     title,
@@ -10,12 +10,12 @@ from simple_html.nodes import (
     p,
     ul,
     li,
-    safe_string,
+    SafeString,
     br,
     meta,
     DOCTYPE_HTML5,
+    render,
 )
-from simple_html.render import render
 
 
 def hello_world_empty(objs: List[None]) -> None:
@@ -39,7 +39,7 @@ def basic(objs: List[Tuple[str, str, List[str]]]) -> None:
                         ul(
                             {},
                             [
-                                li({"class": "item-stuff"}, safe_string(ss))
+                                li({"class": "item-stuff"}, SafeString(ss))
                                 for ss in oks
                             ],
                         ),
@@ -55,7 +55,9 @@ def basic_long(objs: List[Tuple[str, str, List[str]]]) -> None:
             "<!doctype html>",
             html(
                 {},
-                head({}, title({}, title_)),
+                head({},
+                     title({},
+                           title_)),
                 body(
                     {},
                     h1({"class": "great header", "other_attr": "5", "id": "header1"}),
@@ -65,7 +67,7 @@ def basic_long(objs: List[Tuple[str, str, List[str]]]) -> None:
                         ul(
                             {},
                             [
-                                li({"class": "item-stuff"}, safe_string(ss))
+                                li({"class": "item-stuff"}, SafeString(ss))
                                 for ss in oks
                             ],
                         ),
@@ -77,7 +79,7 @@ def basic_long(objs: List[Tuple[str, str, List[str]]]) -> None:
                         ul(
                             {},
                             [
-                                li({"class": "item-stuff"}, safe_string(ss))
+                                li({"class": "item-stuff"}, SafeString(ss))
                                 for ss in oks
                             ],
                         ),
@@ -89,7 +91,7 @@ def basic_long(objs: List[Tuple[str, str, List[str]]]) -> None:
                         ul(
                             {},
                             [
-                                li({"class": "item-stuff"}, safe_string(ss))
+                                li({"class": "item-stuff"}, SafeString(ss))
                                 for ss in oks
                             ],
                         ),
@@ -101,7 +103,7 @@ def basic_long(objs: List[Tuple[str, str, List[str]]]) -> None:
                         ul(
                             {},
                             [
-                                li({"class": "item-stuff"}, safe_string(ss))
+                                li({"class": "item-stuff"}, SafeString(ss))
                                 for ss in oks
                             ],
                         ),
@@ -113,7 +115,7 @@ def basic_long(objs: List[Tuple[str, str, List[str]]]) -> None:
                         ul(
                             {},
                             [
-                                li({"class": "item-stuff"}, safe_string(ss))
+                                li({"class": "item-stuff"}, SafeString(ss))
                                 for ss in oks
                             ],
                         ),
