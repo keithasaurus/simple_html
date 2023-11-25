@@ -1,7 +1,6 @@
-import re
 from html import escape
 from types import GeneratorType
-from typing import Tuple, Union, Dict, List, Generator, Optional
+from typing import Tuple, Union, Dict, List, Generator, FrozenSet
 
 
 class SafeString:
@@ -9,6 +8,9 @@ class SafeString:
 
     def __init__(self, safe_str: str) -> None:
         self.safe_str = safe_str
+
+    def __hash__(self) -> int:
+        return hash(f"SafeString__{self.safe_str}")
 
 
 Node = Union[
@@ -22,7 +24,7 @@ Node = Union[
 
 TagTuple = Tuple[str, Tuple[Node, ...], str]
 
-_common_safe_keys = frozenset(
+_common_safe_keys: FrozenSet[str] = frozenset(
     {'alt', 'autoplay', 'autoplay', 'charset', 'checked', 'class', 'content',
      'contenteditable', 'dir', 'draggable', 'for', 'height', 'hidden', 'href', 'hreflang',
      'http-equiv', 'id', 'itemprop', 'itemscope', 'itemtype', 'lang', 'loadable', 'name',
