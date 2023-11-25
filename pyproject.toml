@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "simple-html"
-version = "1.0.0"
+version = "1.0.1"
 readme = "README.md"
 description = "Template-less html rendering in Python"
 authors = ["Keith Philpott <fakekeith@example.org>"]
