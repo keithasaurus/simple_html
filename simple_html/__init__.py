@@ -1,3 +1,4 @@
+import re
 from html import escape
 from types import GeneratorType
 from typing import Tuple, Union, Dict, List, Generator, Optional
@@ -21,6 +22,20 @@ Node = Union[
 
 TagTuple = Tuple[str, Tuple[Node, ...], str]
 
+_common_safe_keys = frozenset(
+    {'alt', 'autoplay', 'autoplay', 'charset', 'checked', 'class', 'content',
+     'contenteditable', 'dir', 'draggable', 'for', 'height', 'hidden', 'href', 'hreflang',
+     'http-equiv', 'id', 'itemprop', 'itemscope', 'itemtype', 'lang', 'loadable', 'name',
+     'onblur', 'onclick', 'onfocus', 'onkeydown', 'onkeyup', 'onload', 'onselect',
+     'onsubmit', 'placeholder', 'poster', 'property', 'rel', 'sizes', 'spellcheck', 'src',
+     'style', 'target', 'title', 'type', 'value', 'width'}
+)
+
+
+def escape_key(k: str) -> str:
+    return escape(k).replace("=", "&#x3D;").replace("\\", "&#x5C;").replace("`",
+                                                                            "&#x60;")
+
 
 class Tag:
     __slots__ = ("tag_start", "rendered", "closing_tag", "no_children_close")
@@ -36,13 +51,21 @@ class Tag:
         self.rendered = f"{self.tag_start}{self.no_children_close}"
 
     def __call__(
-            self, attributes: Dict[str, Optional[str]], *children: Node
+            self, attributes: Dict[str, Union[str, SafeString, None]], *children: Node
     ) -> TagTuple:
         if attributes:
             # in this case this is faster than attrs = "".join([...])
             attrs = ""
             for key, val in attributes.items():
-                attrs += f" {key}" if val is None else f' {key}="{val}"'
+                if key not in _common_safe_keys:
+                    key = key.safe_str if isinstance(key, SafeString) else escape_key(
+                        key)
+                if isinstance(val, str):
+                    attrs += f' {key}="{escape(val)}"'
+                elif val is None:
+                    attrs += f" {key}"
+                elif isinstance(val, SafeString):
+                    attrs += f' {key}="{val.safe_str}"'
 
             if children:
                 return f"{self.tag_start}{attrs}>", children, self.closing_tag
