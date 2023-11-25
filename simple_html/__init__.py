@@ -1,6 +1,6 @@
 from html import escape
 from types import GeneratorType
-from typing import Tuple, Union, Dict, List, Generator, Optional
+from typing import Tuple, Union, Dict, List, Generator, Optional, Iterable
 
 
 class SafeString:
@@ -167,34 +167,31 @@ video = Tag("video")
 wbr = Tag("wbr")
 
 
-def _render(node: Node, strs: List[str]) -> None:
+def _render(nodes: Iterable[Node], strs: List[str]) -> None:
     """
     mutate a list instead of constantly rendering strings
     """
-    if type(node) is tuple:
-        strs.append(node[0])
-        for child in node[1]:
-            _render(child, strs)
-        strs.append(node[2])
-    elif isinstance(node, str):
-        strs.append(escape(node))
-    elif isinstance(node, SafeString):
-        strs.append(node.safe_str)
-    elif isinstance(node, Tag):
-        strs.append(node.rendered)
-    elif isinstance(node, list):
-        for n in node:
-            _render(n, strs)
-    elif isinstance(node, GeneratorType):
-        for n in node:
-            _render(n, strs)
-    else:
-        raise TypeError(f"Got unknown type: {type(node)}")
+    for node in nodes:
+        if type(node) is tuple:
+            strs.append(node[0])
+            _render(node[1], strs)
+            strs.append(node[2])
+        elif isinstance(node, str):
+            strs.append(escape(node))
+        elif isinstance(node, SafeString):
+            strs.append(node.safe_str)
+        elif isinstance(node, Tag):
+            strs.append(node.rendered)
+        elif isinstance(node, list):
+            _render(node, strs)
+        elif isinstance(node, GeneratorType):
+            _render(node, strs)
+        else:
+            raise TypeError(f"Got unknown type: {type(node)}")
 
 
 def render(*nodes: Node) -> str:
     results: List[str] = []
-    for node in nodes:
-        _render(node, results)
+    _render(nodes, results)
 
     return "".join(results)
