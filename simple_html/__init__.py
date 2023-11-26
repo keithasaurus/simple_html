@@ -112,7 +112,8 @@ class Tag:
             for key, val in attributes.items():
                 # optimization: a large portion of attribute keys should be
                 # covered by this check. It allows us to skip escaping
-                # where it is not needed
+                # where it is not needed. Note this is for attribute names only;
+                # attributes values are always escaped (when they are `str`s)
                 if key not in _common_safe_attribute_names:
                     key = (
                         key.safe_str
