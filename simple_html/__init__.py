@@ -24,7 +24,7 @@ Node = Union[
 
 TagTuple = Tuple[str, Tuple[Node, ...], str]
 
-_common_safe_keys: FrozenSet[str] = frozenset(
+_common_safe_attribute_names: FrozenSet[str] = frozenset(
     {
         "alt",
         "autoplay",
@@ -113,7 +113,7 @@ class Tag:
                 # optimization: a large portion of attribute keys should be
                 # covered by this check. It allows us to skip escaping
                 # where it is not needed
-                if key not in _common_safe_keys:
+                if key not in _common_safe_attribute_names:
                     key = (
                         key.safe_str
                         if isinstance(key, SafeString)
