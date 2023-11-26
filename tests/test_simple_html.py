@@ -18,7 +18,8 @@ from simple_html import (
     span,
     Node,
     DOCTYPE_HTML5,
-    render, escape_key,
+    render,
+    escape_attribute_key,
 )
 
 
@@ -97,9 +98,7 @@ def test_simple_form() -> None:
 
 
 def test_safestring_in_tag() -> None:
-    node = script(
-        {"type": "ld+json"}, SafeString(json.dumps({"some_key": "some_val"}))
-    )
+    node = script({"type": "ld+json"}, SafeString(json.dumps({"some_key": "some_val"})))
 
     assert render(node) == ('<script type="ld+json">{"some_key": "some_val"}</script>')
 
@@ -167,12 +166,40 @@ def test_hash_for_safestring() -> None:
 
 
 def test_escape_key() -> None:
-    assert escape_key("") == ""
-    assert escape_key(">") == "&gt;"
-    assert escape_key("<") == "&lt;"
-    assert escape_key('"') == "&quot;"
-    assert escape_key("\\") == "&#x5C;"
-    assert escape_key("'") == "&#x27;"
-    assert escape_key("=") == "&#x3D;"
-    assert escape_key("`") == "&#x60;"
-    assert escape_key("something with spaces") == "something&nbsp;with&nbsp;spaces"
+    assert escape_attribute_key("") == ""
+    assert escape_attribute_key(">") == "&gt;"
+    assert escape_attribute_key("<") == "&lt;"
+    assert escape_attribute_key('"') == "&quot;"
+    assert escape_attribute_key("\\") == "&#x5C;"
+    assert escape_attribute_key("'") == "&#x27;"
+    assert escape_attribute_key("=") == "&#x3D;"
+    assert escape_attribute_key("`") == "&#x60;"
+    assert (
+        escape_attribute_key("something with spaces")
+        == "something&nbsp;with&nbsp;spaces"
+    )
+
+
+def test_render_with_escaped_attributes() -> None:
+    assert (
+        render(div({'onmousenter="alert(1)" noop': "1"}))
+        == '<div onmousenter&#x3D;&quot;alert(1)&quot;&nbsp;noop="1"></div>'
+    )
+    assert (
+        render(span({"<script></script>": ">"}))
+        == '<span &lt;script&gt;&lt;/script&gt;="&gt;"></span>'
+    )
+    # vals and keys escape slightly differently
+    assert (
+        render(div({'onmousenter="alert(1)" noop': 'onmousenter="alert(1)" noop'}))
+        == '<div onmousenter&#x3D;&quot;alert(1)&quot;&nbsp;noop="onmousenter=&quot;alert(1)&quot; noop"></div>'
+    )
+
+
+def test_render_with_safestring_attributes() -> None:
+    bad_key = 'onmousenter="alert(1)" noop'
+    bad_val = "<script></script>"
+    assert (
+        render(div({SafeString(bad_key): SafeString(bad_val)}))
+        == f'<div {bad_key}="{bad_val}"></div>'
+    )

@@ -76,9 +76,13 @@ _common_safe_keys: FrozenSet[str] = frozenset(
 )
 
 
-def escape_key(k: str) -> str:
+def escape_attribute_key(k: str) -> str:
     return (
-        escape(k).replace("=", "&#x3D;").replace("\\", "&#x5C;").replace("`", "&#x60;").replace(" ", "&nbsp;")
+        escape(k)
+        .replace("=", "&#x3D;")
+        .replace("\\", "&#x5C;")
+        .replace("`", "&#x60;")
+        .replace(" ", "&nbsp;")
     )
 
 
@@ -96,7 +100,9 @@ class Tag:
         self.rendered = f"{self.tag_start}{self.no_children_close}"
 
     def __call__(
-        self, attributes: Dict[str, Union[str, SafeString, None]], *children: Node
+        self,
+        attributes: Dict[Union[SafeString, str], Union[str, SafeString, None]],
+        *children: Node,
     ) -> TagTuple:
         if attributes:
             # in this case this is faster than attrs = "".join([...])
@@ -104,7 +110,9 @@ class Tag:
             for key, val in attributes.items():
                 if key not in _common_safe_keys:
                     key = (
-                        key.safe_str if isinstance(key, SafeString) else escape_key(key)
+                        key.safe_str
+                        if isinstance(key, SafeString)
+                        else escape_attribute_key(key)
                     )
                 if isinstance(val, str):
                     attrs += f' {key}="{escape(val)}"'
