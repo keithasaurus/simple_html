@@ -1,13 +1,16 @@
 from html import escape
 from types import GeneratorType
-from typing import Tuple, Union, Dict, List, Generator, Optional, Iterable
+from typing import Tuple, Union, Dict, List, FrozenSet, Generator, Iterable
 
 
 class SafeString:
-    __slots__ = ('safe_str',)
+    __slots__ = ("safe_str",)
 
     def __init__(self, safe_str: str) -> None:
         self.safe_str = safe_str
+
+    def __hash__(self) -> int:
+        return hash(f"SafeString__{self.safe_str}")
 
 
 Node = Union[
@@ -20,6 +23,69 @@ Node = Union[
 ]
 
 TagTuple = Tuple[str, Tuple[Node, ...], str]
+
+_common_safe_attribute_names: FrozenSet[str] = frozenset(
+    {
+        "alt",
+        "autoplay",
+        "autoplay",
+        "charset",
+        "checked",
+        "class",
+        "colspan",
+        "content",
+        "contenteditable",
+        "dir",
+        "draggable",
+        "enctype",
+        "for",
+        "height",
+        "hidden",
+        "href",
+        "hreflang",
+        "http-equiv",
+        "id",
+        "itemprop",
+        "itemscope",
+        "itemtype",
+        "lang",
+        "loadable",
+        "method",
+        "name",
+        "onblur",
+        "onclick",
+        "onfocus",
+        "onkeydown",
+        "onkeyup",
+        "onload",
+        "onselect",
+        "onsubmit",
+        "placeholder",
+        "poster",
+        "property",
+        "rel",
+        "rowspan",
+        "sizes",
+        "spellcheck",
+        "src",
+        "style",
+        "target",
+        "title",
+        "type",
+        "value",
+        "width",
+    }
+)
+
+
+def escape_attribute_key(k: str) -> str:
+    return (
+        escape(k)
+        .replace("=", "&#x3D;")
+        .replace("\\", "&#x5C;")
+        .replace("`", "&#x60;")
+        .replace(" ", "&nbsp;")
+    )
 
 
 class Tag:
@@ -36,13 +102,30 @@ class Tag:
         self.rendered = f"{self.tag_start}{self.no_children_close}"
 
     def __call__(
-            self, attributes: Dict[str, Optional[str]], *children: Node
+        self,
+        attributes: Dict[Union[SafeString, str], Union[str, SafeString, None]],
+        *children: Node,
     ) -> TagTuple:
         if attributes:
             # in this case this is faster than attrs = "".join([...])
             attrs = ""
             for key, val in attributes.items():
-                attrs += f" {key}" if val is None else f' {key}="{val}"'
+                # optimization: a large portion of attribute keys should be
+                # covered by this check. It allows us to skip escaping
+                # where it is not needed. Note this is for attribute names only;
+                # attributes values are always escaped (when they are `str`s)
+                if key not in _common_safe_attribute_names:
+                    key = (
+                        key.safe_str
+                        if isinstance(key, SafeString)
+                        else escape_attribute_key(key)
+                    )
+                if isinstance(val, str):
+                    attrs += f' {key}="{escape(val)}"'
+                elif isinstance(val, SafeString):
+                    attrs += f' {key}="{val.safe_str}"'
+                elif val is None:
+                    attrs += f" {key}"
 
             if children:
                 return f"{self.tag_start}{attrs}>", children, self.closing_tag

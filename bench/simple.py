@@ -38,10 +38,7 @@ def basic(objs: List[Tuple[str, str, List[str]]]) -> None:
                         p({}, content, br, br),
                         ul(
                             {},
-                            [
-                                li({"class": "item-stuff"}, SafeString(ss))
-                                for ss in oks
-                            ],
+                            [li({"class": "item-stuff"}, SafeString(ss)) for ss in oks],
                         ),
                     ),
                 ),
@@ -55,9 +52,7 @@ def basic_long(objs: List[Tuple[str, str, List[str]]]) -> None:
             "<!doctype html>",
             html(
                 {},
-                head({},
-                     title({},
-                           title_)),
+                head({}, title({}, title_)),
                 body(
                     {},
                     h1({"class": "great header", "other_attr": "5", "id": "header1"}),
@@ -66,10 +61,7 @@ def basic_long(objs: List[Tuple[str, str, List[str]]]) -> None:
                         p({}, content, br, br),
                         ul(
                             {},
-                            [
-                                li({"class": "item-stuff"}, SafeString(ss))
-                                for ss in oks
-                            ],
+                            [li({"class": "item-stuff"}, SafeString(ss)) for ss in oks],
                         ),
                     ),
                     h1({"class": "great header", "other_attr": "5", "id": "header1"}),
@@ -78,10 +70,7 @@ def basic_long(objs: List[Tuple[str, str, List[str]]]) -> None:
                         p({}, content, br, br),
                         ul(
                             {},
-                            [
-                                li({"class": "item-stuff"}, SafeString(ss))
-                                for ss in oks
-                            ],
+                            [li({"class": "item-stuff"}, SafeString(ss)) for ss in oks],
                         ),
                     ),
                     h1({"class": "great header", "other_attr": "5", "id": "header1"}),
@@ -90,10 +79,7 @@ def basic_long(objs: List[Tuple[str, str, List[str]]]) -> None:
                         p({}, content, br, br),
                         ul(
                             {},
-                            [
-                                li({"class": "item-stuff"}, SafeString(ss))
-                                for ss in oks
-                            ],
+                            [li({"class": "item-stuff"}, SafeString(ss)) for ss in oks],
                         ),
                     ),
                     h1({"class": "great header", "other_attr": "5", "id": "header1"}),
@@ -102,10 +88,7 @@ def basic_long(objs: List[Tuple[str, str, List[str]]]) -> None:
                         p({}, content, br, br),
                         ul(
                             {},
-                            [
-                                li({"class": "item-stuff"}, SafeString(ss))
-                                for ss in oks
-                            ],
+                            [li({"class": "item-stuff"}, SafeString(ss)) for ss in oks],
                         ),
                     ),
                     h1({"class": "great header", "other_attr": "5", "id": "header1"}),
@@ -114,10 +97,7 @@ def basic_long(objs: List[Tuple[str, str, List[str]]]) -> None:
                         p({}, content, br, br),
                         ul(
                             {},
-                            [
-                                li({"class": "item-stuff"}, SafeString(ss))
-                                for ss in oks
-                            ],
+                            [li({"class": "item-stuff"}, SafeString(ss)) for ss in oks],
                         ),
                     ),
                 ),
