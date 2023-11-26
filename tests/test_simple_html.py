@@ -18,7 +18,7 @@ from simple_html import (
     span,
     Node,
     DOCTYPE_HTML5,
-    render,
+    render, escape_key,
 )
 
 
@@ -160,3 +160,19 @@ def test_can_render_empty() -> None:
         render(div({}, [], "hello ", [], span({}, "World!"), []))
         == "<div>hello <span>World!</span></div>"
     )
+
+
+def test_hash_for_safestring() -> None:
+    assert hash(SafeString("okokok")) == hash("SafeString__okokok")
+
+
+def test_escape_key() -> None:
+    assert escape_key("") == ""
+    assert escape_key(">") == "&gt;"
+    assert escape_key("<") == "&lt;"
+    assert escape_key('"') == "&quot;"
+    assert escape_key("\\") == "&#x5C;"
+    assert escape_key("'") == "&#x27;"
+    assert escape_key("=") == "&#x3D;"
+    assert escape_key("`") == "&#x60;"
+    assert escape_key("something with spaces") == "something&nbsp;with&nbsp;spaces"

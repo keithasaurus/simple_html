@@ -32,6 +32,7 @@ _common_safe_keys: FrozenSet[str] = frozenset(
         "charset",
         "checked",
         "class",
+        "colspan",
         "content",
         "contenteditable",
         "dir",
@@ -61,6 +62,7 @@ _common_safe_keys: FrozenSet[str] = frozenset(
         "poster",
         "property",
         "rel",
+        "rowspan",
         "sizes",
         "spellcheck",
         "src",
@@ -76,7 +78,7 @@ _common_safe_keys: FrozenSet[str] = frozenset(
 
 def escape_key(k: str) -> str:
     return (
-        escape(k).replace("=", "&#x3D;").replace("\\", "&#x5C;").replace("`", "&#x60;")
+        escape(k).replace("=", "&#x3D;").replace("\\", "&#x5C;").replace("`", "&#x60;").replace(" ", "&nbsp;")
     )
 
 
