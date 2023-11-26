@@ -61,18 +61,6 @@ render(
 # <div empty-str-attribute="" key-only-attr></div>
 ```
 
-Strings are escaped by default, but you can pass in `SafeString`s to avoid escaping.
-
-```python
-from simple_html import br, p, SafeString, render
-
-node = p({},
-         "Escaped & stuff",
-         br,
-         SafeString("Not escaped & stuff"))
-
-render(node)  # returns: <p>Escaped &amp; stuff<br/>Not escaped & stuff</p> 
-```
 
 Lists and generators are both valid collections of nodes:
 ```python
@@ -114,4 +102,32 @@ node = custom_elem(
 )
 
 render(node)  # <custom-elem id="some-custom-elem-id">Wow</custom-elem>
+```
+
+
+Strings are escaped by default, but you can pass in `SafeString`s to avoid escaping.
+
+```python
+from simple_html import br, p, SafeString, render
+
+node = p({},
+         "Escaped & stuff",
+         br,
+         SafeString("Not escaped & stuff"))
+
+render(node)  # <p>Escaped &amp; stuff<br/>Not escaped & stuff</p> 
+```
+
+Attributes are also escaped -- both names and values. You can use `SafeString` to bypass, if needed.
+
+```python
+from simple_html import div, render, SafeString
+
+escaped_attrs_node = div({"<bad>":"</also bad>"})
+
+render(escaped_attrs_node)  # <div &amp;lt;bad&amp;gt;="&amp;lt;/also bad&amp;gt;"></div>
+
+unescaped_attrs_node = div({SafeString("<bad>"): SafeString("</also bad>")})
+
+render(unescaped_attrs_node)  # <div <bad>="</also bad>"></div>
 ```

@@ -108,6 +108,9 @@ class Tag:
             # in this case this is faster than attrs = "".join([...])
             attrs = ""
             for key, val in attributes.items():
+                # optimization: a large portion of attribute keys should be
+                # covered by this check. It allows us to skip escaping
+                # where it is not needed
                 if key not in _common_safe_keys:
                     key = (
                         key.safe_str
@@ -116,10 +119,10 @@ class Tag:
                     )
                 if isinstance(val, str):
                     attrs += f' {key}="{escape(val)}"'
-                elif val is None:
-                    attrs += f" {key}"
                 elif isinstance(val, SafeString):
                     attrs += f' {key}="{val.safe_str}"'
+                elif val is None:
+                    attrs += f" {key}"
 
             if children:
                 return f"{self.tag_start}{attrs}>", children, self.closing_tag
