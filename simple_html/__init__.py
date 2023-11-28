@@ -80,7 +80,7 @@ _common_safe_attribute_names: FrozenSet[str] = frozenset(
 
 def escape_attribute_key(k: str) -> str:
     return (
-        escape(k)
+        escape(k, True)
         .replace("=", "&#x3D;")
         .replace("\\", "&#x5C;")
         .replace("`", "&#x60;")
@@ -121,7 +121,7 @@ class Tag:
                         else escape_attribute_key(key)
                     )
                 if isinstance(val, str):
-                    attrs += f' {key}="{escape(val)}"'
+                    attrs += f' {key}="{escape(val, True)}"'
                 elif isinstance(val, SafeString):
                     attrs += f' {key}="{val.safe_str}"'
                 elif val is None:

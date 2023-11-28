@@ -186,8 +186,8 @@ def test_render_with_escaped_attributes() -> None:
         == '<div onmousenter&#x3D;&quot;alert(1)&quot;&nbsp;noop="1"></div>'
     )
     assert (
-        render(span({"<script></script>": ">"}))
-        == '<span &lt;script&gt;&lt;/script&gt;="&gt;"></span>'
+        render(span({"<script>\"</script>": "\">"}))
+        == '<span &lt;script&gt;&quot;&lt;/script&gt;="&quot;&gt;"></span>'
     )
     # vals and keys escape slightly differently
     assert (
