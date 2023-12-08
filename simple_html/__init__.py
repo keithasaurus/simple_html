@@ -493,7 +493,7 @@ _common_safe_css_props = frozenset(
 
 
 def render_styles(
-    styles: dict[Union[str, SafeString], Union[str | int | float | SafeString]]
+    styles: dict[Union[str, SafeString], Union[str, int, float, SafeString]]
 ) -> SafeString:
     ret = ""
     for k, v in styles.items():
