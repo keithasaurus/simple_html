@@ -1,6 +1,6 @@
 from html import escape
 from types import GeneratorType
-from typing import Tuple, Union, Dict, List, FrozenSet, Generator, Iterable
+from typing import Tuple, Union, Dict, List, FrozenSet, Generator, Iterable, Any
 
 
 class SafeString:
@@ -11,6 +11,12 @@ class SafeString:
 
     def __hash__(self) -> int:
         return hash(f"SafeString__{self.safe_str}")
+
+    def __eq__(self, other: Any) -> bool:
+        return isinstance(other, SafeString) and other.safe_str == self.safe_str
+
+    def __repr__(self) -> str:
+        return f"SafeString(safe_str='{self.safe_str}')"
 
 
 Node = Union[
@@ -271,6 +277,241 @@ def _render(nodes: Iterable[Node], strs: List[str]) -> None:
             _render(node, strs)
         else:
             raise TypeError(f"Got unknown type: {type(node)}")
+
+
+_common_safe_css_props = frozenset(
+    {
+        "color",
+        "border",
+        "margin",
+        "font-style",
+        "transform",
+        "background-color",
+        "align-content",
+        "align-items",
+        "align-self",
+        "all",
+        "animation",
+        "animation-delay",
+        "animation-direction",
+        "animation-duration",
+        "animation-fill-mode",
+        "animation-iteration-count",
+        "animation-name",
+        "animation-play-state",
+        "animation-timing-function",
+        "backface-visibility",
+        "background",
+        "background-attachment",
+        "background-blend-mode",
+        "background-clip",
+        "background-color",
+        "background-image",
+        "background-origin",
+        "background-position",
+        "background-repeat",
+        "background-size",
+        "border",
+        "border-bottom",
+        "border-bottom-color",
+        "border-bottom-left-radius",
+        "border-bottom-right-radius",
+        "border-bottom-style",
+        "border-bottom-width",
+        "border-collapse",
+        "border-color",
+        "border-image",
+        "border-image-outset",
+        "border-image-repeat",
+        "border-image-slice",
+        "border-image-source",
+        "border-image-width",
+        "border-left",
+        "border-left-color",
+        "border-left-style",
+        "border-left-width",
+        "border-radius",
+        "border-right",
+        "border-right-color",
+        "border-right-style",
+        "border-right-width",
+        "border-spacing",
+        "border-style",
+        "border-top",
+        "border-top-color",
+        "border-top-left-radius",
+        "border-top-right-radius",
+        "border-top-style",
+        "border-top-width",
+        "border-width",
+        "bottom",
+        "box-shadow",
+        "box-sizing",
+        "caption-side",
+        "caret-color",
+        "@charset",
+        "clear",
+        "clip",
+        "clip-path",
+        "color",
+        "column-count",
+        "column-fill",
+        "column-gap",
+        "column-rule",
+        "column-rule-color",
+        "column-rule-style",
+        "column-rule-width",
+        "column-span",
+        "column-width",
+        "columns",
+        "content",
+        "counter-increment",
+        "counter-reset",
+        "cursor",
+        "direction",
+        "display",
+        "empty-cells",
+        "filter",
+        "flex",
+        "flex-basis",
+        "flex-direction",
+        "flex-flow",
+        "flex-grow",
+        "flex-shrink",
+        "flex-wrap",
+        "float",
+        "font",
+        "@font-face",
+        "font-family",
+        "font-kerning",
+        "font-size",
+        "font-size-adjust",
+        "font-stretch",
+        "font-style",
+        "font-variant",
+        "font-weight",
+        "grid",
+        "grid-area",
+        "grid-auto-columns",
+        "grid-auto-flow",
+        "grid-auto-rows",
+        "grid-column",
+        "grid-column-end",
+        "grid-column-gap",
+        "grid-column-start",
+        "grid-gap",
+        "grid-row",
+        "grid-row-end",
+        "grid-row-gap",
+        "grid-row-start",
+        "grid-template",
+        "grid-template-areas",
+        "grid-template-columns",
+        "grid-template-rows",
+        "height",
+        "hyphens",
+        "@import",
+        "justify-content",
+        "@keyframes",
+        "left",
+        "letter-spacing",
+        "line-height",
+        "list-style",
+        "list-style-image",
+        "list-style-position",
+        "list-style-type",
+        "margin",
+        "margin-bottom",
+        "margin-left",
+        "margin-right",
+        "margin-top",
+        "max-height",
+        "max-width",
+        "@media",
+        "min-height",
+        "min-width",
+        "object-fit",
+        "object-position",
+        "opacity",
+        "order",
+        "outline",
+        "outline-color",
+        "outline-offset",
+        "outline-style",
+        "outline-width",
+        "overflow",
+        "overflow-x",
+        "overflow-y",
+        "padding",
+        "padding-bottom",
+        "padding-left",
+        "padding-right",
+        "padding-top",
+        "page-break-after",
+        "page-break-before",
+        "page-break-inside",
+        "perspective",
+        "perspective-origin",
+        "pointer-events",
+        "position",
+        "quotes",
+        "right",
+        "scroll-behavior",
+        "table-layout",
+        "text-align",
+        "text-align-last",
+        "text-decoration",
+        "text-decoration-color",
+        "text-decoration-line",
+        "text-decoration-style",
+        "text-indent",
+        "text-justify",
+        "text-overflow",
+        "text-shadow",
+        "text-transform",
+        "top",
+        "transform",
+        "transform-origin",
+        "transform-style",
+        "transition",
+        "transition-delay",
+        "transition-duration",
+        "transition-property",
+        "transition-timing-function",
+        "user-select",
+        "vertical-align",
+        "visibility",
+        "white-space",
+        "width",
+        "word-break",
+        "word-spacing",
+        "word-wrap",
+        "writing-mode",
+        "z-index",
+    }
+)
+
+
+def render_styles(
+    styles: Dict[Union[str, SafeString], Union[str, int, float, SafeString]]
+) -> SafeString:
+    ret = ""
+    for k, v in styles.items():
+        if k not in _common_safe_css_props:
+            if isinstance(k, SafeString):
+                k = k.safe_str
+            else:
+                k = escape(k, True)
+
+        if isinstance(v, SafeString):
+            v = v.safe_str
+        elif isinstance(v, str):
+            v = escape(v, True)
+        # note that ints and floats pass through these condition checks
+
+        ret += f"{k}:{v};"
+
+    return SafeString(ret)
 
 
 def render(*nodes: Node) -> str:

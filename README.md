@@ -61,6 +61,29 @@ render(
 # <div empty-str-attribute="" key-only-attr></div>
 ```
 
+You can render inline css styles with `render_styles`:
+```python
+from simple_html import div, render, render_styles
+
+styles = render_styles({"min-width": "25px"})
+
+render(
+    div({"style": styles}, 
+        "cool")
+)
+# <div style="min-width:25px;">cool</div>
+
+
+# ints and floats are legal values
+styles = render_styles({"padding": 0, "flex-grow": 0.6})
+
+render(
+    div({"style": styles},
+        "wow")
+)
+# <div style="padding:0;flex-grow:0.6;">wow</div>
+```
+
 
 Lists and generators are both valid collections of nodes:
 ```python
