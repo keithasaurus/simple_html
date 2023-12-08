@@ -316,7 +316,7 @@ _common_safe_css_props = frozenset({
 })
 
 
-def render_styles(styles: dict[str | SafeString, str | SafeString]) -> SafeString:
+def render_styles(styles: dict[str | SafeString, str | int | float | SafeString]) -> SafeString:
     ret = ""
     for k, v in styles.items():
         if k not in _common_safe_css_props:
@@ -327,8 +327,9 @@ def render_styles(styles: dict[str | SafeString, str | SafeString]) -> SafeStrin
 
         if isinstance(v, SafeString):
             v = v.safe_str
-        else:
+        elif isinstance(v, str):
             v = escape(v, True)
+        # note that ints and floats pass through these condition checks
 
         ret += f"{k}:{v};"
 

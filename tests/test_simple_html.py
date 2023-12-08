@@ -217,6 +217,15 @@ def test_safe_string_eq() -> None:
 
 def test_render_styles() -> None:
     assert render_styles({}) == SafeString("")
-    assert render_styles({"abc": "123"}) == SafeString("abc:123;")
-    assert render_styles({"padding": "0",
+    assert render_styles({"abc": 123.45}) == SafeString("abc:123.45;")
+    assert render_styles({"padding": 0,
                           "margin": "0 10"}) == SafeString("padding:0;margin:0 10;")
+
+    assert render(div({"style": render_styles({"min-width": "25px"})},
+                      "cool")) == '<div style="min-width:25px;">cool</div>'
+
+
+def test_render_styles_escapes() -> None:
+    assert render_styles({'"><': "><>\""}) == SafeString(
+        safe_str='&quot;&gt;&lt;:&gt;&lt;&gt;&quot;;'
+    )
