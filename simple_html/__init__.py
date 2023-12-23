@@ -95,7 +95,13 @@ def escape_attribute_key(k: str) -> str:
 
 
 class Tag:
-    __slots__ = ("tag_start", "closing_tag", "tag_start_no_attrs", "rendered", "no_children_close")
+    __slots__ = (
+        "tag_start",
+        "closing_tag",
+        "tag_start_no_attrs",
+        "rendered",
+        "no_children_close",
+    )
 
     def __init__(self, name: str, self_closing: bool = False) -> None:
         self.tag_start = f"<{name}"
@@ -134,7 +140,6 @@ class Tag:
                 elif val is None:
                     attrs += f" {key}"
 
-            print("attributes", attrs, attributes)
             if children:
                 return f"{self.tag_start}{attrs}>", children, self.closing_tag
             else:
