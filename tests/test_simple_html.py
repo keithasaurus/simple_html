@@ -19,7 +19,7 @@ from simple_html import (
     Node,
     DOCTYPE_HTML5,
     render,
-    escape_attribute_key, render_styles,
+    escape_attribute_key, render_styles, img,
 )
 
 
@@ -127,6 +127,12 @@ def test_uncalled_tag_renders() -> None:
 def test_attribute_without_value_rendered_as_expected() -> None:
     assert render(a({"something": ""})) == '<a something=""></a>'
     assert render(a({"something": None})) == "<a something></a>"
+
+
+def test_self_closing_still_nests_children() -> None:
+    assert render(img({}, div)) == "<img><div></div></img>"
+    assert render(img({"id": "4"}, div)) == '<img id="4"><div></div></img>'
+
 
 
 def test_render_with_doctype() -> None:
