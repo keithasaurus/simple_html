@@ -95,15 +95,21 @@ def escape_attribute_key(k: str) -> str:
 
 
 class Tag:
-    __slots__ = ("tag_start", "rendered", "closing_tag", "no_children_close")
+    __slots__ = (
+        "tag_start",
+        "closing_tag",
+        "tag_start_no_attrs",
+        "rendered",
+        "no_children_close",
+    )
 
     def __init__(self, name: str, self_closing: bool = False) -> None:
         self.tag_start = f"<{name}"
+        self.tag_start_no_attrs = f"{self.tag_start}>"
+        self.closing_tag = f"</{name}>"
         if self_closing:
-            self.closing_tag = ""
             self.no_children_close = "/>"
         else:
-            self.closing_tag = f"</{name}>"
             self.no_children_close = f">{self.closing_tag}"
         self.rendered = f"{self.tag_start}{self.no_children_close}"
 
@@ -111,7 +117,7 @@ class Tag:
         self,
         attributes: Dict[Union[SafeString, str], Union[str, SafeString, None]],
         *children: Node,
-    ) -> TagTuple:
+    ) -> Union[TagTuple, SafeString]:
         if attributes:
             # in this case this is faster than attrs = "".join([...])
             attrs = ""
@@ -126,6 +132,7 @@ class Tag:
                         if isinstance(key, SafeString)
                         else escape_attribute_key(key)
                     )
+
                 if isinstance(val, str):
                     attrs += f' {key}="{escape(val, True)}"'
                 elif isinstance(val, SafeString):
@@ -136,8 +143,11 @@ class Tag:
             if children:
                 return f"{self.tag_start}{attrs}>", children, self.closing_tag
             else:
-                return f"{self.tag_start}{attrs}{self.no_children_close}", children, ""
-        return f"{self.tag_start}>", children, self.closing_tag
+                return SafeString(f"{self.tag_start}{attrs}{self.no_children_close}")
+        elif children:
+            return self.tag_start_no_attrs, children, self.closing_tag
+        else:
+            return SafeString(self.rendered)
 
 
 DOCTYPE_HTML5 = SafeString("<!doctype html>")
@@ -265,10 +275,10 @@ def _render(nodes: Iterable[Node], strs: List[str]) -> None:
             strs.append(node[0])
             _render(node[1], strs)
             strs.append(node[2])
-        elif isinstance(node, str):
-            strs.append(escape(node))
         elif isinstance(node, SafeString):
             strs.append(node.safe_str)
+        elif isinstance(node, str):
+            strs.append(escape(node))
         elif isinstance(node, Tag):
             strs.append(node.rendered)
         elif isinstance(node, list):

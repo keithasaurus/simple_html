@@ -19,7 +19,9 @@ from simple_html import (
     Node,
     DOCTYPE_HTML5,
     render,
-    escape_attribute_key, render_styles,
+    escape_attribute_key,
+    render_styles,
+    img,
 )
 
 
@@ -114,8 +116,8 @@ def test_kw_attributes() -> None:
     node = div({"class": "first", "name": "some_name", "style": "color:blue;"}, "okok")
 
     assert (
-            render(node)
-            == '<div class="first" name="some_name" style="color:blue;">okok</div>'
+        render(node)
+        == '<div class="first" name="some_name" style="color:blue;">okok</div>'
     )
 
 
@@ -127,6 +129,11 @@ def test_uncalled_tag_renders() -> None:
 def test_attribute_without_value_rendered_as_expected() -> None:
     assert render(a({"something": ""})) == '<a something=""></a>'
     assert render(a({"something": None})) == "<a something></a>"
+
+
+def test_self_closing_still_nests_children() -> None:
+    assert render(img({}, div)) == "<img><div></div></img>"
+    assert render(img({"id": "4"}, div)) == '<img id="4"><div></div></img>'
 
 
 def test_render_with_doctype() -> None:
@@ -156,8 +163,8 @@ def test_render_kw_attribute_with_none() -> None:
 def test_can_render_empty() -> None:
     assert render([]) == ""
     assert (
-            render(div({}, [], "hello ", [], span({}, "World!"), []))
-            == "<div>hello <span>World!</span></div>"
+        render(div({}, [], "hello ", [], span({}, "World!"), []))
+        == "<div>hello <span>World!</span></div>"
     )
 
 
@@ -175,24 +182,24 @@ def test_escape_key() -> None:
     assert escape_attribute_key("=") == "&#x3D;"
     assert escape_attribute_key("`") == "&#x60;"
     assert (
-            escape_attribute_key("something with spaces")
-            == "something&nbsp;with&nbsp;spaces"
+        escape_attribute_key("something with spaces")
+        == "something&nbsp;with&nbsp;spaces"
     )
 
 
 def test_render_with_escaped_attributes() -> None:
     assert (
-            render(div({'onmousenter="alert(1)" noop': "1"}))
-            == '<div onmousenter&#x3D;&quot;alert(1)&quot;&nbsp;noop="1"></div>'
+        render(div({'onmousenter="alert(1)" noop': "1"}))
+        == '<div onmousenter&#x3D;&quot;alert(1)&quot;&nbsp;noop="1"></div>'
     )
     assert (
-            render(span({"<script>\"</script>": "\">"}))
-            == '<span &lt;script&gt;&quot;&lt;/script&gt;="&quot;&gt;"></span>'
+        render(span({'<script>"</script>': '">'}))
+        == '<span &lt;script&gt;&quot;&lt;/script&gt;="&quot;&gt;"></span>'
     )
     # vals and keys escape slightly differently
     assert (
-            render(div({'onmousenter="alert(1)" noop': 'onmousenter="alert(1)" noop'}))
-            == '<div onmousenter&#x3D;&quot;alert(1)&quot;&nbsp;noop="onmousenter=&quot;alert(1)&quot; noop"></div>'
+        render(div({'onmousenter="alert(1)" noop': 'onmousenter="alert(1)" noop'}))
+        == '<div onmousenter&#x3D;&quot;alert(1)&quot;&nbsp;noop="onmousenter=&quot;alert(1)&quot; noop"></div>'
     )
 
 
@@ -200,8 +207,8 @@ def test_render_with_safestring_attributes() -> None:
     bad_key = 'onmousenter="alert(1)" noop'
     bad_val = "<script></script>"
     assert (
-            render(div({SafeString(bad_key): SafeString(bad_val)}))
-            == f'<div {bad_key}="{bad_val}"></div>'
+        render(div({SafeString(bad_key): SafeString(bad_val)}))
+        == f'<div {bad_key}="{bad_val}"></div>'
     )
 
 
@@ -218,14 +225,17 @@ def test_safe_string_eq() -> None:
 def test_render_styles() -> None:
     assert render_styles({}) == SafeString("")
     assert render_styles({"abc": 123.45}) == SafeString("abc:123.45;")
-    assert render_styles({"padding": 0,
-                          "margin": "0 10"}) == SafeString("padding:0;margin:0 10;")
+    assert render_styles({"padding": 0, "margin": "0 10"}) == SafeString(
+        "padding:0;margin:0 10;"
+    )
 
-    assert render(div({"style": render_styles({"min-width": "25px"})},
-                      "cool")) == '<div style="min-width:25px;">cool</div>'
+    assert (
+        render(div({"style": render_styles({"min-width": "25px"})}, "cool"))
+        == '<div style="min-width:25px;">cool</div>'
+    )
 
 
 def test_render_styles_escapes() -> None:
-    assert render_styles({'"><': "><>\""}) == SafeString(
-        safe_str='&quot;&gt;&lt;:&gt;&lt;&gt;&quot;;'
+    assert render_styles({'"><': '><>"'}) == SafeString(
+        safe_str="&quot;&gt;&lt;:&gt;&lt;&gt;&quot;;"
     )
