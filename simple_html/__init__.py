@@ -128,9 +128,9 @@ class Tag:
                 # attributes values are always escaped (when they are `str`s)
                 if key not in _common_safe_attribute_names:
                     key = (
-                        key.safe_str
-                        if isinstance(key, SafeString)
-                        else escape_attribute_key(key)
+                        escape_attribute_key(key)
+                        if isinstance(key, str)
+                        else key.safe_str
                     )
 
                 if isinstance(val, str):
