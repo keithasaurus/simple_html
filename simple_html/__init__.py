@@ -1,6 +1,6 @@
 from html import escape
 from types import GeneratorType
-from typing import Tuple, Union, Dict, List, FrozenSet, Generator, Iterable, Any
+from typing import Tuple, Union, Dict, List, FrozenSet, Generator, Iterable, Any, Callable
 
 
 class SafeString:
@@ -128,9 +128,9 @@ class Tag:
                 # attributes values are always escaped (when they are `str`s)
                 if key not in _common_safe_attribute_names:
                     key = (
-                        key.safe_str
-                        if isinstance(key, SafeString)
-                        else escape_attribute_key(key)
+                        escape_attribute_key(key)
+                        if isinstance(key, str)
+                        else key.safe_str
                     )
 
                 if isinstance(val, str):
@@ -266,25 +266,25 @@ video = Tag("video")
 wbr = Tag("wbr")
 
 
-def _render(nodes: Iterable[Node], strs: List[str]) -> None:
+def _render(nodes: Iterable[Node], append_to_list: Callable[[str], None]) -> None:
     """
     mutate a list instead of constantly rendering strings
     """
     for node in nodes:
         if type(node) is tuple:
-            strs.append(node[0])
-            _render(node[1], strs)
-            strs.append(node[2])
+            append_to_list(node[0])
+            _render(node[1], append_to_list)
+            append_to_list(node[2])
         elif isinstance(node, SafeString):
-            strs.append(node.safe_str)
+            append_to_list(node.safe_str)
         elif isinstance(node, str):
-            strs.append(escape(node))
+            append_to_list(escape(node))
         elif isinstance(node, Tag):
-            strs.append(node.rendered)
+            append_to_list(node.rendered)
         elif isinstance(node, list):
-            _render(node, strs)
+            _render(node, append_to_list)
         elif isinstance(node, GeneratorType):
-            _render(node, strs)
+            _render(node, append_to_list)
         else:
             raise TypeError(f"Got unknown type: {type(node)}")
 
@@ -526,6 +526,6 @@ def render_styles(
 
 def render(*nodes: Node) -> str:
     results: List[str] = []
-    _render(nodes, results)
+    _render(nodes, results.append)
 
     return "".join(results)
