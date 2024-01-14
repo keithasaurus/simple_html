@@ -271,19 +271,20 @@ def _render(nodes: Iterable[Node], append_to_list: Callable[[str], None]) -> Non
     mutate a list instead of constantly rendering strings
     """
     for node in nodes:
-        if type(node) is tuple:
+        node_type = type(node)
+        if node_type is tuple:
             append_to_list(node[0])
             _render(node[1], append_to_list)
             append_to_list(node[2])
-        elif isinstance(node, SafeString):
+        elif node_type is SafeString:
             append_to_list(node.safe_str)
-        elif isinstance(node, str):
+        elif node_type is str:
             append_to_list(escape(node))
-        elif isinstance(node, Tag):
+        elif node_type is Tag:
             append_to_list(node.rendered)
-        elif isinstance(node, list):
+        elif node_type is list:
             _render(node, append_to_list)
-        elif isinstance(node, GeneratorType):
+        elif node is GeneratorType:
             _render(node, append_to_list)
         else:
             raise TypeError(f"Got unknown type: {type(node)}")
