@@ -272,6 +272,8 @@ def _render(nodes: Iterable[Node], append_to_list: Callable[[str], None]) -> Non
     """
     for node in nodes:
         node_type = type(node)
+
+        # check for exact types first
         if node_type is tuple:
             append_to_list(node[0])
             _render(node[1], append_to_list)
@@ -284,7 +286,15 @@ def _render(nodes: Iterable[Node], append_to_list: Callable[[str], None]) -> Non
             append_to_list(node.rendered)
         elif node_type is list:
             _render(node, append_to_list)
-        elif node is GeneratorType:
+        elif isinstance(node, GeneratorType):
+            _render(node, append_to_list)
+
+        # optimization: handle subclasses separately here
+        elif issubclass(node_type, SafeString):
+            append_to_list(node.safe_str)
+        elif issubclass(node_type, Tag):
+            append_to_list(node.rendered)
+        elif issubclass(node_type, list):
             _render(node, append_to_list)
         else:
             raise TypeError(f"Got unknown type: {type(node)}")
