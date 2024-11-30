@@ -1,4 +1,3 @@
-from html import escape
 from types import GeneratorType
 from typing import Tuple, Union, Dict, List, FrozenSet, Generator, Iterable, Any, Callable
 
