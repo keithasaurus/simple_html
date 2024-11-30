@@ -4,8 +4,6 @@ from typing import Tuple, Union, Dict, List, FrozenSet, Generator, Iterable, Any
 
 
 class SafeString:
-    __slots__ = ("safe_str",)
-
     def __init__(self, safe_str: str) -> None:
         self.safe_str = safe_str
 
