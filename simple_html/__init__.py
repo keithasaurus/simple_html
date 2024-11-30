@@ -32,7 +32,6 @@ _common_safe_attribute_names: FrozenSet[str] = frozenset(
     {
         "alt",
         "autoplay",
-        "autoplay",
         "charset",
         "checked",
         "class",
