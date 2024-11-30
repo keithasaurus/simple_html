@@ -29,7 +29,7 @@ Node = Union[
 TagTuple = Tuple[str, Tuple[Node, ...], str]
 
 _common_safe_attribute_names: FrozenSet[str] = frozenset(
-    {
+    (
         "alt",
         "autoplay",
         "charset",
@@ -77,7 +77,7 @@ _common_safe_attribute_names: FrozenSet[str] = frozenset(
         "type",
         "value",
         "width",
-    }
+    )
 )
 
 
@@ -287,7 +287,7 @@ def _render(nodes: Iterable[Node], append_to_list: Callable[[str], None]) -> Non
 
 
 _common_safe_css_props = frozenset(
-    {
+    (
         "color",
         "border",
         "margin",
@@ -495,7 +495,7 @@ _common_safe_css_props = frozenset(
         "word-wrap",
         "writing-mode",
         "z-index",
-    }
+    )
 )
 
 
