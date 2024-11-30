@@ -17,19 +17,16 @@ class SafeString:
         return f"SafeString(safe_str='{self.safe_str}')"
 
 
-def faster_escape(s, quote=True):
+def faster_escape(s: str) -> str:
     """
-    Replace special characters "&", "<" and ">" to HTML-safe sequences.
-    If the optional flag quote is true (the default), the quotation mark
-    characters, both double quote (") and single quote (') characters are also
-    translated.
+    This is nearly duplicate of html.escape in the standard lib.
+    it's a little faster because:
+     - we don't check if some of the replacements are desired
+     - we don't re-assign a variable many times.
     """
-    s = s.replace(
+    return s.replace(
         "&", "&amp;"   # Must be done first!
-    ).replace("<", "&lt;").replace(">", "&gt;")
-    if quote:
-        return s.replace('"', "&quot;").replace('\'', "&#x27;")
-    return s
+    ).replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;").replace('\'', "&#x27;")
 
 Node = Union[
     str,
@@ -97,7 +94,7 @@ _common_safe_attribute_names: FrozenSet[str] = frozenset(
 
 def escape_attribute_key(k: str) -> str:
     return (
-        faster_escape(k, True)
+        faster_escape(k)
         .replace("=", "&#x3D;")
         .replace("\\", "&#x5C;")
         .replace("`", "&#x60;")
@@ -145,7 +142,7 @@ class Tag:
                     )
 
                 if isinstance(val, str):
-                    attrs += f' {key}="{faster_escape(val, True)}"'
+                    attrs += f' {key}="{faster_escape(val)}"'
                 elif isinstance(val, SafeString):
                     attrs += f' {key}="{val.safe_str}"'
                 elif val is None:
@@ -522,12 +519,12 @@ def render_styles(
             if isinstance(k, SafeString):
                 k = k.safe_str
             else:
-                k = faster_escape(k, True)
+                k = faster_escape(k)
 
         if isinstance(v, SafeString):
             v = v.safe_str
         elif isinstance(v, str):
-            v = faster_escape(v, True)
+            v = faster_escape(v)
         # note that ints and floats pass through these condition checks
 
         ret += f"{k}:{v};"
