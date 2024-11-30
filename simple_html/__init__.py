@@ -17,6 +17,20 @@ class SafeString:
         return f"SafeString(safe_str='{self.safe_str}')"
 
 
+def faster_escape(s, quote=True):
+    """
+    Replace special characters "&", "<" and ">" to HTML-safe sequences.
+    If the optional flag quote is true (the default), the quotation mark
+    characters, both double quote (") and single quote (') characters are also
+    translated.
+    """
+    s = s.replace(
+        "&", "&amp;"   # Must be done first!
+    ).replace("<", "&lt;").replace(">", "&gt;")
+    if quote:
+        return s.replace('"', "&quot;").replace('\'', "&#x27;")
+    return s
+
 Node = Union[
     str,
     SafeString,
@@ -83,7 +97,7 @@ _common_safe_attribute_names: FrozenSet[str] = frozenset(
 
 def escape_attribute_key(k: str) -> str:
     return (
-        escape(k, True)
+        faster_escape(k, True)
         .replace("=", "&#x3D;")
         .replace("\\", "&#x5C;")
         .replace("`", "&#x60;")
@@ -131,7 +145,7 @@ class Tag:
                     )
 
                 if isinstance(val, str):
-                    attrs += f' {key}="{escape(val, True)}"'
+                    attrs += f' {key}="{faster_escape(val, True)}"'
                 elif isinstance(val, SafeString):
                     attrs += f' {key}="{val.safe_str}"'
                 elif val is None:
@@ -275,7 +289,7 @@ def _render(nodes: Iterable[Node], append_to_list: Callable[[str], None]) -> Non
         elif isinstance(node, SafeString):
             append_to_list(node.safe_str)
         elif isinstance(node, str):
-            append_to_list(escape(node))
+            append_to_list(faster_escape(node))
         elif isinstance(node, Tag):
             append_to_list(node.rendered)
         elif isinstance(node, list):
@@ -508,12 +522,12 @@ def render_styles(
             if isinstance(k, SafeString):
                 k = k.safe_str
             else:
-                k = escape(k, True)
+                k = faster_escape(k, True)
 
         if isinstance(v, SafeString):
             v = v.safe_str
         elif isinstance(v, str):
-            v = escape(v, True)
+            v = faster_escape(v, True)
         # note that ints and floats pass through these condition checks
 
         ret += f"{k}:{v};"
