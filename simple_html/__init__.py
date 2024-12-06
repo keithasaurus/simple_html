@@ -1,5 +1,5 @@
 from types import GeneratorType
-from typing import Tuple, Union, Dict, List, FrozenSet, Generator, Iterable, Any, Callable
+from typing import Tuple, Union, Dict, List, FrozenSet, Generator, Iterable, Any, Callable, Mapping
 
 
 class SafeString:
@@ -100,6 +100,8 @@ def escape_attribute_key(k: str) -> str:
         .replace(" ", "&nbsp;")
     )
 
+type AttributeDict = Dict[Union[SafeString, str], Union[str, SafeString, None]]
+
 
 class Tag:
     __slots__ = (
@@ -122,7 +124,7 @@ class Tag:
 
     def __call__(
         self,
-        attributes: Dict[Union[SafeString, str], Union[str, SafeString, None]],
+        attributes: None | AttributeDict,
         *children: Node,
     ) -> Union[TagTuple, SafeString]:
         if attributes:

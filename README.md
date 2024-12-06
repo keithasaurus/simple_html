@@ -50,6 +50,18 @@ render(
 # <div><h1>something</h1></div>'
 ```
 
+TIP: empty attributes can be made less visually busy by using an underscore:
+```python
+_ = None
+
+render(
+    div(_,
+        h1(_,
+           "something"))
+)
+# <div><h1>something</h1></div>'
+```
+
 Tag attributes with `None` as the value will only render the attribute name:
 ```python
 from simple_html import div, render
@@ -90,12 +102,13 @@ Lists and generators are both valid collections of nodes:
 from typing import Generator
 from simple_html import div, render, Node, br
 
+_: None = None
 
 def get_list_of_nodes() -> list[Node]:
     return ["neat", br]
 
 
-render(div({}, get_list_of_nodes()))
+render(div(_, get_list_of_nodes()))
 # <div>neat<br/></div>
 
 
@@ -105,7 +118,7 @@ def node_generator() -> Generator[Node, None, None]:
 
 
 render(
-    div({}, node_generator())
+    div(_, node_generator())
 )
 # <div>neat<br/></div>
 ```
