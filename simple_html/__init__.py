@@ -147,8 +147,10 @@ class Tag:
                         attrs += f' {key}="{val.safe_str}"'
                     elif val is None:
                         attrs += f" {key}"
-            except AttributeError:
-                print("----------------\n\nIs your first argument to a tag not a dictionary?\n\n----------------")
+            except AttributeError as e:
+                e.add_note(
+                    "---\nHINT: This error often occurs when the first argument to a `Tag` is not a dictionary."
+                )
                 raise
 
             if children:
