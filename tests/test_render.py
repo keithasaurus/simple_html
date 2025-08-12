@@ -16,13 +16,11 @@ from simple_html import (
     p,
     script,
     span,
-    Node,
     DOCTYPE_HTML5,
     render,
-    escape_attribute_key,
-    render_styles,
     img,
 )
+from simple_html.render import render_styles, escape_attribute_key, Node
 
 
 def test_renders_no_children() -> None:
