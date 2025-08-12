@@ -49,7 +49,7 @@ class Tag:
 
     def __call__(
         self,
-        attributes: dict[Union[SafeString, str], Union[str, SafeString, None]],
+        attributes: dict[SafeString | str, str | SafeString | None],
         *children: Node,
     ) -> Union[TagTuple, SafeString]:
         if attributes:
