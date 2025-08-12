@@ -17,7 +17,7 @@ class SafeString:
         return f"SafeString(safe_str='{self.safe_str}')"
 
 
-Node = Union[
+type Node = Union[
     str,
     SafeString,
     "Tag",
@@ -25,18 +25,10 @@ Node = Union[
     list["Node"],
     Generator["Node", None, None],
 ]
-TagTuple = tuple[str, tuple[Node, ...], str]
+type TagTuple = tuple[str, tuple[Node, ...], str]
 
 
 class Tag:
-    __slots__ = (
-        "tag_start",
-        "closing_tag",
-        "tag_start_no_attrs",
-        "rendered",
-        "no_children_close",
-    )
-
     def __init__(self, name: str, self_closing: bool = False) -> None:
         self.tag_start = f"<{name}"
         self.tag_start_no_attrs = f"{self.tag_start}>"
