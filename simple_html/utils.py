@@ -1,3 +1,6 @@
+from typing import Final
+
+
 def faster_escape(s: str) -> str:
     """
     This is nearly duplicate of html.escape in the standard lib.
@@ -20,7 +23,7 @@ def escape_attribute_key(k: str) -> str:
     )
 
 
-_common_safe_attribute_names: frozenset[str] = frozenset(
+_common_safe_attribute_names: Final[frozenset[str]] = frozenset(
     (
         "alt",
         "autoplay",
@@ -71,7 +74,7 @@ _common_safe_attribute_names: frozenset[str] = frozenset(
         "width",
     )
 )
-_common_safe_css_props = frozenset(
+_common_safe_css_props: Final[frozenset[str]] = frozenset(
     (
         "color",
         "border",

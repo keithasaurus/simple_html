@@ -55,31 +55,25 @@ class Tag:
         if attributes:
             # in this case this is faster than attrs = "".join([...])
             attrs = ""
-            try:
-                val: str | SafeString | None
-                for key, val in attributes.items():
-                    # optimization: a large portion of attribute keys should be
-                    # covered by this check. It allows us to skip escaping
-                    # where it is not needed. Note this is for attribute names only;
-                    # attributes values are always escaped (when they are `str`s)
-                    if key not in _common_safe_attribute_names:
-                        key = (
-                            escape_attribute_key(key)
-                            if isinstance(key, str)
-                            else key.safe_str
-                        )
+            val: str | SafeString | None
+            for key, val in attributes.items():
+                # optimization: a large portion of attribute keys should be
+                # covered by this check. It allows us to skip escaping
+                # where it is not needed. Note this is for attribute names only;
+                # attributes values are always escaped (when they are `str`s)
+                if key not in _common_safe_attribute_names:
+                    key = (
+                        escape_attribute_key(key)
+                        if isinstance(key, str)
+                        else key.safe_str
+                    )
 
-                    if isinstance(val, str):
-                        attrs += f' {key}="{faster_escape(val)}"'
-                    elif isinstance(val, SafeString):
-                        attrs += f' {key}="{val.safe_str}"'
-                    elif val is None:
-                        attrs += f" {key}"
-            except AttributeError as e:
-                e.add_note(
-                    "---\nHINT: This error often occurs when the first argument to a `Tag` is not a dictionary."
-                )
-                raise
+                if isinstance(val, str):
+                    attrs += f' {key}="{faster_escape(val)}"'
+                elif isinstance(val, SafeString):
+                    attrs += f' {key}="{val.safe_str}"'
+                elif val is None:
+                    attrs += f" {key}"
 
             if children:
                 return f"{self.tag_start}{attrs}>", children, self.closing_tag
