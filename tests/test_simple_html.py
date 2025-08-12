@@ -19,10 +19,10 @@ from simple_html import (
     Node,
     DOCTYPE_HTML5,
     render,
-    escape_attribute_key,
     render_styles,
     img,
 )
+from simple_html.utils import escape_attribute_key
 
 
 def test_renders_no_children() -> None:
