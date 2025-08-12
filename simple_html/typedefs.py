@@ -17,7 +17,7 @@ class SafeString:
         return f"SafeString(safe_str='{self.safe_str}')"
 
 
-type Node = Union[
+Node = Union[
     str,
     SafeString,
     "Tag",
@@ -25,7 +25,8 @@ type Node = Union[
     list["Node"],
     Generator["Node", None, None],
 ]
-type TagTuple = tuple[str, tuple[Node, ...], str]
+
+TagTuple = tuple[str, tuple[Node, ...], str]
 
 
 class Tag:
