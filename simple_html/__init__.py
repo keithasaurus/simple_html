@@ -1,5 +1,5 @@
 from types import GeneratorType
-from typing import Tuple, Union, Dict, List, FrozenSet, Generator, Iterable, Any, Callable
+from typing import Union, Generator, Iterable, Any, Callable
 
 
 class SafeString:
@@ -32,13 +32,13 @@ Node = Union[
     SafeString,
     "Tag",
     "TagTuple",
-    List["Node"],
+    list["Node"],
     Generator["Node", None, None],
 ]
 
-TagTuple = Tuple[str, Tuple[Node, ...], str]
+TagTuple = tuple[str, tuple[Node, ...], str]
 
-_common_safe_attribute_names: FrozenSet[str] = frozenset(
+_common_safe_attribute_names: frozenset[str] = frozenset(
     (
         "alt",
         "autoplay",
@@ -122,7 +122,7 @@ class Tag:
 
     def __call__(
         self,
-        attributes: Dict[Union[SafeString, str], Union[str, SafeString, None]],
+        attributes: dict[Union[SafeString, str], Union[str, SafeString, None]],
         *children: Node,
     ) -> Union[TagTuple, SafeString]:
         if attributes:
@@ -516,7 +516,7 @@ _common_safe_css_props = frozenset(
 
 
 def render_styles(
-    styles: Dict[Union[str, SafeString], Union[str, int, float, SafeString]]
+    styles: dict[str | SafeString, str | int | float | SafeString]
 ) -> SafeString:
     ret = ""
     for k, v in styles.items():
@@ -538,7 +538,7 @@ def render_styles(
 
 
 def render(*nodes: Node) -> str:
-    results: List[str] = []
+    results: list[str] = []
     _render(nodes, results.append)
 
     return "".join(results)
