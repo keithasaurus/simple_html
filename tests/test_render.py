@@ -20,7 +20,9 @@ from simple_html import (
     render,
     img,
 )
-from simple_html.render import render_styles, escape_attribute_key, Node
+from simple_html.render import render_styles
+from simple_html.utils import escape_attribute_key
+from simple_html.typedefs import Node
 
 
 def test_renders_no_children() -> None:

@@ -1,4 +1,5 @@
-from simple_html.render import SafeString, Tag, render
+from simple_html.render import render
+from simple_html.typedefs import SafeString, Tag
 
 DOCTYPE_HTML5 = SafeString("<!doctype html>")
 
