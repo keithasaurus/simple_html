@@ -28,4 +28,4 @@ jobs:
       - name: run bench (pure python)
         run: poetry run python -m bench.run
       - name: linting
-        run: ruff check
+        run: poetry run ruff check
