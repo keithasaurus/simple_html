@@ -122,7 +122,7 @@ class Tag:
 
     def __call__(
         self,
-        attrs_or_first_child: dict[Union[SafeString, str], Union[str, SafeString, None]] | Node,
+        attrs_or_first_child: Union[dict[Union[SafeString, str], Union[str, SafeString, None]], Node],
         *children: Node,
     ) -> Union[TagTuple, SafeString]:
         if isinstance(attrs_or_first_child, dict):
