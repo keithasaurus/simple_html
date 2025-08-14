@@ -130,7 +130,7 @@ class Tag:
             tag_start_with_attrs = self.tag_start
             for key in attrs_or_first_child:
                 # seems to be faster than using .items()
-                val = attrs_or_first_child[key]
+                val: Union[str, SafeString, None] = attrs_or_first_child[key]
 
                 # optimization: a large portion of attribute keys should be
                 # covered by this check. It allows us to skip escaping
