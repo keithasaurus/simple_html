@@ -1,5 +1,5 @@
 from types import GeneratorType
-from typing import Any, Union, Generator, Iterable, Callable, Final
+from typing import Any, Union, Generator, Iterable, Callable, Final, final
 
 
 class SafeString:
@@ -128,7 +128,11 @@ class Tag:
         if isinstance(attrs_or_first_child, dict):
             # in this case this tends to be faster than attrs = "".join([...])
             tag_start_with_attrs = self.tag_start
-            for key, val in attrs_or_first_child.items():
+            val: Union[str, SafeString, None]
+            for key in attrs_or_first_child:
+                # seems to be faster than using .items()
+                val = attrs_or_first_child[key]
+
                 # optimization: a large portion of attribute keys should be
                 # covered by this check. It allows us to skip escaping
                 # where it is not needed. Note this is for attribute names only;
