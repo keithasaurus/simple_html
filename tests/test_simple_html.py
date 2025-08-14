@@ -239,3 +239,9 @@ def test_render_styles_escapes() -> None:
     assert render_styles({'"><': '><>"'}) == SafeString(
         safe_str="&quot;&gt;&lt;:&gt;&lt;&gt;&quot;;"
     )
+
+def test_attrs_not_required() -> None:
+    assert (
+        render(div(p({"class": "ok"}, "neat", br, "ok"))) ==
+        '<div><p class="ok">neat<br/>ok</p></div>'
+    )
