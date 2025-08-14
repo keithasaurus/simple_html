@@ -128,7 +128,6 @@ class Tag:
         if isinstance(attrs_or_first_child, dict):
             # in this case this tends to be faster than attrs = "".join([...])
             tag_start_with_attrs = self.tag_start
-            val: Union[str, SafeString, None]
             for key in attrs_or_first_child:
                 # seems to be faster than using .items()
                 val = attrs_or_first_child[key]
