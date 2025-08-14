@@ -127,7 +127,7 @@ class Tag:
     ) -> Union[TagTuple, SafeString]:
         if isinstance(attrs_or_first_child, dict):
             if attrs_or_first_child:
-                # in this case this is faster than attrs = "".join([...])
+                # in this case this tends to be faster than attrs = "".join([...])
                 tag_start_with_attrs = self.tag_start
                 val: str | SafeString | None
                 for key, val in attrs_or_first_child.items():
