@@ -19,10 +19,10 @@ from simple_html import (
     Node,
     DOCTYPE_HTML5,
     render,
-    escape_attribute_key,
     render_styles,
     img,
 )
+from simple_html.utils import escape_attribute_key
 
 
 def test_renders_no_children() -> None:
@@ -169,7 +169,7 @@ def test_can_render_empty() -> None:
 
 
 def test_hash_for_safestring() -> None:
-    assert hash(SafeString("okokok")) == hash("SafeString__okokok")
+    assert hash(SafeString("okokok")) == hash(("SafeString", "okokok"))
 
 
 def test_escape_key() -> None:
