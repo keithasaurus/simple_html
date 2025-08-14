@@ -24,7 +24,13 @@ node = h1("Hello World!")
 render(node)  
 # <h1>Hello World!</h1> 
 ```
-Here, `h1` is a `Tag` and the string "Hello World!" is it's only child. We call `render` to produce a string.
+Here, `h1` is a `Tag` and the string "Hello World!" is it's only child. We call `render` to produce a string. If we wanted to add a attribute, like an `id`, we could do it by adding a dictionary as the first argument:
+```python
+node = h1({"id": "heading"}, "Hello World!")
+
+render(node)  
+# <h1 class="heading">Hello World!</h1> 
+```
 
 There are several ways to use `Tag`s:
 ```python
