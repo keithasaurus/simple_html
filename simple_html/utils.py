@@ -126,36 +126,31 @@ class Tag:
         *children: Node,
     ) -> Union[TagTuple, SafeString]:
         if isinstance(attrs_or_first_child, dict):
-            if attrs_or_first_child:
-                # in this case this tends to be faster than attrs = "".join([...])
-                tag_start_with_attrs = self.tag_start
-                for key, val in attrs_or_first_child.items():
-                    # optimization: a large portion of attribute keys should be
-                    # covered by this check. It allows us to skip escaping
-                    # where it is not needed. Note this is for attribute names only;
-                    # attributes values are always escaped (when they are `str`s)
-                    if key not in _common_safe_attribute_names:
-                        key = (
-                            escape_attribute_key(key)
-                            if isinstance(key, str)
-                            else key.safe_str
-                        )
+            # in this case this tends to be faster than attrs = "".join([...])
+            tag_start_with_attrs = self.tag_start
+            for key, val in attrs_or_first_child.items():
+                # optimization: a large portion of attribute keys should be
+                # covered by this check. It allows us to skip escaping
+                # where it is not needed. Note this is for attribute names only;
+                # attributes values are always escaped (when they are `str`s)
+                if key not in _common_safe_attribute_names:
+                    key = (
+                        escape_attribute_key(key)
+                        if isinstance(key, str)
+                        else key.safe_str
+                    )
 
-                    if isinstance(val, str):
-                        tag_start_with_attrs += f' {key}="{faster_escape(val)}"'
-                    elif isinstance(val, SafeString):
-                        tag_start_with_attrs += f' {key}="{val.safe_str}"'
-                    elif val is None:
-                        tag_start_with_attrs += f" {key}"
+                if isinstance(val, str):
+                    tag_start_with_attrs += f' {key}="{faster_escape(val)}"'
+                elif isinstance(val, SafeString):
+                    tag_start_with_attrs += f' {key}="{val.safe_str}"'
+                elif val is None:
+                    tag_start_with_attrs += f" {key}"
 
-                if children:
-                    return f"{tag_start_with_attrs}>", children, self.closing_tag
-                else:
-                    return SafeString(f"{tag_start_with_attrs}{self.no_children_close}")
-            elif children:
-                return self.tag_start_no_attrs, children, self.closing_tag
+            if children:
+                return f"{tag_start_with_attrs}>", children, self.closing_tag
             else:
-                return SafeString(self.rendered)
+                return SafeString(f"{tag_start_with_attrs}{self.no_children_close}")
         else:
             return self.tag_start_no_attrs, (attrs_or_first_child,) + children, self.closing_tag
 
