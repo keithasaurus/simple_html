@@ -17,47 +17,44 @@ simple_html allows you to create HTML in standard Python. Benefits include:
 ### Usage
 
 ```python
-from simple_html import div, h1, render, p
+from simple_html import h1, render
 
-node = div({},
-           h1({"id": "hello"},
-              "Hello World!"),
-           p({},
-             "hooray!"))
+node = h1("Hello World!")
 
 render(node)  
-# <div><h1 id="hello">Hello World!</h1><p>hooray!</p></div> 
+# <h1>Hello World!</h1> 
 ```
+Here, `h1` is a `Tag` and the string "Hello World!" is it's only child. We call `render` to produce a string.
 
-There are several ways to render nodes:
+There are several ways to use `Tag`s:
 ```python
-from simple_html import br, div, h1, img, render
+from simple_html import br, div, h1, img
 
 # raw node
-render(br)
-# <br/>
+br
+# renders to <br/>
 
 # node with attributes only
-render(img({"src": "/some/image/url.jpg", "alt": "a great picture"}))
-# <img src="/some/image/url.jpg" alt="a great picture"/>
+img({"src": "/some-image.jpg", "alt": "a great picture"})
+# renders to <img src="/some-image.jpg" alt="a great picture"/>
 
-# node with children
-render(
-    div({},
-        h1({},
-           "something"))
+# node with children and (optional) attributes
+div(
+    h1({"class": "neat-class"}, 
+       "cool")
 )
-# <div><h1>something</h1></div>'
+# renders to <div><h1 class="neat-class">cool</h1></div>'
 ```
+
+#### Working with Attributes
 
 Tag attributes with `None` as the value will only render the attribute name:
 ```python
 from simple_html import div, render
 
-render(
-    div({"empty-str-attribute": "", 
-         "key-only-attr": None})
-)
+node = div({"empty-str-attribute": "", 
+            "key-only-attr": None})
+render(node)
 # <div empty-str-attribute="" key-only-attr></div>
 ```
 
@@ -67,23 +64,65 @@ from simple_html import div, render, render_styles
 
 styles = render_styles({"min-width": "25px"})
 
-render(
-    div({"style": styles}, 
-        "cool")
-)
+node = div({"style": styles}, "cool")
+
+render(node)
 # <div style="min-width:25px;">cool</div>
 
 
 # ints and floats are legal values
 styles = render_styles({"padding": 0, "flex-grow": 0.6})
 
-render(
-    div({"style": styles},
-        "wow")
-)
+node = div({"style": styles}, "wow")
+
+render(node)
 # <div style="padding:0;flex-grow:0.6;">wow</div>
 ```
 
+Attributes are escaped by default -- both names and values. You can use `SafeString` to bypass, if needed.
+
+```python
+from simple_html import div, render, SafeString
+
+escaped_attrs_node = div({"<bad>":"</also bad>"})
+
+render(escaped_attrs_node)  # <div &amp;lt;bad&amp;gt;="&amp;lt;/also bad&amp;gt;"></div>
+
+unescaped_attrs_node = div({SafeString("<bad>"): SafeString("</also bad>")})
+
+render(unescaped_attrs_node)  # <div <bad>="</also bad>"></div>
+```
+
+
+#### The `Node` type
+
+The type for `Node` is fairly flexible:
+```python
+from typing import Union, Generator
+from simple_html import SafeString
+
+Node = Union[
+    str,
+    SafeString, 
+    list["Node"],
+    Generator["Node", None, None],
+    # You probably won't need to think about these two much, since they are mainly internal to the library
+    "Tag", 
+    "TagTuple",
+]
+```
+
+`str`s are escaped by default, but you can pass in `SafeString`s to avoid escaping.
+
+```python
+from simple_html import br, p, SafeString, render
+
+node = p("Escaped & stuff",
+         br,
+         SafeString("Not escaped & stuff"))
+
+render(node)  # <p>Escaped &amp; stuff<br/>Not escaped & stuff</p> 
+```
 
 Lists and generators are both valid collections of nodes:
 ```python
@@ -95,7 +134,7 @@ def get_list_of_nodes() -> list[Node]:
     return ["neat", br]
 
 
-render(div({}, get_list_of_nodes()))
+render(div(get_list_of_nodes()))
 # <div>neat<br/></div>
 
 
@@ -105,11 +144,12 @@ def node_generator() -> Generator[Node, None, None]:
 
 
 render(
-    div({}, node_generator())
+    div(node_generator())
 )
 # <div>neat<br/></div>
 ```
 
+#### Custom Tags
 
 For convenience, many tags are provided, but you can also create your own:
 
@@ -124,33 +164,6 @@ node = custom_elem(
     "Wow"
 )
 
-render(node)  # <custom-elem id="some-custom-elem-id">Wow</custom-elem>
-```
-
-
-Strings are escaped by default, but you can pass in `SafeString`s to avoid escaping.
-
-```python
-from simple_html import br, p, SafeString, render
-
-node = p({},
-         "Escaped & stuff",
-         br,
-         SafeString("Not escaped & stuff"))
-
-render(node)  # <p>Escaped &amp; stuff<br/>Not escaped & stuff</p> 
-```
-
-Attributes are also escaped -- both names and values. You can use `SafeString` to bypass, if needed.
-
-```python
-from simple_html import div, render, SafeString
-
-escaped_attrs_node = div({"<bad>":"</also bad>"})
-
-render(escaped_attrs_node)  # <div &amp;lt;bad&amp;gt;="&amp;lt;/also bad&amp;gt;"></div>
-
-unescaped_attrs_node = div({SafeString("<bad>"): SafeString("</also bad>")})
-
-render(unescaped_attrs_node)  # <div <bad>="</also bad>"></div>
+render(node)
+# <custom-elem id="some-custom-elem-id">Wow</custom-elem>
 ```
