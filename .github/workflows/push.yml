@@ -27,4 +27,5 @@ jobs:
         run: poetry run pytest
       - name: run bench (pure python)
         run: poetry run python -m bench.run
-
+      - name: linting
+        run: ruff check
