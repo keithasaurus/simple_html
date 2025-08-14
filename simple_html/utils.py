@@ -1,5 +1,5 @@
 from types import GeneratorType
-from typing import Any, List, Union, Generator, Tuple, FrozenSet, Dict, Iterable, Callable, Final
+from typing import Any, Union, Generator, Iterable, Callable, Final
 
 
 class SafeString:
@@ -32,13 +32,13 @@ Node = Union[
     SafeString,
     "Tag",
     "TagTuple",
-    List["Node"],
+    list["Node"],
     Generator["Node", None, None],
 ]
 
-TagTuple = Tuple[str, Tuple[Node, ...], str]
+TagTuple = tuple[str, tuple[Node, ...], str]
 
-_common_safe_attribute_names: Final[FrozenSet[str]] = frozenset(
+_common_safe_attribute_names: Final[frozenset[str]] = frozenset(
     (
         "alt",
         "autoplay",
@@ -122,14 +122,14 @@ class Tag:
 
     def __call__(
         self,
-        attrs_or_first_child: Dict[Union[SafeString, str], Union[str, SafeString, None]] | Node,
+        attrs_or_first_child: dict[SafeString | str, str | SafeString| None] | Node,
         *children: Node,
     ) -> Union[TagTuple, SafeString]:
         if isinstance(attrs_or_first_child, dict):
             if attrs_or_first_child:
                 # in this case this tends to be faster than attrs = "".join([...])
                 tag_start_with_attrs = self.tag_start
-                val: str | SafeString | None
+                # val: str | SafeString | None
                 for key, val in attrs_or_first_child.items():
                     # optimization: a large portion of attribute keys should be
                     # covered by this check. It allows us to skip escaping
@@ -399,7 +399,7 @@ _common_safe_css_props: Final[frozenset[str]] = frozenset(
 
 
 def render_styles(
-    styles: Dict[Union[str, SafeString], Union[str, int, float, SafeString]]
+    styles: dict[str | SafeString, str | int | float | SafeString]
 ) -> SafeString:
     ret = ""
     for k, v in styles.items():
@@ -421,7 +421,7 @@ def render_styles(
 
 
 def render(*nodes: Node) -> str:
-    results: List[str] = []
+    results: list[str] = []
     _render(nodes, results.append)
 
     return "".join(results)
