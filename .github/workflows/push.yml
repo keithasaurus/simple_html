@@ -23,6 +23,8 @@ jobs:
         run: poetry install
       - name: mypy
         run: poetry run mypy simple_html
+      - name: mypyc
+        run: mypyc simple_html/utils.py
       - name: run tests
         run: poetry run pytest
       - name: run bench (pure python)
