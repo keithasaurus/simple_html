@@ -125,7 +125,7 @@ class Tag:
         attrs_or_first_child: Union[dict[Union[SafeString, str], Union[str, SafeString, None]], Node],
         *children: Node,
     ) -> Union[TagTuple, SafeString]:
-        if type(attrs_or_first_child) is dict:
+        if isinstance(attrs_or_first_child, dict):
             # in this case this tends to be faster than attrs = "".join([...])
             tag_start_with_attrs = self.tag_start
             for key in attrs_or_first_child:
@@ -139,7 +139,7 @@ class Tag:
                 if key not in _common_safe_attribute_names:
                     key = (
                         escape_attribute_key(key)
-                        if type(key) is str
+                        if isinstance(key, str)
                         else key.safe_str
                     )
 
@@ -164,18 +164,17 @@ def _render(nodes: Iterable[Node], append_to_list: Callable[[str], None]) -> Non
     mutate a list instead of constantly rendering strings
     """
     for node in nodes:
-        _t = type(node)
-        if _t is tuple:
+        if type(node) is tuple:
             append_to_list(node[0])
             _render(node[1], append_to_list)
             append_to_list(node[2])
-        elif _t is SafeString:
+        elif type(node) is SafeString:
             append_to_list(node.safe_str)
-        elif _t is str:
+        elif type(node) is str:
             append_to_list(faster_escape(node))
-        elif _t is Tag:
+        elif type(node) is Tag:
             append_to_list(node.rendered)
-        elif _t is list or _t is GeneratorType:
+        elif type(node) is list or type(node) is GeneratorType:
             _render(node, append_to_list)
         else:
             raise TypeError(f"Got unknown type: {type(node)}")
@@ -400,7 +399,7 @@ def render_styles(
     ret = ""
     for k, v in styles.items():
         if k not in _common_safe_css_props:
-            if type(k) is SafeString:
+            if isinstance(k, SafeString):
                 k = k.safe_str
             else:
                 k = faster_escape(k)
