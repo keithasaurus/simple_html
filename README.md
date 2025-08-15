@@ -29,7 +29,7 @@ Here, `h1` is a `Tag` and the string "Hello World!" is its only child. We call `
 node = h1({"id": "heading"}, "Hello World!")
 
 render(node)  
-# <h1 class="heading">Hello World!</h1> 
+# <h1 id="heading">Hello World!</h1> 
 ```
 
 Here's a fuller-featured example:
