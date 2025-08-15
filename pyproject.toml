@@ -40,7 +40,8 @@ ruff = "0.12.8"
 requires = [
     "poetry-core>=1.0.0",
     "setuptools>=80",
-    "mypyc==1.17.1"
+    "mypyc==1.17.1",
+    "wheel>=45"
 ]
 build-backend = "poetry.core.masonry.api"
 
