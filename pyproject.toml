@@ -68,6 +68,9 @@ warn_unused_configs = true
 warn_unused_ignores = true
 warn_unreachable = true
 
+[tool.cibuildwheel]
+skip = ["cp38-*", "cp314-*"]
+
 [tool.cibuildwheel.macos]
 archs = ["arm64"]
 
