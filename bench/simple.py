@@ -28,18 +28,17 @@ def basic(objs: List[Tuple[str, str, List[str]]]) -> None:
         render(
             DOCTYPE_HTML5,
             html(
-                head(title(title_)),
+                head(title("A Great Web page!")),
                 body(
-                    h1({"class": "great header", "other_attr": "5", "id": "header1"}),
+                    h1({"class": "great header",
+                        "id": "header1",
+                        "other_attr": "5"},
+                       "Welcome!"),
                     div(
-                        p(content, br, br),
-                        ul(
-                            [li({"class": "item-stuff"}, SafeString(ss)) for ss in oks],
-                        ),
-                    ),
-                ),
-            ),
-        )
+                        p("What a great web page!!!", br, br),
+                        ul([
+                            li({"class": "item-stuff"}, SafeString(ss))
+                            for ss in oks])))))
 
 
 def basic_long(objs: List[Tuple[str, str, List[str]]]) -> None:

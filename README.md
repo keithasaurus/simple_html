@@ -32,7 +32,47 @@ render(node)
 # <h1 class="heading">Hello World!</h1> 
 ```
 
-There are several ways to use `Tag`s:
+Here's a fuller-featured example:
+```python
+from simple_html import render, DOCTYPE_HTML5, html, head, title, body, h1, div, p, br, ul, li, SafeString
+
+
+render(
+    DOCTYPE_HTML5,
+    html(
+        head(title("A Great Web page!")),
+        body(
+            h1({"class": "great header",
+                "id": "header1",
+                "other_attr": "5"},
+               "Welcome!"),
+            div(
+                p("What a great web page!!!", 
+                  br),
+                ul([
+                    li({"class": "item-stuff"}, 
+                       SafeString(ss))
+                    for ss in ["first", "second", "third"]]))))
+)
+```
+The above renders to a minified version of the following html:
+```html
+<!doctype html>
+<html>
+<head><title>A Great Web page!</title></head>
+<body><h1 class="great header" id="header1" other_attr="5">Welcome!</h1>
+<div><p>What a great web page!!!<br/><br/></p>
+    <ul>
+        <li class="item-stuff">first</li>
+        <li class="item-stuff">second</li>
+        <li class="item-stuff">third</li>
+    </ul>
+</div>
+</body>
+</html>
+```
+
+As you might have noticed, there are several ways to use `Tag`s:
 ```python
 from simple_html import br, div, h1, img, span
 
