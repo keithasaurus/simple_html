@@ -6,7 +6,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.11', '3.12', '3.13']
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
         poetry-version: [2.1]
         os: [ubuntu-24.04, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
@@ -27,4 +27,5 @@ jobs:
         run: poetry run pytest
       - name: run bench (pure python)
         run: poetry run python -m bench.run
-
+      - name: linting
+        run: poetry run ruff check
