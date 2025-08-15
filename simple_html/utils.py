@@ -10,7 +10,7 @@ class SafeString:
         return hash(("SafeString", self.safe_str))
 
     def __eq__(self, other: Any) -> bool:
-        return isinstance(other, SafeString) and other.safe_str == self.safe_str
+        return type(other) is SafeString and other.safe_str == self.safe_str
 
     def __repr__(self) -> str:
         return f"SafeString(safe_str='{self.safe_str}')"
@@ -125,7 +125,7 @@ class Tag:
         attrs_or_first_child: Union[dict[Union[SafeString, str], Union[str, SafeString, None]], Node],
         *children: Node,
     ) -> Union[TagTuple, SafeString]:
-        if isinstance(attrs_or_first_child, dict):
+        if type(attrs_or_first_child) is dict:
             # in this case this tends to be faster than attrs = "".join([...])
             tag_start_with_attrs = self.tag_start
             for key in attrs_or_first_child:
@@ -139,13 +139,13 @@ class Tag:
                 if key not in _common_safe_attribute_names:
                     key = (
                         escape_attribute_key(key)
-                        if isinstance(key, str)
+                        if type(key) is str
                         else key.safe_str
                     )
 
-                if isinstance(val, str):
+                if type(val) is str:
                     tag_start_with_attrs += f' {key}="{faster_escape(val)}"'
-                elif isinstance(val, SafeString):
+                elif type(val) is SafeString:
                     tag_start_with_attrs += f' {key}="{val.safe_str}"'
                 elif val is None:
                     tag_start_with_attrs += f" {key}"
@@ -400,14 +400,14 @@ def render_styles(
     ret = ""
     for k, v in styles.items():
         if k not in _common_safe_css_props:
-            if isinstance(k, SafeString):
+            if type(k) is SafeString:
                 k = k.safe_str
             else:
                 k = faster_escape(k)
 
-        if isinstance(v, SafeString):
+        if type(v) is SafeString:
             v = v.safe_str
-        elif isinstance(v, str):
+        elif type(v) is str:
             v = faster_escape(v)
         # note that ints and floats pass through these condition checks
 
