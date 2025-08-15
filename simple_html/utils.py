@@ -30,10 +30,10 @@ def faster_escape(s: str) -> str:
 Node = Union[
     str,
     SafeString,
-    "Tag",
-    "TagTuple",
     list["Node"],
     Generator["Node", None, None],
+    "Tag",
+    "TagTuple",
 ]
 
 TagTuple = tuple[str, tuple[Node, ...], str]

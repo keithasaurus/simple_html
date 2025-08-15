@@ -24,7 +24,7 @@ node = h1("Hello World!")
 render(node)  
 # <h1>Hello World!</h1> 
 ```
-Here, `h1` is a `Tag` and the string "Hello World!" is it's only child. We call `render` to produce a string. If we wanted to add a attribute, like an `id`, we could do it by adding a dictionary as the first argument:
+Here, `h1` is a `Tag` and the string "Hello World!" is its only child. We call `render` to produce a string. If we wanted to add a attribute, like an `id`, we could do it by adding a dictionary as the first argument:
 ```python
 node = h1({"id": "heading"}, "Hello World!")
 
@@ -34,7 +34,7 @@ render(node)
 
 There are several ways to use `Tag`s:
 ```python
-from simple_html import br, div, h1, img
+from simple_html import br, div, h1, img, span
 
 # raw node
 br
@@ -47,12 +47,13 @@ img({"src": "/some-image.jpg", "alt": "a great picture"})
 # node with children and (optional) attributes
 div(
     h1({"class": "neat-class"}, 
-       "cool")
+       span("cool"),
+       br)
 )
-# renders to <div><h1 class="neat-class">cool</h1></div>'
+# renders to <div><h1 class="neat-class"><span>cool</span><br/></h1></div>
 ```
 
-#### Working with Attributes
+#### More About Attributes
 
 Tag attributes with `None` as the value will only render the attribute name:
 ```python
@@ -60,6 +61,7 @@ from simple_html import div, render
 
 node = div({"empty-str-attribute": "", 
             "key-only-attr": None})
+
 render(node)
 # <div empty-str-attribute="" key-only-attr></div>
 ```
@@ -99,10 +101,10 @@ unescaped_attrs_node = div({SafeString("<bad>"): SafeString("</also bad>")})
 render(unescaped_attrs_node)  # <div <bad>="</also bad>"></div>
 ```
 
-
 #### The `Node` type
 
-The type for `Node` is fairly flexible:
+`Node` defines what kinds of objects can be passed used as `children` or as arguments to `render`:
+
 ```python
 from typing import Union, Generator
 from simple_html import SafeString
@@ -117,43 +119,40 @@ Node = Union[
     "TagTuple",
 ]
 ```
+While `Tag` and `TagTuple` are amongst the most common types in simple_html, it's not common to work directly with them; instead developers
+should expect to use objects like `div`, `a`, `span`, etc., which use these types transparently. 
 
-`str`s are escaped by default, but you can pass in `SafeString`s to avoid escaping.
+Some things to note:
 
-```python
-from simple_html import br, p, SafeString, render
+- `str`s are escaped by default, but you can pass in `SafeString`s to avoid escaping.
+    ```python
+    from simple_html import br, p, SafeString, render
 
-node = p("Escaped & stuff",
-         br,
-         SafeString("Not escaped & stuff"))
+    node = p("Escaped & stuff",
+             br,
+             SafeString("Not escaped & stuff"))
 
-render(node)  # <p>Escaped &amp; stuff<br/>Not escaped & stuff</p> 
-```
+    render(node)  # <p>Escaped &amp; stuff<br/>Not escaped & stuff</p> 
+    ```
 
-Lists and generators are both valid collections of nodes:
-```python
-from typing import Generator
-from simple_html import div, render, Node, br
+- lists and generators are both valid collections of nodes:
+    ```python
+    from typing import Generator
+    from simple_html import div, render, Node, br
 
-
-def get_list_of_nodes() -> list[Node]:
-    return ["neat", br]
-
-
-render(div(get_list_of_nodes()))
-# <div>neat<br/></div>
-
-
-def node_generator() -> Generator[Node, None, None]:
-    yield "neat"
-    yield br
+  
+    div(["neat", br])
+    # renders to <div>neat<br/></div>
 
 
-render(
+    def node_generator() -> Generator[Node, None, None]:
+        yield "neat"
+        yield br
+
+
     div(node_generator())
-)
-# <div>neat<br/></div>
-```
+    # renders to <div>neat<br/></div>
+    ```
 
 #### Custom Tags
 
