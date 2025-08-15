@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 from mypyc.build import mypycify
 
 ext_modules = mypycify([
