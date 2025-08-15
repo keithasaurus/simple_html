@@ -39,7 +39,7 @@ ruff = "0.12.8"
 [build-system]
 requires = [
     "poetry-core>=1.0.0",
-    "mypy[mypyc]==1.14.1",
+    "mypy[mypyc]==1.17.1",
 ]
 
 [tool.mypy]
