@@ -36,7 +36,6 @@ Here's a fuller-featured example:
 ```python
 from simple_html import render, DOCTYPE_HTML5, html, head, title, body, h1, div, p, br, ul, li, SafeString
 
-
 render(
     DOCTYPE_HTML5,
     html(
@@ -47,12 +46,11 @@ render(
                 "other_attr": "5"},
                "Welcome!"),
             div(
-                p("What a great web page!!!", 
+                p("What a great web page!!!",
                   br),
-                ul([
-                    li({"class": "item-stuff"}, 
-                       SafeString(ss))
-                    for ss in ["first", "second", "third"]]))))
+                ul(
+                    li({"class": "item-stuff"}, SafeString(ss))
+                    for ss in ["first", "second", "third"]))))
 )
 ```
 The above renders to a minified version of the following html:
@@ -61,7 +59,7 @@ The above renders to a minified version of the following html:
 <html>
 <head><title>A Great Web page!</title></head>
 <body><h1 class="great header" id="header1" other_attr="5">Welcome!</h1>
-<div><p>What a great web page!!!<br/><br/></p>
+<div><p>What a great web page!!!<br/></p>
     <ul>
         <li class="item-stuff">first</li>
         <li class="item-stuff">second</li>
@@ -95,7 +93,8 @@ div(
 
 #### More About Attributes
 
-Tag attributes with `None` as the value will only render the attribute name:
+Tag attributes are defined as simple dictionaries -- typically you'll just use strings for both keys and values. Note 
+that Tag attributes with `None` as the value will only render the attribute name:
 ```python
 from simple_html import div, render
 
@@ -106,7 +105,23 @@ render(node)
 # <div empty-str-attribute="" key-only-attr></div>
 ```
 
-You can render inline css styles with `render_styles`:
+Attributes are escaped by default -- both keys and values. You can use `SafeString` to bypass, if needed.
+
+```python
+from simple_html import div, render, SafeString
+
+escaped_attrs_node = div({"<bad>":"</also bad>"})
+
+render(escaped_attrs_node)  # <div &amp;lt;bad&amp;gt;="&amp;lt;/also bad&amp;gt;"></div>
+
+unescaped_attrs_node = div({SafeString("<bad>"): SafeString("</also bad>")})
+
+render(unescaped_attrs_node)  # <div <bad>="</also bad>"></div>
+```
+
+#### CSS
+
+You can render inline CSS styles with `render_styles`:
 ```python
 from simple_html import div, render, render_styles
 
@@ -127,23 +142,9 @@ render(node)
 # <div style="padding:0;flex-grow:0.6;">wow</div>
 ```
 
-Attributes are escaped by default -- both names and values. You can use `SafeString` to bypass, if needed.
-
-```python
-from simple_html import div, render, SafeString
-
-escaped_attrs_node = div({"<bad>":"</also bad>"})
-
-render(escaped_attrs_node)  # <div &amp;lt;bad&amp;gt;="&amp;lt;/also bad&amp;gt;"></div>
-
-unescaped_attrs_node = div({SafeString("<bad>"): SafeString("</also bad>")})
-
-render(unescaped_attrs_node)  # <div <bad>="</also bad>"></div>
-```
-
 #### The `Node` type
 
-`Node` defines what kinds of objects can be passed used as `children` or as arguments to `render`:
+`Node` defines what types of objects can be used as `Tag` `children`, or passed as arguments to `render`:
 
 ```python
 from typing import Union, Generator
