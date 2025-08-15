@@ -39,7 +39,7 @@ ruff = "0.12.8"
 [build-system]
 requires = [
     "poetry-core>=1.0.0",
-    "mypy==1.17.1",
+    "mypy[mypyc]==1.17.1",
 ]
 build-backend = "poetry.core.masonry.api"
 
@@ -75,8 +75,8 @@ warn_unreachable = true
 #build = "cp39-* cp310-* cp311-* cp312-* cp313-*"
 #skip = "pp* *-musllinux*"  # Skip PyPy and musl builds
 #
-#[tool.cibuildwheel.config-settings]
-#"--build-option" = "--use-mypyc"
+[tool.cibuildwheel.config-settings]
+"--build-option" = "--use-mypyc"
 #
 #[tool.cibuildwheel.macos]
 #archs = ["arm64"]
