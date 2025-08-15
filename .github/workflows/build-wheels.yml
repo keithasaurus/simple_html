@@ -1,11 +1,6 @@
-name: Build wheels
+name: Build
 
-on:
-  push:
-    branches: [main]
-    tags: ["v*"]
-  pull_request:
-    branches: [main]
+on: [push, pull_request]
 
 jobs:
   build_wheels:
@@ -13,7 +8,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        # macos-13 is an intel runner, macos-14 is apple silicon
+        os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, windows-11-arm, macos-13, macos-14]
 
     steps:
       - uses: actions/checkout@v4
