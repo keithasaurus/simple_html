@@ -1,5 +1,5 @@
 from types import GeneratorType
-from typing import Any, Union, Generator, Iterable, Callable, Final, final
+from typing import Any, Union, Generator, Iterable, Callable, Final
 
 
 class SafeString:
