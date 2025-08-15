@@ -10,7 +10,7 @@ class SafeString:
         return hash(("SafeString", self.safe_str))
 
     def __eq__(self, other: Any) -> bool:
-        return isinstance(other, SafeString) and other.safe_str == self.safe_str
+        return type(other) is SafeString and other.safe_str == self.safe_str
 
     def __repr__(self) -> str:
         return f"SafeString(safe_str='{self.safe_str}')"
@@ -143,9 +143,9 @@ class Tag:
                         else key.safe_str
                     )
 
-                if isinstance(val, str):
+                if type(val) is str:
                     tag_start_with_attrs += f' {key}="{faster_escape(val)}"'
-                elif isinstance(val, SafeString):
+                elif type(val) is SafeString:
                     tag_start_with_attrs += f' {key}="{val.safe_str}"'
                 elif val is None:
                     tag_start_with_attrs += f" {key}"
@@ -168,15 +168,13 @@ def _render(nodes: Iterable[Node], append_to_list: Callable[[str], None]) -> Non
             append_to_list(node[0])
             _render(node[1], append_to_list)
             append_to_list(node[2])
-        elif isinstance(node, SafeString):
+        elif type(node) is SafeString:
             append_to_list(node.safe_str)
-        elif isinstance(node, str):
+        elif type(node) is str:
             append_to_list(faster_escape(node))
-        elif isinstance(node, Tag):
+        elif type(node) is Tag:
             append_to_list(node.rendered)
-        elif isinstance(node, list):
-            _render(node, append_to_list)
-        elif isinstance(node, GeneratorType):
+        elif type(node) is list or type(node) is GeneratorType:
             _render(node, append_to_list)
         else:
             raise TypeError(f"Got unknown type: {type(node)}")
@@ -406,9 +404,9 @@ def render_styles(
             else:
                 k = faster_escape(k)
 
-        if isinstance(v, SafeString):
+        if type(v) is SafeString:
             v = v.safe_str
-        elif isinstance(v, str):
+        elif type(v) is str:
             v = faster_escape(v)
         # note that ints and floats pass through these condition checks
 
