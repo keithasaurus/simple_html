@@ -3,10 +3,10 @@ from mypyc.build import mypycify
 
 
 setup(
-    name="simple-html",
+    name="simple_html",
     ext_modules=mypycify([
         "simple_html/utils.py",
     ]),
-    packages=find_packages(),
+    packages="simple_html",
     python_requires=">=3.9",
 )
