@@ -152,10 +152,11 @@ from simple_html import SafeString
 
 Node = Union[
     str,
-    SafeString, 
+    int,
+    float,
+    SafeString,
     list["Node"],
     Generator["Node", None, None],
-    # You probably won't need to think about these two much, since they are mainly internal to the library
     "Tag", 
     "TagTuple",
 ]

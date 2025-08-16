@@ -245,3 +245,11 @@ def test_attrs_not_required() -> None:
         render(div(p({"class": "ok"}, "neat", br, "ok"))) ==
         '<div><p class="ok">neat<br/>ok</p></div>'
     )
+
+def test_accepts_float() -> None:
+    assert render(5.5) == "5.5"
+    assert render(div(1.123)) == "<div>1.123</div>"
+
+def test_accepts_int() -> None:
+    assert render(0) == "0"
+    assert render(p(5)) == "<p>5</p>"

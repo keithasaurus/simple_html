@@ -29,6 +29,8 @@ def faster_escape(s: str) -> str:
 
 Node = Union[
     str,
+    int,
+    float,
     SafeString,
     list["Node"],
     Generator["Node", None, None],
@@ -176,6 +178,8 @@ def _render(nodes: Iterable[Node], append_to_list: Callable[[str], None]) -> Non
             append_to_list(node.rendered)
         elif type(node) is list or type(node) is GeneratorType:
             _render(node, append_to_list)
+        elif type(node) is float or type(node) is int:
+            append_to_list(str(node))
         else:
             raise TypeError(f"Got unknown type: {type(node)}")
 
