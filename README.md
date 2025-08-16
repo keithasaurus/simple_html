@@ -3,9 +3,9 @@
 ### Template-less. Type-safe. Minified by default. Fast.
 
 simple_html allows you to create HTML in standard Python. Benefits include:
-- typically faster than jinja2 -- up to 15x faster
-- typically renders fewer bytes than template-based rendering
-- types let your editor and tools help you write correct code faster
+- fast -- up to 20x faster than jinja2 
+- minified renders by default 
+- fully typed 
 - lightweight and framework agnostic
 - always renders valid html
 
@@ -173,7 +173,8 @@ Some things to note:
              br,
              SafeString("Not escaped & stuff"))
 
-    render(node)  # <p>Escaped &amp; stuff<br/>Not escaped & stuff</p> 
+    render(node)  
+    # <p>Escaped &amp; stuff<br/>Not escaped & stuff</p> 
     ```
 
 - lists and generators are both valid collections of nodes:
