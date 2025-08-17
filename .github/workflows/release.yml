@@ -1,11 +1,6 @@
 name: Build
 
-on:
-  push:
-    tags:
-      - "v*"
-  pull_request:
-    types: [opened, synchronize, reopened]
+on: [push]
 
 jobs:
   build_sdist:
