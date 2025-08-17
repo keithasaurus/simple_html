@@ -1,3 +1,4 @@
+from decimal import Decimal
 from types import GeneratorType
 from typing import Tuple, Union, Dict, List, FrozenSet, Generator, Iterable, Any, Callable
 
@@ -30,10 +31,13 @@ def faster_escape(s: str) -> str:
 Node = Union[
     str,
     SafeString,
-    "Tag",
-    "TagTuple",
+    int,
+    float,
+    Decimal,
     List["Node"],
     Generator["Node", None, None],
+    "Tag",
+    "TagTuple",
 ]
 
 TagTuple = Tuple[str, Tuple[Node, ...], str]
@@ -298,6 +302,8 @@ def _render(nodes: Iterable[Node], append_to_list: Callable[[str], None]) -> Non
             _render(node, append_to_list)
         elif isinstance(node, GeneratorType):
             _render(node, append_to_list)
+        elif isinstance(node, (int, float, Decimal)):
+            append_to_list(str(node))
         else:
             raise TypeError(f"Got unknown type: {type(node)}")
 

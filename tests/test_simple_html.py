@@ -1,4 +1,5 @@
 import json
+from decimal import Decimal
 from typing import Generator
 
 from simple_html import (
@@ -239,3 +240,16 @@ def test_render_styles_escapes() -> None:
     assert render_styles({'"><': '><>"'}) == SafeString(
         safe_str="&quot;&gt;&lt;:&gt;&lt;&gt;&quot;;"
     )
+
+
+def test_works_for_int() -> None:
+    assert render(5) == "5"
+    assert render(div({}, -500)) == "<div>-500</div>"
+
+def test_works_for_float() -> None:
+    assert render(5.0) == "5.0"
+    assert render(div({}, -123.456)) == "<div>-123.456</div>"
+
+def test_works_for_decimal() -> None:
+    assert render(Decimal("5.0")) == "5.0"
+    assert render(div({}, Decimal("-123.456"))) == "<div>-123.456</div>"
