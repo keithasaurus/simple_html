@@ -24,7 +24,8 @@ node = h1("Hello World!")
 render(node)  
 # <h1>Hello World!</h1> 
 ```
-Here, `h1` is a `Tag` and the string "Hello World!" is its only child. We call `render` to produce a string. If we wanted to add a attribute, like an `id`, we could do it by adding a dictionary as the first argument:
+
+If you want a tag to have attribute, you can pass a dictionary as the first argument: 
 ```python
 node = h1({"id": "heading"}, "Hello World!")
 
@@ -34,36 +35,38 @@ render(node)
 
 Here's a fuller-featured example:
 ```python
-from simple_html import render, DOCTYPE_HTML5, html, head, title, body, h1, div, p, br, ul, li, SafeString
+from simple_html import render, DOCTYPE_HTML5, html, head, title, body, h1, div, p, br, ul, li
 
 render(
     DOCTYPE_HTML5,
     html(
-        head(title("A Great Web page!")),
+        head(title("A Great Webpage!")),
         body(
             h1({"class": "great header",
                 "id": "header1",
                 "other_attr": "5"},
                "Welcome!"),
             div(
-                p("What a great web page!!!",
+                p("This webpage is great for three reasons:",
                   br),
-                ul(
-                    li({"class": "item-stuff"}, SafeString(ss))
-                    for ss in ["first", "second", "third"]))))
+                ul(li(f"{s} reason") for s in ["first", "second", "third"]),
+            )
+        )
+    )
 )
+
 ```
 The above renders to a minified version of the following html:
 ```html
 <!doctype html>
 <html>
-<head><title>A Great Web page!</title></head>
+<head><title>A Great Webpage!</title></head>
 <body><h1 class="great header" id="header1" other_attr="5">Welcome!</h1>
-<div><p>What a great web page!!!<br/></p>
+<div><p>This webpage is great for three reasons:<br/></p>
     <ul>
-        <li class="item-stuff">first</li>
-        <li class="item-stuff">second</li>
-        <li class="item-stuff">third</li>
+        <li>first reason</li>
+        <li>second reason</li>
+        <li>third reason</li>
     </ul>
 </div>
 </body>
@@ -74,21 +77,21 @@ As you might have noticed, there are several ways to use `Tag`s:
 ```python
 from simple_html import br, div, h1, img, span
 
-# raw node
+# raw node renders to empty tag
 br
-# renders to <br/>
+# <br/>
 
-# node with attributes only
+# node with attributes but not children
 img({"src": "/some-image.jpg", "alt": "a great picture"})
-# renders to <img src="/some-image.jpg" alt="a great picture"/>
+# <img src="/some-image.jpg" alt="a great picture"/>
 
-# node with children and (optional) attributes
+# nodes with children and (optional) attributes
 div(
     h1({"class": "neat-class"}, 
        span("cool"),
        br)
 )
-# renders to <div><h1 class="neat-class"><span>cool</span><br/></h1></div>
+# <div><h1 class="neat-class"><span>cool</span><br/></h1></div>
 ```
 
 #### More About Attributes
@@ -133,7 +136,7 @@ render(node)
 # <div style="min-width:25px;">cool</div>
 
 
-# ints and floats are legal values
+# ints, floats, and Decimals are legal values
 styles = render_styles({"padding": 0, "flex-grow": 0.6})
 
 node = div({"style": styles}, "wow")
