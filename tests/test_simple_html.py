@@ -226,8 +226,8 @@ def test_safe_string_eq() -> None:
 def test_render_styles() -> None:
     assert render_styles({}) == SafeString("")
     assert render_styles({"abc": 123.45}) == SafeString("abc:123.45;")
-    assert render_styles({"padding": 0, "margin": "0 10"}) == SafeString(
-        "padding:0;margin:0 10;"
+    assert render_styles({"padding": 0, "margin": "0 10", "line-height": Decimal('2.3')}) == SafeString(
+        "padding:0;margin:0 10;line-height:2.3;"
     )
 
     assert (
