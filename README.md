@@ -1,11 +1,13 @@
 # simple_html
 
 ### Why should I use it?
+- clean syntax
 - fully-typed
-- clean and straightforward syntax
-- speed -- up to 15x faster than jinja2  
-- lightweight and framework agnostic
 - always renders valid html
+- speed -- faster than jinja2  
+- zero dependencies
+- framework agnostic
+- escaped by default
 - space significance typically results in fewer bytes rendered
 
 
