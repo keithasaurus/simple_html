@@ -1,13 +1,12 @@
 # simple_html
 
-### Template-less. Type-safe. Minified by default. Fast.
-
-simple_html allows you to create HTML in standard Python. Benefits include:
-- typically faster than jinja2 -- up to 15x faster
-- typically renders fewer bytes than template-based rendering
-- types let your editor and tools help you write correct code faster
+### Why should I use it?
+- fully-typed
+- clean and straightforward syntax
+- the fastest way to render html in python -- up to 15x faster than jinja2  
 - lightweight and framework agnostic
 - always renders valid html
+- space significance typically results in fewer bytes rendered
 
 
 ### Installation
