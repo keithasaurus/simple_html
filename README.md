@@ -1,13 +1,14 @@
 # simple_html
 
-### Template-less. Type-safe. Minified by default. Fast.
-
-simple_html allows you to create HTML in standard Python. Benefits include:
-- typically faster than jinja2 -- up to 15x faster
-- typically renders fewer bytes than template-based rendering
-- types let your editor and tools help you write correct code faster
-- lightweight and framework agnostic
+### Why should I use it?
+- clean syntax
+- fully-typed
 - always renders valid html
+- speed -- faster than jinja2  
+- zero dependencies
+- framework agnostic
+- escaped by default
+- space significance typically results in fewer bytes rendered
 
 
 ### Installation
@@ -24,7 +25,8 @@ node = h1("Hello World!")
 render(node)  
 # <h1>Hello World!</h1> 
 ```
-Here, `h1` is a `Tag` and the string "Hello World!" is its only child. We call `render` to produce a string. If we wanted to add a attribute, like an `id`, we could do it by adding a dictionary as the first argument:
+
+If you want a tag to have attribute, you can pass a dictionary as the first argument: 
 ```python
 node = h1({"id": "heading"}, "Hello World!")
 
@@ -34,38 +36,42 @@ render(node)
 
 Here's a fuller-featured example:
 ```python
-from simple_html import render, DOCTYPE_HTML5, html, head, title, body, h1, div, p, br, ul, li, SafeString
+from simple_html import render, DOCTYPE_HTML5, html, head, title, body, h1, div, p, br, ul, li
 
 render(
     DOCTYPE_HTML5,
     html(
-        head(title("A Great Web page!")),
+        head(
+            title("A Great Webpage!")
+        ),
         body(
-            h1({"class": "great header",
-                "id": "header1",
-                "other_attr": "5"},
+            h1({"class": "great header"},
                "Welcome!"),
             div(
-                p("What a great web page!!!",
-                  br),
-                ul(
-                    li({"class": "item-stuff"}, SafeString(ss))
-                    for ss in ["first", "second", "third"]))))
+                p("This webpage is great for three reasons:"),
+                ul(li(f"{s} reason") for s in ["first", "second", "third"]),
+            ),
+            br,
+            "Hope you like it!"
+        )
+    )
 )
+
 ```
 The above renders to a minified version of the following html:
 ```html
 <!doctype html>
 <html>
-<head><title>A Great Web page!</title></head>
-<body><h1 class="great header" id="header1" other_attr="5">Welcome!</h1>
-<div><p>What a great web page!!!<br/></p>
+<head><title>A Great Webpage!</title></head>
+<body><h1 class="great header">Welcome!</h1>
+<div><p>This webpage is great for three reasons:</p>
     <ul>
-        <li class="item-stuff">first</li>
-        <li class="item-stuff">second</li>
-        <li class="item-stuff">third</li>
+        <li>first reason</li>
+        <li>second reason</li>
+        <li>third reason</li>
     </ul>
 </div>
+<br/>Hope you like it!
 </body>
 </html>
 ```
@@ -74,21 +80,21 @@ As you might have noticed, there are several ways to use `Tag`s:
 ```python
 from simple_html import br, div, h1, img, span
 
-# raw node
+# raw node renders to empty tag
 br
-# renders to <br/>
+# <br/>
 
-# node with attributes only
+# node with attributes but not children
 img({"src": "/some-image.jpg", "alt": "a great picture"})
-# renders to <img src="/some-image.jpg" alt="a great picture"/>
+# <img src="/some-image.jpg" alt="a great picture"/>
 
-# node with children and (optional) attributes
+# nodes with children and (optional) attributes
 div(
     h1({"class": "neat-class"}, 
        span("cool"),
        br)
 )
-# renders to <div><h1 class="neat-class"><span>cool</span><br/></h1></div>
+# <div><h1 class="neat-class"><span>cool</span><br/></h1></div>
 ```
 
 #### More About Attributes
@@ -133,7 +139,7 @@ render(node)
 # <div style="min-width:25px;">cool</div>
 
 
-# ints and floats are legal values
+# ints, floats, and Decimals are legal values
 styles = render_styles({"padding": 0, "flex-grow": 0.6})
 
 node = div({"style": styles}, "wow")
@@ -147,12 +153,16 @@ render(node)
 `Node` defines what types of objects can be used as `Tag` `children`, or passed as arguments to `render`:
 
 ```python
+from decimal import Decimal
 from typing import Union, Generator
 from simple_html import SafeString
 
 Node = Union[
     str,
     SafeString, 
+    float,
+    int,
+    Decimal,
     list["Node"],
     Generator["Node", None, None],
     # You probably won't need to think about these two much, since they are mainly internal to the library
