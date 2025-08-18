@@ -26,7 +26,7 @@ render(node)
 # <h1>Hello World!</h1> 
 ```
 
-If you want a tag to have attribute, you can pass a dictionary as the first argument: 
+To add attributes to a tag, pass a dictionary as the first argument: 
 ```python
 node = h1({"id": "heading"}, "Hello World!")
 
