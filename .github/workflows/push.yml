@@ -23,11 +23,13 @@ jobs:
         run: poetry install
       - name: mypy
         run: poetry run mypy simple_html
+      - name: run bench (pure python)
+        run: poetry run python -m bench.run
       - name: mypyc
         run: poetry run mypyc simple_html/utils.py
       - name: run tests
         run: poetry run pytest
-      - name: run bench (pure python)
+      - name: run bench (compiled)
         run: poetry run python -m bench.run
       - name: linting
         run: poetry run ruff check
