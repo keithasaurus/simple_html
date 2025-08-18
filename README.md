@@ -40,17 +40,18 @@ from simple_html import render, DOCTYPE_HTML5, html, head, title, body, h1, div,
 render(
     DOCTYPE_HTML5,
     html(
-        head(title("A Great Webpage!")),
+        head(
+            title("A Great Webpage!")
+        ),
         body(
-            h1({"class": "great header",
-                "id": "header1",
-                "other_attr": "5"},
+            h1({"class": "great header"},
                "Welcome!"),
             div(
-                p("This webpage is great for three reasons:",
-                  br),
+                p("This webpage is great for three reasons:"),
                 ul(li(f"{s} reason") for s in ["first", "second", "third"]),
-            )
+            ),
+            br,
+            "Hope you like it!"
         )
     )
 )
@@ -61,14 +62,15 @@ The above renders to a minified version of the following html:
 <!doctype html>
 <html>
 <head><title>A Great Webpage!</title></head>
-<body><h1 class="great header" id="header1" other_attr="5">Welcome!</h1>
-<div><p>This webpage is great for three reasons:<br/></p>
+<body><h1 class="great header">Welcome!</h1>
+<div><p>This webpage is great for three reasons:</p>
     <ul>
         <li>first reason</li>
         <li>second reason</li>
         <li>third reason</li>
     </ul>
 </div>
+<br/>Hope you like it!
 </body>
 </html>
 ```
@@ -150,12 +152,16 @@ render(node)
 `Node` defines what types of objects can be used as `Tag` `children`, or passed as arguments to `render`:
 
 ```python
+from decimal import Decimal
 from typing import Union, Generator
 from simple_html import SafeString
 
 Node = Union[
     str,
     SafeString, 
+    float,
+    int,
+    Decimal,
     list["Node"],
     Generator["Node", None, None],
     # You probably won't need to think about these two much, since they are mainly internal to the library
