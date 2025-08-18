@@ -1,4 +1,5 @@
 import json
+from decimal import Decimal
 from typing import Generator
 
 from simple_html import (
@@ -222,17 +223,20 @@ def test_safe_string_eq() -> None:
     assert SafeString("abc123") == SafeString("abc123")
 
 
+
 def test_render_styles() -> None:
     assert render_styles({}) == SafeString("")
     assert render_styles({"abc": 123.45}) == SafeString("abc:123.45;")
-    assert render_styles({"padding": 0, "margin": "0 10"}) == SafeString(
-        "padding:0;margin:0 10;"
+    assert render_styles({"padding": 0, "margin": "0 10", "line-height": Decimal('2.3')}) == SafeString(
+        "padding:0;margin:0 10;line-height:2.3;"
     )
 
     assert (
         render(div({"style": render_styles({"min-width": "25px"})}, "cool"))
         == '<div style="min-width:25px;">cool</div>'
     )
+
+
 
 
 def test_render_styles_escapes() -> None:
@@ -245,3 +249,15 @@ def test_attrs_not_required() -> None:
         render(div(p({"class": "ok"}, "neat", br, "ok"))) ==
         '<div><p class="ok">neat<br/>ok</p></div>'
     )
+
+def test_works_for_int() -> None:
+    assert render(5) == "5"
+    assert render(div({}, -500)) == "<div>-500</div>"
+
+def test_works_for_float() -> None:
+    assert render(5.0) == "5.0"
+    assert render(div({}, -123.456)) == "<div>-123.456</div>"
+
+def test_works_for_decimal() -> None:
+    assert render(Decimal("5.0")) == "5.0"
+    assert render(div({}, Decimal("-123.456"))) == "<div>-123.456</div>"

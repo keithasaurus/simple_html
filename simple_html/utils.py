@@ -1,3 +1,4 @@
+from decimal import Decimal
 from types import GeneratorType
 from typing import Any, Union, Generator, Iterable, Callable, Final
 
@@ -30,6 +31,9 @@ def faster_escape(s: str) -> str:
 Node = Union[
     str,
     SafeString,
+    float,
+    int,
+    Decimal,
     list["Node"],
     Generator["Node", None, None],
     "Tag",
@@ -176,6 +180,8 @@ def _render(nodes: Iterable[Node], append_to_list: Callable[[str], None]) -> Non
             append_to_list(node.rendered)
         elif type(node) is list or type(node) is GeneratorType:
             _render(node, append_to_list)
+        elif isinstance(node, (int, float, Decimal)):
+            append_to_list(str(node))
         else:
             raise TypeError(f"Got unknown type: {type(node)}")
 
@@ -393,8 +399,9 @@ _common_safe_css_props: Final[frozenset[str]] = frozenset(
 )
 
 
+
 def render_styles(
-    styles: dict[Union[str, SafeString], Union[str, int, float, SafeString]]
+    styles: dict[Union[str, SafeString], Union[str, int, float, Decimal, SafeString]]
 ) -> SafeString:
     ret = ""
     for k, v in styles.items():
@@ -404,9 +411,9 @@ def render_styles(
             else:
                 k = faster_escape(k)
 
-        if type(v) is SafeString:
+        if isinstance(v, SafeString):
             v = v.safe_str
-        elif type(v) is str:
+        elif isinstance(v, str):
             v = faster_escape(v)
         # note that ints and floats pass through these condition checks
 
