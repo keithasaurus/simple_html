@@ -3,7 +3,7 @@
 ### Why should I use it?
 - fully-typed
 - clean and straightforward syntax
-- the fastest way to render html in python -- up to 15x faster than jinja2  
+- speed -- up to 15x faster than jinja2  
 - lightweight and framework agnostic
 - always renders valid html
 - space significance typically results in fewer bytes rendered
