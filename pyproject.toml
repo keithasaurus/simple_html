@@ -5,7 +5,6 @@ description="Template-less HTML rendering in Python"
 authors = [
     {name="Keith Philpott"}
 ]
-license = "MIT"
 classifiers = [
     'Development Status :: 5 - Production/Stable',
     'Environment :: Console',
@@ -23,6 +22,7 @@ classifiers = [
 keywords=["html", "type hints"]
 readme="README.md"
 requires-python = ">=3.9"
+dynamic = ["license"]
 
 [project.urls]
 Homepage="https://github.com/keithasaurus/simple_html"

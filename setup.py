@@ -1,6 +1,7 @@
 try:
     import tomllib
 except ModuleNotFoundError:
+    # python 3.10 and earlier
     import pip._vendor.tomli as tomllib
 
 from pathlib import Path
@@ -14,6 +15,7 @@ with open(this_directory / "pyproject.toml", "rb") as f:
     toml_data = tomllib.load(f)
 
 project_data = toml_data["project"]
+print(project_data)
 
 setup(
     name="simple-html",
@@ -27,7 +29,7 @@ setup(
     description=project_data["description"],
     long_description=long_description,
     long_description_content_type='text/markdown',
-    license = project_data["license"],
+    license ="MIT",
     url=project_data["urls"]["Homepage"],
     classifiers = project_data["classifiers"],
     keywords=["html", "type hints"]
