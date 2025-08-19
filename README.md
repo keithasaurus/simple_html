@@ -3,7 +3,7 @@
 ## Why use it?
 - clean syntax
 - fully-typed
-- speed -- faster even than jinja2
+- speed -- faster even than jinja
 - zero dependencies
 - escaped by default
 - usually renders fewer bytes than templating
@@ -100,7 +100,7 @@ render(
 # <div><h1 class="neat-class"><span>cool</span><br/></h1></div>
 ```
 ### Strings and Things
-Strings, ints, floats, and Decimals are generally rendered as one would expect expect. For security, `str`s are 
+Strings, ints, floats, and Decimals are generally rendered as one would expect expect. For safety, `str`s are 
 escaped by default; `SafeString`s can be used to bypass escaping.
 
 ```python
@@ -128,7 +128,7 @@ render(node)
 # <div empty-str-attribute="" key-only-attr></div>
 ```
 
-Attributes are escaped by default -- both keys and values. You can use `SafeString` to bypass, if needed.
+String attributes are escaped by default -- both keys and values. You can use `SafeString` to bypass, if needed.
 
 ```python
 from simple_html import div, render, SafeString
@@ -142,6 +142,17 @@ render(
     div({SafeString("<bad>"): SafeString("</also bad>")})
 )  
 # <div <bad>="</also bad>"></div>
+```
+
+You can also use `int`, `float`, and `Decimal` instances for attribute values.
+```python
+from decimal import Decimal
+from simple_html import div, render, SafeString
+
+render(
+    div({"x": 1, "y": 2.3, "z": Decimal('3.45')})    
+)
+# <div x="1" y="2.3" z="3.45"></div>
 ```
 
 ### CSS
@@ -168,7 +179,7 @@ render(node)
 ```
 
 ### Collections
-You can pass many items as a `Tag`'s children using `*args`, lists and generators:
+You can pass many items as a `Tag`'s children using `*args`, lists or generators:
 ```python
 from typing import Generator
 from simple_html import div, render, Node, br, p
@@ -178,7 +189,8 @@ div(
 )
 # renders to <div>neat<br/><p>cool</p></div>
 
-# same, but no star args
+
+# passing the raw list instead of *args 
 div(
     ["neat", br],
     p("cool")

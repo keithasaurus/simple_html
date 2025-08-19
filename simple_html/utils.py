@@ -1,6 +1,6 @@
 from decimal import Decimal
 from types import GeneratorType
-from typing import Any, Union, Generator, Iterable, Callable, Final
+from typing import Any, Union, Generator, Iterable, Callable, Final, TYPE_CHECKING
 
 
 class SafeString:
@@ -128,38 +128,43 @@ class Tag:
 
     def __call__(
         self,
-        attrs_or_first_child: Union[dict[Union[SafeString, str], Union[str, SafeString, None]], Node],
+        attrs_or_first_child: Union[dict[Union[SafeString, str], Union[str, SafeString, int, float, Decimal, None]], Node],
         *children: Node,
     ) -> Union[TagTuple, SafeString]:
         if isinstance(attrs_or_first_child, dict):
             # in this case this tends to be faster than attrs = "".join([...])
-            tag_start_with_attrs = self.tag_start
+            attrs: list[str] = []
             for key in attrs_or_first_child:
                 # seems to be faster than using .items()
-                val: Union[str, SafeString, None] = attrs_or_first_child[key]
+                val: Union[str, SafeString, int, float, Decimal, None] = attrs_or_first_child[key]
 
                 # optimization: a large portion of attribute keys should be
                 # covered by this check. It allows us to skip escaping
                 # where it is not needed. Note this is for attribute names only;
                 # attributes values are always escaped (when they are `str`s)
+                # key_: str
                 if key not in _common_safe_attribute_names:
                     key = (
                         escape_attribute_key(key)
                         if isinstance(key, str)
                         else key.safe_str
                     )
+                elif TYPE_CHECKING:
+                    assert isinstance(key, str)
 
                 if type(val) is str:
-                    tag_start_with_attrs += f' {key}="{faster_escape(val)}"'
+                    attrs.append(f' {key}="{faster_escape(val)}"')
                 elif type(val) is SafeString:
-                    tag_start_with_attrs += f' {key}="{val.safe_str}"'
+                    attrs.append(f' {key}="{val.safe_str}"')
                 elif val is None:
-                    tag_start_with_attrs += f" {key}"
+                    attrs.append(" " + key)
+                elif isinstance(val, (int, float, Decimal)):
+                    attrs.append(f' {key}="{val}"')
 
             if children:
-                return f"{tag_start_with_attrs}>", children, self.closing_tag
+                return self.tag_start + "".join(attrs) + ">", children, self.closing_tag
             else:
-                return SafeString(f"{tag_start_with_attrs}{self.no_children_close}")
+                return SafeString(self.tag_start + "".join(attrs) + self.no_children_close)
         else:
             return self.tag_start_no_attrs, (attrs_or_first_child,) + children, self.closing_tag
 
@@ -407,7 +412,8 @@ _common_safe_css_props: Final[frozenset[str]] = frozenset(
 def render_styles(
     styles: dict[Union[str, SafeString], Union[str, int, float, Decimal, SafeString]]
 ) -> SafeString:
-    ret = ""
+    ret: list[str] = []
+    app = ret.append
     for k, v in styles.items():
         if k not in _common_safe_css_props:
             if isinstance(k, SafeString):
@@ -421,9 +427,9 @@ def render_styles(
             v = faster_escape(v)
         # note that ints and floats pass through these condition checks
 
-        ret += f"{k}:{v};"
+        app(f"{k}:{v};")
 
-    return SafeString(ret)
+    return SafeString("".join(ret))
 
 
 def render(*nodes: Node) -> str:

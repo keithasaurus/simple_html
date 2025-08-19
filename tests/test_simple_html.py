@@ -264,3 +264,6 @@ def test_works_for_decimal() -> None:
 
 def test_tag_repr() -> None:
     assert repr(img) == "Tag(name='img', self_closing=True)"
+
+def test_render_number_attributes() -> None:
+    assert render(div({"x": 1, "y": 2.01, "z": Decimal("3.02")})) == '<div x="1" y="2.01" z="3.02"></div>'
