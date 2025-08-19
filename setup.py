@@ -18,7 +18,7 @@ setup(
     author="Keith Philpott",
     packages=["simple_html"],
     python_requires=">=3.9",
-    version=pyproj_data["version"],
+    version=pyproj_data["project"]["version"],
     description="Template-less HTML rendering in Python",
     long_description=long_description,
     long_description_content_type='text/markdown',
