@@ -100,7 +100,7 @@ render(
 # <div><h1 class="neat-class"><span>cool</span><br/></h1></div>
 ```
 ### Strings and Things
-Strings, ints, floats, and Decimals are generally rendered as you'd expect. The main thing know is that `str`s are 
+Strings, ints, floats, and Decimals are generally rendered as one would expect expect. For security, `str`s are 
 escaped by default; `SafeString`s can be used to bypass escaping.
 
 ```python
