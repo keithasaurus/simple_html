@@ -13,7 +13,7 @@ long_description = (this_directory / "README.md").read_text()
 
 
 setup(
-    name="simple_html",
+    name="simple-html",
     ext_modules=ext_modules,
     author="Keith Philpott",
     packages=["simple_html"],

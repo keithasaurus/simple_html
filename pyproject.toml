@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "simple_html"
+name = "simple-html"
 
 
 [tool.poetry.dependencies]
