@@ -1,5 +1,6 @@
 [tool.poetry]
 name = "simple-html"
+version = "3.0.0"
 
 
 [tool.poetry.dependencies]
