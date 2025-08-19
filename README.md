@@ -83,7 +83,7 @@ from simple_html import br, div, h1, img, span, render
 render(br)
 # <br/>
 
-# node with attributes but not children
+# node with attributes but no children
 render(
     img({"src": "/some-image.jpg", "alt": "a great picture"})
 )
