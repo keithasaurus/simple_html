@@ -27,7 +27,7 @@ requires-python = ">=3.9"
 [project.urls]
 Homepage="https://github.com/keithasaurus/simple_html"
 
-[tools.setuptools]
+[tool.setuptools]
 packages = ["simple_html"]
 
 [tool.poetry.dependencies]
