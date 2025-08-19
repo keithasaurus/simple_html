@@ -1,4 +1,4 @@
-[tool.poetry]
+[project]
 name = "simple-html"
 version = "3.0.0"
 
