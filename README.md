@@ -3,12 +3,10 @@
 ## Why use it?
 - clean syntax
 - fully-typed
-- always renders valid html
-- speed -- faster than jinja2  
+- speed -- faster even than jinja2
 - zero dependencies
-- framework agnostic
 - escaped by default
-- space significance typically results in fewer bytes rendered
+- usually renders fewer bytes than templating
 
 
 ## Installation
@@ -79,26 +77,30 @@ The above renders to a minified version of the following html:
 
 As you might have noticed, there are several ways to use `Tag`s:
 ```python
-from simple_html import br, div, h1, img, span
+from simple_html import br, div, h1, img, span, render
 
 # raw node renders to empty tag
-br
+render(br)
 # <br/>
 
 # node with attributes but not children
-img({"src": "/some-image.jpg", "alt": "a great picture"})
+render(
+    img({"src": "/some-image.jpg", "alt": "a great picture"})
+)
 # <img src="/some-image.jpg" alt="a great picture"/>
 
 # nodes with children and (optional) attributes
-div(
-    h1({"class": "neat-class"}, 
-       span("cool"),
-       br)
+render(
+    div(
+        h1({"class": "neat-class"}, 
+        span("cool"),
+        br)
+    )
 )
 # <div><h1 class="neat-class"><span>cool</span><br/></h1></div>
 ```
 ### Strings and Things
-Generally, strings, ints, floats, and Decimals are render as you'd expect. The main thing know is that `str`s are 
+Strings, ints, floats, and Decimals are generally rendered as you'd expect. The main thing know is that `str`s are 
 escaped by default; `SafeString`s can be used to bypass escaping.
 
 ```python
@@ -131,13 +133,15 @@ Attributes are escaped by default -- both keys and values. You can use `SafeStri
 ```python
 from simple_html import div, render, SafeString
 
-escaped_attrs_node = div({"<bad>":"</also bad>"})
+render(
+    div({"<bad>":"</also bad>"})
+)
+# <div &amp;lt;bad&amp;gt;="&amp;lt;/also bad&amp;gt;"></div>
 
-render(escaped_attrs_node)  # <div &amp;lt;bad&amp;gt;="&amp;lt;/also bad&amp;gt;"></div>
-
-unescaped_attrs_node = div({SafeString("<bad>"): SafeString("</also bad>")})
-
-render(unescaped_attrs_node)  # <div <bad>="</also bad>"></div>
+render(
+    div({SafeString("<bad>"): SafeString("</also bad>")})
+)  
+# <div <bad>="</also bad>"></div>
 ```
 
 ### CSS
