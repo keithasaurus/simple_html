@@ -143,26 +143,24 @@ class Tag:
                 # covered by this check. It allows us to skip escaping
                 # where it is not needed. Note this is for attribute names only;
                 # attributes values are always escaped (when they are `str`s)
-                key_: str
+                # key_: str
                 if key not in _common_safe_attribute_names:
-                    key_ = (
+                    key = (
                         escape_attribute_key(key)
                         if isinstance(key, str)
                         else key.safe_str
                     )
-                else:
-                    if TYPE_CHECKING:
-                        assert isinstance(key, str)
-                    key_ = key
+                elif TYPE_CHECKING:
+                    assert isinstance(key, str)
 
                 if type(val) is str:
-                    app(f'{key_}="{faster_escape(val)}"')
+                    app(f'{key}="{faster_escape(val)}"')
                 elif type(val) is SafeString:
-                    app(f'{key_}="{val.safe_str}"')
+                    app(f'{key}="{val.safe_str}"')
                 elif val is None:
-                    app(key_)
+                    app(key)
                 elif isinstance(val, (int, float, Decimal)):
-                    app(f'{key_}="{val}"')
+                    app(f'{key}="{val}"')
 
             if children:
                 return " ".join(tag_start_with_attrs) + ">", children, self.closing_tag
