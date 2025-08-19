@@ -2,7 +2,7 @@
 name = "simple-html"
 version = "3.0.0"
 license = "MIT"
-homepage="https://github.com/keithasaurus/simple_html",
+homepage="https://github.com/keithasaurus/simple_html"
 classifiers = [
     'Development Status :: 5 - Production/Stable',
     'Environment :: Console',
@@ -16,7 +16,7 @@ classifiers = [
     'Topic :: Software Development :: Libraries :: Python Modules',
     'Topic :: Utilities',
     'Typing :: Typed'
-],
+]
 keywords=["html", "type hints"]
 
 
