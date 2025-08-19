@@ -128,7 +128,7 @@ render(node)
 # <div empty-str-attribute="" key-only-attr></div>
 ```
 
-Attributes are escaped by default -- both keys and values. You can use `SafeString` to bypass, if needed.
+String attributes are escaped by default -- both keys and values. You can use `SafeString` to bypass, if needed.
 
 ```python
 from simple_html import div, render, SafeString
@@ -142,6 +142,17 @@ render(
     div({SafeString("<bad>"): SafeString("</also bad>")})
 )  
 # <div <bad>="</also bad>"></div>
+```
+
+You can also use `int`, `float`, and `Decimal` instances for attribute values.
+```python
+from decimal import Decimal
+from simple_html import div, render, SafeString
+
+render(
+    div({"x": 1, "y": 2.3, "z": Decimal('3.45')})    
+)
+# <div x="1" y="2.3" z="3.45"></div>
 ```
 
 ### CSS

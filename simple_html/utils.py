@@ -1,6 +1,6 @@
 from decimal import Decimal
 from types import GeneratorType
-from typing import Any, Union, Generator, Iterable, Callable, Final
+from typing import Any, Union, Generator, Iterable, Callable, Final, cast, TYPE_CHECKING
 
 
 class SafeString:
@@ -137,25 +137,32 @@ class Tag:
             app = tag_start_with_attrs.append
             for key in attrs_or_first_child:
                 # seems to be faster than using .items()
-                val: Union[str, SafeString, None] = attrs_or_first_child[key]
+                val: Union[str, SafeString, int, float, Decimal, None] = attrs_or_first_child[key]
 
                 # optimization: a large portion of attribute keys should be
                 # covered by this check. It allows us to skip escaping
                 # where it is not needed. Note this is for attribute names only;
                 # attributes values are always escaped (when they are `str`s)
+                key_: str
                 if key not in _common_safe_attribute_names:
-                    key = (
+                    key_ = (
                         escape_attribute_key(key)
                         if isinstance(key, str)
                         else key.safe_str
                     )
+                else:
+                    if TYPE_CHECKING:
+                        assert isinstance(key, str)
+                    key_ = key
 
                 if type(val) is str:
-                    app(f'{key}="{faster_escape(val)}"')
+                    app(f'{key_}="{faster_escape(val)}"')
                 elif type(val) is SafeString:
-                    app(f'{key}="{val.safe_str}"')
+                    app(f'{key_}="{val.safe_str}"')
                 elif val is None:
-                    app(key)
+                    app(key_)
+                elif isinstance(val, (int, float, Decimal)):
+                    app(f'{key_}="{val}"')
 
             if children:
                 return " ".join(tag_start_with_attrs) + ">", children, self.closing_tag
@@ -408,7 +415,7 @@ _common_safe_css_props: Final[frozenset[str]] = frozenset(
 def render_styles(
     styles: dict[Union[str, SafeString], Union[str, int, float, Decimal, SafeString]]
 ) -> SafeString:
-    ret = []
+    ret: list[str] = []
     app = ret.append
     for k, v in styles.items():
         if k not in _common_safe_css_props:
