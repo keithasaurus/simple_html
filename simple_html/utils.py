@@ -1,6 +1,6 @@
 from decimal import Decimal
 from types import GeneratorType
-from typing import Any, Union, Generator, Iterable, Callable, Final, cast, TYPE_CHECKING
+from typing import Any, Union, Generator, Iterable, Callable, Final, TYPE_CHECKING
 
 
 class SafeString:
