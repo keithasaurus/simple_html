@@ -1,6 +1,6 @@
 [project]
 name = "simple-html"
-version = "3.2.0"
+version = "3.0.0"
 description="Template-less HTML rendering in Python"
 authors = [
     {name="Keith Philpott"}

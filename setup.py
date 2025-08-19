@@ -15,7 +15,6 @@ with open(this_directory / "pyproject.toml", "rb") as f:
     toml_data = tomllib.load(f)
 
 project_data = toml_data["project"]
-print(project_data)
 
 setup(
     name="simple-html",
