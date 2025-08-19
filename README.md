@@ -3,7 +3,7 @@
 ## Why use it?
 - clean syntax
 - fully-typed
-- speed -- faster even than jinja2
+- speed -- faster even than jinja
 - zero dependencies
 - escaped by default
 - usually renders fewer bytes than templating
