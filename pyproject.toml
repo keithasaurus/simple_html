@@ -1,8 +1,11 @@
 [project]
 name = "simple-html"
-version = "3.0.0"
+version = "3.2.0"
+description="Template-less HTML rendering in Python"
+authors = [
+    {name="Keith Philpott"}
+]
 license = "MIT"
-homepage="https://github.com/keithasaurus/simple_html"
 classifiers = [
     'Development Status :: 5 - Production/Stable',
     'Environment :: Console',
@@ -18,7 +21,14 @@ classifiers = [
     'Typing :: Typed'
 ]
 keywords=["html", "type hints"]
+readme="README.md"
+requires-python = ">=3.9"
 
+[project.urls]
+Homepage="https://github.com/keithasaurus/simple_html"
+
+[tools.setuptools]
+packages = ["simple_html"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
