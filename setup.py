@@ -1,6 +1,9 @@
-import tomllib
-from pathlib import Path
+try:
+    import tomllib
+except ModuleNotFoundError:
+    import pip._vendor.tomli as tomllib
 
+from pathlib import Path
 from setuptools import setup
 from mypyc.build import mypycify
 
