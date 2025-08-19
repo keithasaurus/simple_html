@@ -112,9 +112,11 @@ class Tag:
         "tag_start_no_attrs",
         "rendered",
         "no_children_close",
+        "_repr"
     )
 
     def __init__(self, name: str, self_closing: bool = False) -> None:
+        self._repr = f"Tag(name='{name}', self_closing={self_closing})"
         self.tag_start = f"<{name}"
         self.tag_start_no_attrs = f"{self.tag_start}>"
         self.closing_tag = f"</{name}>"
@@ -161,6 +163,8 @@ class Tag:
         else:
             return self.tag_start_no_attrs, (attrs_or_first_child,) + children, self.closing_tag
 
+    def __repr__(self) -> str:
+        return self._repr
 
 
 def _render(nodes: Iterable[Node], append_to_list: Callable[[str], None]) -> None:

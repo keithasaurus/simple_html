@@ -261,3 +261,6 @@ def test_works_for_float() -> None:
 def test_works_for_decimal() -> None:
     assert render(Decimal("5.0")) == "5.0"
     assert render(div({}, Decimal("-123.456"))) == "<div>-123.456</div>"
+
+def test_tag_repr() -> None:
+    assert repr(img) == "Tag(name='img', self_closing=True)"
