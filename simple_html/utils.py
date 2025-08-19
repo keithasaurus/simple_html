@@ -133,8 +133,7 @@ class Tag:
     ) -> Union[TagTuple, SafeString]:
         if isinstance(attrs_or_first_child, dict):
             # in this case this tends to be faster than attrs = "".join([...])
-            tag_start_with_attrs = [self.tag_start]
-            app = tag_start_with_attrs.append
+            attrs: list[str] = []
             for key in attrs_or_first_child:
                 # seems to be faster than using .items()
                 val: Union[str, SafeString, int, float, Decimal, None] = attrs_or_first_child[key]
@@ -154,18 +153,18 @@ class Tag:
                     assert isinstance(key, str)
 
                 if type(val) is str:
-                    app(f'{key}="{faster_escape(val)}"')
+                    attrs.append(f' {key}="{faster_escape(val)}"')
                 elif type(val) is SafeString:
-                    app(f'{key}="{val.safe_str}"')
+                    attrs.append(f' {key}="{val.safe_str}"')
                 elif val is None:
-                    app(key)
+                    attrs.append(" " + key)
                 elif isinstance(val, (int, float, Decimal)):
-                    app(f'{key}="{val}"')
+                    attrs.append(f' {key}="{val}"')
 
             if children:
-                return " ".join(tag_start_with_attrs) + ">", children, self.closing_tag
+                return self.tag_start + "".join(attrs) + ">", children, self.closing_tag
             else:
-                return SafeString(" ".join(tag_start_with_attrs) + self.no_children_close)
+                return SafeString(self.tag_start + "".join(attrs) + self.no_children_close)
         else:
             return self.tag_start_no_attrs, (attrs_or_first_child,) + children, self.closing_tag
 
