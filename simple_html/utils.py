@@ -128,7 +128,7 @@ class Tag:
 
     def __call__(
         self,
-        attrs_or_first_child: Union[dict[Union[SafeString, str], Union[str, SafeString, None]], Node],
+        attrs_or_first_child: Union[dict[Union[SafeString, str], Union[str, SafeString, int, float, Decimal, None]], Node],
         *children: Node,
     ) -> Union[TagTuple, SafeString]:
         if isinstance(attrs_or_first_child, dict):
@@ -151,16 +151,16 @@ class Tag:
                     )
 
                 if type(val) is str:
-                    app(f' {key}="{faster_escape(val)}"')
+                    app(f'{key}="{faster_escape(val)}"')
                 elif type(val) is SafeString:
-                    app(f' {key}="{val.safe_str}"')
+                    app(f'{key}="{val.safe_str}"')
                 elif val is None:
-                    app(f" {key}")
+                    app(key)
 
             if children:
-                return "".join(tag_start_with_attrs) + ">", children, self.closing_tag
+                return " ".join(tag_start_with_attrs) + ">", children, self.closing_tag
             else:
-                return SafeString("".join(tag_start_with_attrs) + self.no_children_close)
+                return SafeString(" ".join(tag_start_with_attrs) + self.no_children_close)
         else:
             return self.tag_start_no_attrs, (attrs_or_first_child,) + children, self.closing_tag
 
