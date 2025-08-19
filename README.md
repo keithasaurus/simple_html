@@ -1,21 +1,19 @@
 # simple_html
 
-### Why should I use it?
+## Why use it?
 - clean syntax
 - fully-typed
-- always renders valid html
-- speed -- faster than jinja2  
+- speed -- faster even than jinja2
 - zero dependencies
-- framework agnostic
 - escaped by default
-- space significance typically results in fewer bytes rendered
+- usually renders fewer bytes than templating
 
 
-### Installation
+## Installation
 `pip install simple-html`
 
 
-### Usage
+## Usage
 
 ```python
 from simple_html import h1, render
@@ -58,6 +56,7 @@ render(
 )
 
 ```
+
 The above renders to a minified version of the following html:
 ```html
 <!doctype html>
@@ -78,26 +77,44 @@ The above renders to a minified version of the following html:
 
 As you might have noticed, there are several ways to use `Tag`s:
 ```python
-from simple_html import br, div, h1, img, span
+from simple_html import br, div, h1, img, span, render
 
 # raw node renders to empty tag
-br
+render(br)
 # <br/>
 
-# node with attributes but not children
-img({"src": "/some-image.jpg", "alt": "a great picture"})
+# node with attributes but no children
+render(
+    img({"src": "/some-image.jpg", "alt": "a great picture"})
+)
 # <img src="/some-image.jpg" alt="a great picture"/>
 
 # nodes with children and (optional) attributes
-div(
-    h1({"class": "neat-class"}, 
-       span("cool"),
-       br)
+render(
+    div(
+        h1({"class": "neat-class"}, 
+        span("cool"),
+        br)
+    )
 )
 # <div><h1 class="neat-class"><span>cool</span><br/></h1></div>
 ```
+### Strings and Things
+Strings, ints, floats, and Decimals are generally rendered as one would expect expect. For security, `str`s are 
+escaped by default; `SafeString`s can be used to bypass escaping.
 
-#### More About Attributes
+```python
+from simple_html import br, p, SafeString, render
+
+node = p("Escaped & stuff",
+         br,
+         SafeString("Not escaped & stuff"))
+
+render(node)  
+# <p>Escaped &amp; stuff<br/>Not escaped & stuff</p> 
+```
+
+### Attributes
 
 Tag attributes are defined as simple dictionaries -- typically you'll just use strings for both keys and values. Note 
 that Tag attributes with `None` as the value will only render the attribute name:
@@ -116,16 +133,18 @@ Attributes are escaped by default -- both keys and values. You can use `SafeStri
 ```python
 from simple_html import div, render, SafeString
 
-escaped_attrs_node = div({"<bad>":"</also bad>"})
+render(
+    div({"<bad>":"</also bad>"})
+)
+# <div &amp;lt;bad&amp;gt;="&amp;lt;/also bad&amp;gt;"></div>
 
-render(escaped_attrs_node)  # <div &amp;lt;bad&amp;gt;="&amp;lt;/also bad&amp;gt;"></div>
-
-unescaped_attrs_node = div({SafeString("<bad>"): SafeString("</also bad>")})
-
-render(unescaped_attrs_node)  # <div <bad>="</also bad>"></div>
+render(
+    div({SafeString("<bad>"): SafeString("</also bad>")})
+)  
+# <div <bad>="</also bad>"></div>
 ```
 
-#### CSS
+### CSS
 
 You can render inline CSS styles with `render_styles`:
 ```python
@@ -148,67 +167,38 @@ render(node)
 # <div style="padding:0;flex-grow:0.6;">wow</div>
 ```
 
-#### The `Node` type
-
-`Node` defines what types of objects can be used as `Tag` `children`, or passed as arguments to `render`:
-
+### Collections
+You can pass many items as a `Tag`'s children using `*args`, lists or generators:
 ```python
-from decimal import Decimal
-from typing import Union, Generator
-from simple_html import SafeString
+from typing import Generator
+from simple_html import div, render, Node, br, p
 
-Node = Union[
-    str,
-    SafeString, 
-    float,
-    int,
-    Decimal,
-    list["Node"],
-    Generator["Node", None, None],
-    # You probably won't need to think about these two much, since they are mainly internal to the library
-    "Tag", 
-    "TagTuple",
-]
+div(
+    *["neat", br], p("cool")
+)
+# renders to <div>neat<br/><p>cool</p></div>
+
+
+# passing the raw list instead of *args 
+div(
+    ["neat", br],
+    p("cool")
+)
+# renders to <div>neat<br/><p>cool</p></div>
+
+
+def node_generator() -> Generator[Node, None, None]:
+    yield "neat"
+    yield br 
+
+
+div(node_generator(), p("cool"))
+# renders to <div>neat<br/><p>cool</p></div>
 ```
-While `Tag` and `TagTuple` are amongst the most common types in simple_html, it's not common to work directly with them; instead developers
-should expect to use objects like `div`, `a`, `span`, etc., which use these types transparently. 
-
-Some things to note:
-
-- `str`s are escaped by default, but you can pass in `SafeString`s to avoid escaping.
-    ```python
-    from simple_html import br, p, SafeString, render
-
-    node = p("Escaped & stuff",
-             br,
-             SafeString("Not escaped & stuff"))
-
-    render(node)  
-    # <p>Escaped &amp; stuff<br/>Not escaped & stuff</p> 
-    ```
-
-- lists and generators are both valid collections of nodes:
-    ```python
-    from typing import Generator
-    from simple_html import div, render, Node, br
-
-  
-    div(["neat", br])
-    # renders to <div>neat<br/></div>
-
-
-    def node_generator() -> Generator[Node, None, None]:
-        yield "neat"
-        yield br
-
-
-    div(node_generator())
-    # renders to <div>neat<br/></div>
-    ```
 
 #### Custom Tags
 
-For convenience, many tags are provided, but you can also create your own:
+For convenience, most common tags are provided, but you can also create your own:
 
 ```python
 from simple_html import Tag, render
