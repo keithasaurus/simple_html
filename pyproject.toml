@@ -1,6 +1,23 @@
 [project]
 name = "simple-html"
 version = "3.0.0"
+license = "MIT"
+homepage="https://github.com/keithasaurus/simple_html",
+classifiers = [
+    'Development Status :: 5 - Production/Stable',
+    'Environment :: Console',
+    'Environment :: MacOS X',
+    'Environment :: Web Environment',
+    'Intended Audience :: Developers',
+    'Operating System :: MacOS',
+    'Operating System :: Microsoft :: Windows',
+    'Operating System :: POSIX :: Linux',
+    'Operating System :: Unix',
+    'Topic :: Software Development :: Libraries :: Python Modules',
+    'Topic :: Utilities',
+    'Typing :: Typed'
+],
+keywords=["html", "type hints"]
 
 
 [tool.poetry.dependencies]
