@@ -1,12 +1,10 @@
-[tool.poetry]
+[project]
 name = "simple-html"
 version = "3.0.0"
-readme = "README.md"
-description = "Template-less html rendering in Python"
-authors = ["Keith Philpott <fakekeith@example.org>"]
-license = "MIT"
-homepage = "https://github.com/keithasaurus/simple_html"
-keywords = ["html", "type hints"]
+description="Template-less HTML rendering in Python"
+authors = [
+    {name="Keith Philpott"}
+]
 classifiers = [
     'Development Status :: 5 - Production/Stable',
     'Environment :: Console',
@@ -21,7 +19,15 @@ classifiers = [
     'Topic :: Utilities',
     'Typing :: Typed'
 ]
+keywords=["html", "type hints"]
+readme="README.md"
+requires-python = ">=3.9"
 
+[project.urls]
+Homepage="https://github.com/keithasaurus/simple_html"
+
+[tool.setuptools]
+packages = ["simple_html"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
@@ -40,6 +46,7 @@ ruff = "0.12.8"
 requires = [
     "poetry-core>=1.0.0",
     "mypy[mypyc]==1.17.1",
+    "tomli==2.2.1"
 ]
 
 [tool.mypy]
