@@ -1,4 +1,5 @@
 from decimal import Decimal
+from functools import lru_cache
 from types import GeneratorType
 from typing import Any, Union, Generator, Iterable, Callable, Final, TYPE_CHECKING
 
@@ -17,6 +18,16 @@ class SafeString:
         return f"SafeString(safe_str='{self.safe_str}')"
 
 
+
+def _faster_escape(s: str) -> str:
+    return s.replace(
+        "&", "&amp;"  # Must be done first!
+    ).replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;").replace('\'', "&#x27;")
+
+
+caching_faster_escape = lru_cache(maxsize=100_000)(_faster_escape)
+
+
 def faster_escape(s: str) -> str:
     """
     This is nearly duplicate of html.escape in the standard lib.
@@ -24,9 +35,11 @@ def faster_escape(s: str) -> str:
      - we don't check if some of the replacements are desired
      - we don't re-assign a variable many times.
     """
-    return s.replace(
-        "&", "&amp;"   # Must be done first!
-    ).replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;").replace('\'', "&#x27;")
+    if len(s) > 10_000:
+        return _faster_escape(s)
+    else:
+        return caching_faster_escape(s)
+
 
 Node = Union[
     str,
