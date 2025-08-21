@@ -439,7 +439,7 @@ def render_styles(
 def get_caching_escape_func(maxsize: int | None, max_string_length: int | None) -> Callable[[str], str]:
     """
     @param maxsize: maximum number of entries in the lru_cache (use `None` for no maximum -- not recommended)
-    @param max_string_length: maximum length of the strings for which we'll use the cache. Caching very long strings
+    @param max_string_length: maximum length of the strings for which we'll use the cache. Caching lots of very long strings
         could result in heavy memory consumption
     """
     _cache_escape = lru_cache(maxsize=maxsize)(faster_escape)
@@ -455,7 +455,7 @@ def get_caching_escape_func(maxsize: int | None, max_string_length: int | None) 
          return _cache_escape
 
 
-caching_escape_fun = get_caching_escape_func(5_000, 2_000)
+caching_escape_fun = get_caching_escape_func(5_000, 5_000)
 
 def render(*nodes: Node,
            escape_func: Callable[[str], str]=caching_escape_fun) -> str:
