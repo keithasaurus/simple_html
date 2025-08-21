@@ -455,7 +455,7 @@ def get_caching_escape_func(maxsize: int | None, max_string_length: int | None) 
          return _cache_escape
 
 
-caching_escape_fun = get_caching_escape_func(2_000, 2_000)
+caching_escape_fun = get_caching_escape_func(5_000, 2_000)
 
 def render(*nodes: Node,
            escape_func: Callable[[str], str]=caching_escape_fun) -> str:

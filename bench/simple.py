@@ -1,5 +1,4 @@
-from functools import lru_cache
-from typing import List, Tuple, Callable
+from typing import List, Tuple
 
 from simple_html import (
     h1,
