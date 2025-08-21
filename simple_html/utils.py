@@ -19,15 +19,6 @@ class SafeString:
 
 
 
-def _faster_escape(s: str) -> str:
-    return s.replace(
-        "&", "&amp;"  # Must be done first!
-    ).replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;").replace('\'', "&#x27;")
-
-
-caching_faster_escape = lru_cache(maxsize=100_000)(_faster_escape)
-
-
 def faster_escape(s: str) -> str:
     """
     This is nearly duplicate of html.escape in the standard lib.
@@ -35,10 +26,9 @@ def faster_escape(s: str) -> str:
      - we don't check if some of the replacements are desired
      - we don't re-assign a variable many times.
     """
-    if len(s) > 10_000:
-        return _faster_escape(s)
-    else:
-        return caching_faster_escape(s)
+    return s.replace(
+        "&", "&amp;"  # Must be done first!
+    ).replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;").replace('\'', "&#x27;")
 
 
 Node = Union[
@@ -185,23 +175,24 @@ class Tag:
         return self._repr
 
 
-def _render(nodes: Iterable[Node], append_to_list: Callable[[str], None]) -> None:
+def _render(nodes: Iterable[Node], append_to_list: Callable[[str], None],
+            escape_func: Callable[[str], str]) -> None:
     """
     mutate a list instead of constantly rendering strings
     """
     for node in nodes:
         if type(node) is tuple:
             append_to_list(node[0])
-            _render(node[1], append_to_list)
+            _render(node[1], append_to_list, escape_func)
             append_to_list(node[2])
         elif type(node) is SafeString:
             append_to_list(node.safe_str)
         elif type(node) is str:
-            append_to_list(faster_escape(node))
+            append_to_list(escape_func(node))
         elif type(node) is Tag:
             append_to_list(node.rendered)
         elif type(node) is list or type(node) is GeneratorType:
-            _render(node, append_to_list)
+            _render(node, append_to_list, escape_func)
         elif isinstance(node, (int, float, Decimal)):
             append_to_list(str(node))
         else:
@@ -445,8 +436,36 @@ def render_styles(
     return SafeString("".join(ret))
 
 
-def render(*nodes: Node) -> str:
+def get_caching_escape_func(maxsize: int | None, max_string_length: int | None) -> Callable[[str], str]:
+    """
+    @param maxsize: maximum number of entries in the lru_cache (use `None` for no maximum -- not recommended)
+    @param max_string_length: maximum length of the strings for which we'll use the cache. Caching very long strings
+        could result in heavy memory consumption
+    """
+    _cache_escape = lru_cache(maxsize=maxsize)(faster_escape)
+
+    if max_string_length is not None:
+        def inner(s: str) -> str:
+            if len(s) > max_string_length:
+                return faster_escape(s)
+            else:
+                return _cache_escape(s)
+        return inner
+    else:
+         return _cache_escape
+
+
+caching_escape_fun = get_caching_escape_func(2_000, 2_000)
+
+def render(*nodes: Node,
+           escape_func: Callable[[str], str]=caching_escape_fun) -> str:
+    """
+    @param nodes: the nodes to render
+    @param escape_func: a function which controls the escaping of strings. The primary
+        purpose of this is to allow custom caching sizes / strategies. By default it will
+        maintain a fairly small cache, which can only grow to single-digit megabytes in size.
+    """
     results: list[str] = []
-    _render(nodes, results.append)
+    _render(nodes, results.append, escape_func)
 
     return "".join(results)
