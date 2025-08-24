@@ -31,6 +31,33 @@ def faster_escape(s: str) -> str:
     ).replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;").replace('\'', "&#x27;")
 
 
+
+def get_caching_escape_func(maxsize: int | None, max_string_length: int | None) -> Callable[[str], str]:
+    """
+    @param maxsize: maximum number of entries in the lru_cache (use `None` for no maximum -- not recommended)
+    @param max_string_length: maximum length of the strings for which we'll use the cache. Caching lots of very long strings
+        could result in heavy memory consumption
+    """
+    _cache_escape = lru_cache(maxsize=maxsize)(faster_escape)
+
+    if max_string_length is not None:
+        def inner(s: str) -> str:
+            if len(s) > max_string_length:
+                return faster_escape(s)
+            else:
+                return _cache_escape(s)
+        return inner
+    else:
+         return _cache_escape
+
+
+_key_cache_escape = get_caching_escape_func(max_string_length=100,
+                                            maxsize=10000)
+
+
+_val_cache_escape = get_caching_escape_func(max_string_length=200,
+                                            maxsize=20000)
+
 Node = Union[
     str,
     SafeString,
@@ -100,7 +127,7 @@ _common_safe_attribute_names: Final[frozenset[str]] = frozenset(
 
 def escape_attribute_key(k: str) -> str:
     return (
-        faster_escape(k)
+        _key_cache_escape(k)
         .replace("=", "&#x3D;")
         .replace("\\", "&#x5C;")
         .replace("`", "&#x60;")
@@ -156,7 +183,7 @@ class Tag:
                     assert isinstance(key, str)
 
                 if type(val) is str:
-                    attrs.append(f' {key}="{faster_escape(val)}"')
+                    attrs.append(f' {key}="{_val_cache_escape(val)}"')
                 elif type(val) is SafeString:
                     attrs.append(f' {key}="{val.safe_str}"')
                 elif val is None:
@@ -435,30 +462,10 @@ def render_styles(
 
     return SafeString("".join(ret))
 
-
-def get_caching_escape_func(maxsize: int | None, max_string_length: int | None) -> Callable[[str], str]:
-    """
-    @param maxsize: maximum number of entries in the lru_cache (use `None` for no maximum -- not recommended)
-    @param max_string_length: maximum length of the strings for which we'll use the cache. Caching lots of very long strings
-        could result in heavy memory consumption
-    """
-    _cache_escape = lru_cache(maxsize=maxsize)(faster_escape)
-
-    if max_string_length is not None:
-        def inner(s: str) -> str:
-            if len(s) > max_string_length:
-                return faster_escape(s)
-            else:
-                return _cache_escape(s)
-        return inner
-    else:
-         return _cache_escape
-
-
-caching_escape_fun = get_caching_escape_func(5_000, 5_000)
+str_cache_escape = get_caching_escape_func(10_000, 2_000)
 
 def render(*nodes: Node,
-           escape_func: Callable[[str], str]=caching_escape_fun) -> str:
+           escape_func: Callable[[str], str]=str_cache_escape) -> str:
     """
     @param nodes: the nodes to render
     @param escape_func: a function which controls the escaping of strings. The primary
