@@ -125,6 +125,7 @@ _common_safe_attribute_names: Final[frozenset[str]] = frozenset(
 )
 
 
+# todo: cache this
 def escape_attribute_key(k: str) -> str:
     return (
         _key_cache_escape(k)
@@ -133,6 +134,8 @@ def escape_attribute_key(k: str) -> str:
         .replace("`", "&#x60;")
         .replace(" ", "&nbsp;")
     )
+
+# todo: css caches
 
 
 class Tag:
