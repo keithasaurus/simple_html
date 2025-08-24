@@ -32,18 +32,22 @@ def faster_escape(s: str) -> str:
 
 
 
-def get_caching_escape_func(maxsize: int | None, max_string_length: int | None) -> Callable[[str], str]:
+def get_caching_escape_func(
+        func: Callable[[str], str],
+        maxsize: int | None,
+        max_string_length: int | None
+) -> Callable[[str], str]:
     """
     @param maxsize: maximum number of entries in the lru_cache (use `None` for no maximum -- not recommended)
     @param max_string_length: maximum length of the strings for which we'll use the cache. Caching lots of very long strings
         could result in heavy memory consumption
     """
-    _cache_escape = lru_cache(maxsize=maxsize)(faster_escape)
+    _cache_escape = lru_cache(maxsize=maxsize)(func)
 
     if max_string_length is not None:
         def inner(s: str) -> str:
             if len(s) > max_string_length:
-                return faster_escape(s)
+                return func(s)
             else:
                 return _cache_escape(s)
         return inner
@@ -51,11 +55,9 @@ def get_caching_escape_func(maxsize: int | None, max_string_length: int | None) 
          return _cache_escape
 
 
-_key_cache_escape = get_caching_escape_func(max_string_length=100,
-                                            maxsize=10000)
 
-
-_val_cache_escape = get_caching_escape_func(max_string_length=200,
+_val_cache_escape = get_caching_escape_func(faster_escape,
+                                            max_string_length=200,
                                             maxsize=20000)
 
 Node = Union[
@@ -125,17 +127,17 @@ _common_safe_attribute_names: Final[frozenset[str]] = frozenset(
 )
 
 
-# todo: cache this
+
 def escape_attribute_key(k: str) -> str:
     return (
-        _key_cache_escape(k)
+        faster_escape(k)
         .replace("=", "&#x3D;")
         .replace("\\", "&#x5C;")
         .replace("`", "&#x60;")
         .replace(" ", "&nbsp;")
     )
 
-# todo: css caches
+_key_cache_escape = get_caching_escape_func(escape_attribute_key, maxsize=1000, max_string_length=100)
 
 
 class Tag:
@@ -178,7 +180,7 @@ class Tag:
                 # key_: str
                 if key not in _common_safe_attribute_names:
                     key = (
-                        escape_attribute_key(key)
+                        _key_cache_escape(key)
                         if isinstance(key, str)
                         else key.safe_str
                     )
@@ -465,7 +467,9 @@ def render_styles(
 
     return SafeString("".join(ret))
 
-str_cache_escape = get_caching_escape_func(10_000, 2_000)
+str_cache_escape = get_caching_escape_func(faster_escape,
+                                           10_000,
+                                           2_000)
 
 def render(*nodes: Node,
            escape_func: Callable[[str], str]=str_cache_escape) -> str:
