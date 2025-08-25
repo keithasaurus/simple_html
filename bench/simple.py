@@ -1,4 +1,5 @@
-from typing import List, Tuple
+from functools import lru_cache
+from typing import List, Tuple, Callable
 
 from simple_html import (
     h1,
@@ -14,7 +15,7 @@ from simple_html import (
     br,
     meta,
     DOCTYPE_HTML5,
-    render, ol, hr,
+    render, ol, hr, Node,
 )
 
 from simple_html import (
@@ -143,41 +144,116 @@ def lorem_ipsum(titles: List[str]) -> None:
             ),
         )
 
+def prerender_static(*nodes: Node) -> SafeString:
+    return SafeString(render(*nodes))
 
-def large_page(titles: list[str]) -> None:
-    for t in titles:
-        render(
-            DOCTYPE_HTML5,
-            html({"lang": "en"},
-                 head(
-                     meta({"charset": "UTF-8"}),
-                     meta({"name": "viewport", "content": "width=device-width, initial-scale=1.0"}),
-                     meta({"name": "description",
-                           "content": "Tech Insights - Your source for the latest in web development, AI, and programming trends"}),
-                     meta({"name": "keywords",
-                           "content": "web development, programming, AI, JavaScript, Python, tech news"}),
-                     title(t),
-                     link({"rel": "stylesheet", "href": "/static/css/main.css"}),
-                     link({"rel": "icon", "type": "image/x-icon", "href": "/favicon.ico"}),
-                     style("""
-                        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; }
-                        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-                        .site-header { background: #2c3e50; color: white; padding: 1rem 0; }
-                        .site-title { margin: 0; font-size: 2rem; }
-                        .nav-menu { list-style: none; padding: 0; display: flex; gap: 2rem; }
-                        .nav-menu a { color: white; text-decoration: none; }
-                        .main-content { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; padding: 2rem 0; }
-                        .post { margin-bottom: 2rem; padding: 1.5rem; border: 1px solid #ddd; border-radius: 8px; }
-                        .post-meta { color: #666; font-size: 0.9rem; }
-                        .sidebar { background: #f8f9fa; padding: 1.5rem; border-radius: 8px; }
-                        .code-block { background: #f4f4f4; padding: 1rem; border-radius: 4px; overflow-x: auto; }
-                        .comment-form { margin-top: 2rem; padding: 1rem; background: #f9f9f9; border-radius: 8px; }
-                        .stats-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
-                        .stats-table th, .stats-table td { padding: 0.5rem; border: 1px solid #ddd; text-align: left; }
-                        .stats-table th { background: #f0f0f0; }
-                    """)
-                 ),
-                 body(
+
+
+_large_footer = prerender_static(
+    footer({"class": "site-footer"},
+                            div({"class": "container"},
+                                div({"class": "footer-content"},
+                                    div({"class": "footer-section"},
+                                        h4("About Tech Insights"),
+                                        p("Your go-to resource for web development tutorials, programming guides, and the latest technology trends. We help developers stay current with industry best practices.")
+                                        ),
+                                    div({"class": "footer-section"},
+                                        h4("Quick Links"),
+                                        ul(
+                                            li(a({"href": "/privacy"}, "Privacy Policy")),
+                                            li(a({"href": "/terms"}, "Terms of Service")),
+                                            li(a({"href": "/sitemap"}, "Sitemap")),
+                                            li(a({"href": "/advertise"}, "Advertise"))
+                                        )
+                                        ),
+                                    div({"class": "footer-section"},
+                                        h4("Contact Info"),
+                                        p("Email: hello@techinsights.dev"),
+                                        p("Location: San Francisco, CA"),
+                                        p("Phone: (555) 123-4567")
+                                        )
+                                    ),
+                                hr,
+                                div({"class": "footer-bottom"},
+                                    p("© 2024 Tech Insights. All rights reserved. Built with simple_html library."),
+                                    p("Made with ❤️ for the developer community")
+                                    )
+                                )
+                            )
+)
+
+def html_cache(
+        func: Callable[..., Node]
+) -> Callable[..., SafeString]:
+    @lru_cache(maxsize=None)
+    def inner(*args, **kwargs) -> SafeString:
+        return SafeString(
+            render(func(*args, **kwargs))
+        )
+
+    return inner
+
+
+@html_cache
+def _article_1():
+    return article({"class": "post"},
+                                          h2("Python vs JavaScript: Which Language to Learn in 2024?"),
+                                          p({"class": "post-meta"},
+                                            "Published on ", time({"datetime": "2024-03-05"}, "March 5, 2024"),
+                                            " by ", span({"class": "author"}, "Emily Rodriguez"),
+                                            " | ", span({"class": "read-time"}, "10 min read")
+                                            ),
+                                          p(
+                                              "The eternal debate continues: should new developers learn Python or JavaScript first? ",
+                                              "Both languages have their strengths and use cases, and the answer largely depends on ",
+                                              "your career goals and the type of projects you want to work on."
+                                          ),
+                                          h3("Python Advantages"),
+                                          ul(
+                                              li("Simple, readable syntax that's beginner-friendly"),
+                                              li("Excellent for data science, machine learning, and AI"),
+                                              li("Strong in automation, scripting, and backend development"),
+                                              li("Huge ecosystem of libraries and frameworks (Django, Flask, NumPy, pandas)")
+                                          ),
+                                          h3("JavaScript Advantages"),
+                                          ul(
+                                              li("Essential for web development (frontend and backend with Node.js)"),
+                                              li("Immediate visual feedback when learning"),
+                                              li("Huge job market and demand"),
+                                              li("Versatile: runs in browsers, servers, mobile apps, and desktop applications")
+                                          ),
+                                          p("The truth is, both languages are valuable, and learning one makes learning the other easier.")
+                   )
+
+@html_cache
+def _article_2():
+    return article({"class": "post"},
+                                          h2("The Rise of AI in Development: Tools and Techniques"),
+                                          p({"class": "post-meta"},
+                                            "Published on ", time({"datetime": "2024-03-10"}, "March 10, 2024"),
+                                            " by ", span({"class": "author"}, "Michael Chen"),
+                                            " | ", span({"class": "read-time"}, "8 min read")
+                                            ),
+                                          p(
+                                              "Artificial Intelligence is fundamentally transforming how we write, test, and deploy code. ",
+                                              "From intelligent autocomplete suggestions to automated bug detection and code generation, ",
+                                              "AI tools are becoming essential companions for modern developers."
+                                          ),
+                                          h3("Popular AI Development Tools"),
+                                          ul(
+                                              li("**GitHub Copilot**: AI-powered code completion and generation"),
+                                              li("**ChatGPT & GPT-4**: Code explanation, debugging, and architecture advice"),
+                                              li("**Amazon CodeWhisperer**: Real-time code suggestions with security scanning"),
+                                              li("**DeepCode**: AI-powered code review and vulnerability detection"),
+                                              li("**Kite**: Intelligent code completion for Python and JavaScript")
+                                          ),
+                                          p(
+                                              "These tools don't replace developers but rather augment their capabilities, ",
+                                              "allowing them to focus on higher-level problem solving and creative solutions."
+                                          )
+                                          )
+
+_body = prerender_static(body(
                      header({"class": "site-header"},
                             div({"class": "container"},
                                 h1({"class": "site-title"}, "Tech Insights"),
@@ -311,61 +387,9 @@ def large_page(titles: list[str]) -> None:
                                               footer("— John Doe, Senior Frontend Architect at TechCorp")
                                           )
                                           ),
+                                  _article_2(),
 
-                                  article({"class": "post"},
-                                          h2("The Rise of AI in Development: Tools and Techniques"),
-                                          p({"class": "post-meta"},
-                                            "Published on ", time({"datetime": "2024-03-10"}, "March 10, 2024"),
-                                            " by ", span({"class": "author"}, "Michael Chen"),
-                                            " | ", span({"class": "read-time"}, "8 min read")
-                                            ),
-                                          p(
-                                              "Artificial Intelligence is fundamentally transforming how we write, test, and deploy code. ",
-                                              "From intelligent autocomplete suggestions to automated bug detection and code generation, ",
-                                              "AI tools are becoming essential companions for modern developers."
-                                          ),
-                                          h3("Popular AI Development Tools"),
-                                          ul(
-                                              li("**GitHub Copilot**: AI-powered code completion and generation"),
-                                              li("**ChatGPT & GPT-4**: Code explanation, debugging, and architecture advice"),
-                                              li("**Amazon CodeWhisperer**: Real-time code suggestions with security scanning"),
-                                              li("**DeepCode**: AI-powered code review and vulnerability detection"),
-                                              li("**Kite**: Intelligent code completion for Python and JavaScript")
-                                          ),
-                                          p(
-                                              "These tools don't replace developers but rather augment their capabilities, ",
-                                              "allowing them to focus on higher-level problem solving and creative solutions."
-                                          )
-                                          ),
-
-                                  article({"class": "post"},
-                                          h2("Python vs JavaScript: Which Language to Learn in 2024?"),
-                                          p({"class": "post-meta"},
-                                            "Published on ", time({"datetime": "2024-03-05"}, "March 5, 2024"),
-                                            " by ", span({"class": "author"}, "Emily Rodriguez"),
-                                            " | ", span({"class": "read-time"}, "10 min read")
-                                            ),
-                                          p(
-                                              "The eternal debate continues: should new developers learn Python or JavaScript first? ",
-                                              "Both languages have their strengths and use cases, and the answer largely depends on ",
-                                              "your career goals and the type of projects you want to work on."
-                                          ),
-                                          h3("Python Advantages"),
-                                          ul(
-                                              li("Simple, readable syntax that's beginner-friendly"),
-                                              li("Excellent for data science, machine learning, and AI"),
-                                              li("Strong in automation, scripting, and backend development"),
-                                              li("Huge ecosystem of libraries and frameworks (Django, Flask, NumPy, pandas)")
-                                          ),
-                                          h3("JavaScript Advantages"),
-                                          ul(
-                                              li("Essential for web development (frontend and backend with Node.js)"),
-                                              li("Immediate visual feedback when learning"),
-                                              li("Huge job market and demand"),
-                                              li("Versatile: runs in browsers, servers, mobile apps, and desktop applications")
-                                          ),
-                                          p("The truth is, both languages are valuable, and learning one makes learning the other easier.")
-                                          ),
+                                  _article_1(),
 
                                   section({"class": "comment-section"},
                                           h3("Join the Discussion"),
@@ -458,36 +482,44 @@ def large_page(titles: list[str]) -> None:
                                 )
                           ),
 
-                     footer({"class": "site-footer"},
-                            div({"class": "container"},
-                                div({"class": "footer-content"},
-                                    div({"class": "footer-section"},
-                                        h4("About Tech Insights"),
-                                        p("Your go-to resource for web development tutorials, programming guides, and the latest technology trends. We help developers stay current with industry best practices.")
-                                        ),
-                                    div({"class": "footer-section"},
-                                        h4("Quick Links"),
-                                        ul(
-                                            li(a({"href": "/privacy"}, "Privacy Policy")),
-                                            li(a({"href": "/terms"}, "Terms of Service")),
-                                            li(a({"href": "/sitemap"}, "Sitemap")),
-                                            li(a({"href": "/advertise"}, "Advertise"))
-                                        )
-                                        ),
-                                    div({"class": "footer-section"},
-                                        h4("Contact Info"),
-                                        p("Email: hello@techinsights.dev"),
-                                        p("Location: San Francisco, CA"),
-                                        p("Phone: (555) 123-4567")
-                                        )
-                                    ),
-                                hr,
-                                div({"class": "footer-bottom"},
-                                    p("© 2024 Tech Insights. All rights reserved. Built with simple_html library."),
-                                    p("Made with ❤️ for the developer community")
-                                    )
-                                )
-                            )
+                     _large_footer
                  )
+)
+
+
+def large_page(titles: list[str]) -> None:
+    for t in titles:
+        render(
+            DOCTYPE_HTML5,
+            html({"lang": "en"},
+                 head(
+                     meta({"charset": "UTF-8"}),
+                     meta({"name": "viewport", "content": "width=device-width, initial-scale=1.0"}),
+                     meta({"name": "description",
+                           "content": "Tech Insights - Your source for the latest in web development, AI, and programming trends"}),
+                     meta({"name": "keywords",
+                           "content": "web development, programming, AI, JavaScript, Python, tech news"}),
+                     title(t),
+                     link({"rel": "stylesheet", "href": "/static/css/main.css"}),
+                     link({"rel": "icon", "type": "image/x-icon", "href": "/favicon.ico"}),
+                     style("""
+                        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; }
+                        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+                        .site-header { background: #2c3e50; color: white; padding: 1rem 0; }
+                        .site-title { margin: 0; font-size: 2rem; }
+                        .nav-menu { list-style: none; padding: 0; display: flex; gap: 2rem; }
+                        .nav-menu a { color: white; text-decoration: none; }
+                        .main-content { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; padding: 2rem 0; }
+                        .post { margin-bottom: 2rem; padding: 1.5rem; border: 1px solid #ddd; border-radius: 8px; }
+                        .post-meta { color: #666; font-size: 0.9rem; }
+                        .sidebar { background: #f8f9fa; padding: 1.5rem; border-radius: 8px; }
+                        .code-block { background: #f4f4f4; padding: 1rem; border-radius: 4px; overflow-x: auto; }
+                        .comment-form { margin-top: 2rem; padding: 1rem; background: #f9f9f9; border-radius: 8px; }
+                        .stats-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+                        .stats-table th, .stats-table td { padding: 0.5rem; border: 1px solid #ddd; text-align: left; }
+                        .stats-table th { background: #f0f0f0; }
+                    """)
+                 ),
+                 _body
                  )
         )
