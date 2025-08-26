@@ -1,7 +1,6 @@
 from functools import lru_cache
 from typing import List, Tuple, Callable, Any
 
-from typing_extensions import ParamSpec
 
 from simple_html import (
     h1,
