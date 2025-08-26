@@ -1,5 +1,7 @@
 from functools import lru_cache
-from typing import List, Tuple, Callable
+from typing import List, Tuple, Callable, Any
+
+from typing_extensions import ParamSpec
 
 from simple_html import (
     h1,
@@ -29,12 +31,13 @@ def prerender_html(*nodes: Node) -> SafeString:
     return SafeString(render(*nodes))
 
 
-
 def html_cache(
         func: Callable[..., Node]
 ) -> Callable[..., SafeString]:
+    # ParamSpec is not yet capable enough to bind to `Hashable` types, so it would
+    # fail to typecheck for lru_cache anyway
     @lru_cache(maxsize=None)
-    def inner(*args, **kwargs) -> SafeString:
+    def inner(*args: Any, **kwargs: Any) -> SafeString:
         return SafeString(render(func(*args, **kwargs)))
 
     return inner
@@ -193,93 +196,99 @@ _large_footer = prerender_html(
            )
 )
 
+_article_1 = prerender_html(
+    article(
+        {"class": "post"},
+        h2("Python vs JavaScript: Which Language to Learn in 2024?"),
+        p({"class": "post-meta"},
+          "Published on ",
+          time({"datetime": "2024-03-05"}, "March 5, 2024"),
+          " by ",
+          span({"class": "author"}, "Emily Rodriguez"),
+          " | ",
+          span({"class": "read-time"}, "10 min read")
+          ),
+        p(
+            "The eternal debate continues: should new developers learn Python or JavaScript first? ",
+            "Both languages have their strengths and use cases, and the answer largely depends on ",
+            "your career goals and the type of projects you want to work on."
+        ),
+        h3("Python Advantages"),
+        ul(
+            li("Simple, readable syntax that's beginner-friendly"),
+            li("Excellent for data science, machine learning, and AI"),
+            li("Strong in automation, scripting, and backend development"),
+            li("Huge ecosystem of libraries and frameworks (Django, Flask, NumPy, pandas)")
+        ),
+        h3("JavaScript Advantages"),
+        ul(
+            li("Essential for web development (frontend and backend with Node.js)"),
+            li("Immediate visual feedback when learning"),
+            li("Huge job market and demand"),
+            li("Versatile: runs in browsers, servers, mobile apps, and desktop applications")
+        ),
+        p("The truth is, both languages are valuable, and learning one makes learning the other easier.")
+    )
+)
 
-@html_cache
-def _article_1():
-    return article({"class": "post"},
-                   h2("Python vs JavaScript: Which Language to Learn in 2024?"),
-                   p({"class": "post-meta"},
-                     "Published on ", time({"datetime": "2024-03-05"}, "March 5, 2024"),
-                     " by ", span({"class": "author"}, "Emily Rodriguez"),
-                     " | ", span({"class": "read-time"}, "10 min read")
-                     ),
-                   p(
-                       "The eternal debate continues: should new developers learn Python or JavaScript first? ",
-                       "Both languages have their strengths and use cases, and the answer largely depends on ",
-                       "your career goals and the type of projects you want to work on."
-                   ),
-                   h3("Python Advantages"),
-                   ul(
-                       li("Simple, readable syntax that's beginner-friendly"),
-                       li("Excellent for data science, machine learning, and AI"),
-                       li("Strong in automation, scripting, and backend development"),
-                       li("Huge ecosystem of libraries and frameworks (Django, Flask, NumPy, pandas)")
-                   ),
-                   h3("JavaScript Advantages"),
-                   ul(
-                       li("Essential for web development (frontend and backend with Node.js)"),
-                       li("Immediate visual feedback when learning"),
-                       li("Huge job market and demand"),
-                       li("Versatile: runs in browsers, servers, mobile apps, and desktop applications")
-                   ),
-                   p("The truth is, both languages are valuable, and learning one makes learning the other easier.")
-                   )
-
-
-@html_cache
-def _article_2():
-    return article({"class": "post"},
-                   h2("The Rise of AI in Development: Tools and Techniques"),
-                   p({"class": "post-meta"},
-                     "Published on ", time({"datetime": "2024-03-10"}, "March 10, 2024"),
-                     " by ", span({"class": "author"}, "Michael Chen"),
-                     " | ", span({"class": "read-time"}, "8 min read")
-                     ),
-                   p(
-                       "Artificial Intelligence is fundamentally transforming how we write, test, and deploy code. ",
-                       "From intelligent autocomplete suggestions to automated bug detection and code generation, ",
-                       "AI tools are becoming essential companions for modern developers."
-                   ),
-                   h3("Popular AI Development Tools"),
-                   ul(
-                       li("**GitHub Copilot**: AI-powered code completion and generation"),
-                       li("**ChatGPT & GPT-4**: Code explanation, debugging, and architecture advice"),
-                       li("**Amazon CodeWhisperer**: Real-time code suggestions with security scanning"),
-                       li("**DeepCode**: AI-powered code review and vulnerability detection"),
-                       li("**Kite**: Intelligent code completion for Python and JavaScript")
-                   ),
-                   p(
-                       "These tools don't replace developers but rather augment their capabilities, ",
-                       "allowing them to focus on higher-level problem solving and creative solutions."
-                   )
-                   )
-
+_article_2 = prerender_html(
+    article(
+        {"class": "post"},
+        h2("The Rise of AI in Development: Tools and Techniques"),
+        p({"class": "post-meta"},
+          "Published on ", time({"datetime": "2024-03-10"}, "March 10, 2024"),
+          " by ", span({"class": "author"}, "Michael Chen"),
+          " | ", span({"class": "read-time"}, "8 min read")
+          ),
+        p(
+            "Artificial Intelligence is fundamentally transforming how we write, test, and deploy code. ",
+            "From intelligent autocomplete suggestions to automated bug detection and code generation, ",
+            "AI tools are becoming essential companions for modern developers."
+        ),
+        h3("Popular AI Development Tools"),
+        ul(
+            li("**GitHub Copilot**: AI-powered code completion and generation"),
+            li("**ChatGPT & GPT-4**: Code explanation, debugging, and architecture advice"),
+            li("**Amazon CodeWhisperer**: Real-time code suggestions with security scanning"),
+            li("**DeepCode**: AI-powered code review and vulnerability detection"),
+            li("**Kite**: Intelligent code completion for Python and JavaScript")
+        ),
+        p(
+            "These tools don't replace developers but rather augment their capabilities, ",
+            "allowing them to focus on higher-level problem solving and creative solutions."
+        )
+    )
+)
 
 _body = prerender_html(body(
-    header({"class": "site-header"},
-           div({"class": "container"},
-               h1({"class": "site-title"}, "Tech Insights"),
-               nav(
-                   ul({"class": "nav-menu"},
-                      li(a({"href": "/"}, "Home")),
-                      li(a({"href": "/tutorials"}, "Tutorials")),
-                      li(a({"href": "/articles"}, "Articles")),
-                      li(a({"href": "/reviews"}, "Reviews")),
-                      li(a({"href": "/resources"}, "Resources")),
-                      li(a({"href": "/about"}, "About")),
-                      li(a({"href": "/contact"}, "Contact"))
-                      )
-               )
-               )
-           ),
+    header(
+        {"class": "site-header"},
+        div({"class": "container"},
+            h1({"class": "site-title"}, "Tech Insights"),
+            nav(
+                ul({"class": "nav-menu"},
+                   li(a({"href": "/"}, "Home")),
+                   li(a({"href": "/tutorials"}, "Tutorials")),
+                   li(a({"href": "/articles"}, "Articles")),
+                   li(a({"href": "/reviews"}, "Reviews")),
+                   li(a({"href": "/resources"}, "Resources")),
+                   li(a({"href": "/about"}, "About")),
+                   li(a({"href": "/contact"}, "Contact"))
+                   )
+            )
+        )
+    ),
     main({"class": "container main-content"},
          section({"class": "content-area"},
                  article({"class": "post featured-post"},
                          h2("Complete Guide to Modern Web Development in 2024"),
                          p({"class": "post-meta"},
-                           "Published on ", time({"datetime": "2024-03-15"}, "March 15, 2024"),
-                           " by ", span({"class": "author"}, "Sarah Johnson"),
-                           " | ", span({"class": "read-time"}, "12 min read")
+                           "Published on ",
+                           time({"datetime": "2024-03-15"}, "March 15, 2024"),
+                           " by ",
+                           span({"class": "author"}, "Sarah Johnson"),
+                           " | ",
+                           span({"class": "read-time"}, "12 min read")
                            ),
                          img({"src": "/images/web-dev-2024.jpg",
                               "alt": "Modern web development tools and frameworks",
@@ -389,9 +398,9 @@ _body = prerender_html(body(
                              footer("— John Doe, Senior Frontend Architect at TechCorp")
                          )
                          ),
-                 _article_2(),
+                 _article_2,
 
-                 _article_1(),
+                 _article_1,
 
                  section({"class": "comment-section"},
                          h3("Join the Discussion"),
@@ -526,12 +535,13 @@ def large_page(titles: list[str]) -> None:
     for t in titles:
         render(
             DOCTYPE_HTML5,
-            html({"lang": "en"},
-                 head(
-                     title(t),
-                     _head_meta,
-                     _header_css,
-                 ),
-                 _body
+            html(
+                {"lang": "en"},
+                head(
+                    title(t),
+                    _head_meta,
+                    _header_css,
+                ),
+                _body
             )
         )

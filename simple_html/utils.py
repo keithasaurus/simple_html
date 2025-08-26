@@ -471,6 +471,7 @@ str_cache_escape = get_caching_escape_func(faster_escape,
                                            10_000,
                                            2_000)
 
+
 def render(*nodes: Node,
            escape_func: Callable[[str], str]=str_cache_escape) -> str:
     """
