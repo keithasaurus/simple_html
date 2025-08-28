@@ -44,6 +44,9 @@ benches: Dict[str, BenchCompare[Any]] = {
         lambda i: (str(i), f"some content {i}", ["ok" for _ in range(i % 50)]),
         {SIMPLE_HTML: simple.basic_long, JINJA2: jin.basic_long},
     ),
+    # While this features a real-world sized page, note that it unnaturally disadvantages
+    # simple_html because there's is very little dynamism. So it creates
+    # a good edge case to chase. Not being complete up to par with jinja here should be expected
     "large page": BenchCompare(
         lambda i: f"title {i}",
         {SIMPLE_HTML: simple.large_page, JINJA2: jin.large_page},
