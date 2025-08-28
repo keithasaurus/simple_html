@@ -125,237 +125,6 @@ _common_safe_attribute_names: Final[frozenset[str]] = frozenset(
 )
 
 
-_common_safe_attribute_values = frozenset([
-  "true",
-  "false",
-  "checked",
-  "disabled",
-  "hidden",
-  "readonly",
-  "required",
-  "selected",
-  "autofocus",
-  "autoplay",
-  "controls",
-  "defer",
-  "loop",
-  "multiple",
-  "muted",
-  "open",
-  "reversed",
-  "async",
-  "text",
-  "email",
-  "password",
-  "number",
-  "tel",
-  "url",
-  "search",
-  "date",
-  "time",
-  "datetime-local",
-  "month",
-  "week",
-  "color",
-  "range",
-  "checkbox",
-  "radio",
-  "submit",
-  "button",
-  "reset",
-  "file",
-  "image",
-  "hidden",
-  "_blank",
-  "_self",
-  "_parent",
-  "_top",
-  "GET",
-  "POST",
-  "PUT",
-  "DELETE",
-  "PATCH",
-  "HEAD",
-  "OPTIONS",
-  "stylesheet",
-  "icon",
-  "shortcut icon",
-  "canonical",
-  "alternate",
-  "prev",
-  "next",
-  "nofollow",
-  "noopener",
-  "noreferrer",
-  "prefetch",
-  "preload",
-  "dns-prefetch",
-  "preconnect",
-  "bookmark",
-  "help",
-  "license",
-  "tag",
-  "author",
-  "external",
-  "application/x-www-form-urlencoded",
-  "multipart/form-data",
-  "text/plain",
-  "application/json",
-  "ltr",
-  "rtl",
-  "auto",
-  "en",
-  "en-US",
-  "en-GB",
-  "es",
-  "es-ES",
-  "fr",
-  "fr-FR",
-  "de",
-  "de-DE",
-  "it",
-  "it-IT",
-  "pt",
-  "pt-BR",
-  "ru",
-  "zh",
-  "zh-CN",
-  "ja",
-  "ko",
-  "ar",
-  "hi",
-  "refresh",
-  "content-type",
-  "x-ua-compatible",
-  "content-security-policy",
-  "viewport",
-  "description",
-  "keywords",
-  "robots",
-  "generator",
-  "application-name",
-  "UTF-8",
-  "ISO-8859-1",
-  "ASCII",
-  "Windows-1252",
-  "on",
-  "off",
-  "polite",
-  "assertive",
-  "name",
-  "honorific-prefix",
-  "given-name",
-  "additional-name",
-  "family-name",
-  "honorific-suffix",
-  "nickname",
-  "email",
-  "username",
-  "new-password",
-  "current-password",
-  "one-time-code",
-  "organization-title",
-  "organization",
-  "street-address",
-  "address-line1",
-  "address-line2",
-  "address-line3",
-  "address-level4",
-  "address-level3",
-  "address-level2",
-  "address-level1",
-  "country",
-  "country-name",
-  "postal-code",
-  "cc-name",
-  "cc-given-name",
-  "cc-additional-name",
-  "cc-family-name",
-  "cc-number",
-  "cc-exp",
-  "cc-exp-month",
-  "cc-exp-year",
-  "cc-csc",
-  "cc-type",
-  "transaction-currency",
-  "transaction-amount",
-  "language",
-  "bday",
-  "bday-day",
-  "bday-month",
-  "bday-year",
-  "sex",
-  "tel",
-  "tel-country-code",
-  "tel-national",
-  "tel-area-code",
-  "tel-local",
-  "tel-extension",
-  "impp",
-  "url",
-  "photo",
-  "anonymous",
-  "use-credentials",
-  "eager",
-  "lazy",
-  "sync",
-  "async",
-  "auto",
-  "metadata",
-  "none",
-  "subtitles",
-  "captions",
-  "descriptions",
-  "chapters",
-  "soft",
-  "hard",
-  "yes",
-  "no",
-  "1",
-  "0",
-  "-1",
-  "text/html",
-  "text/css",
-  "text/javascript",
-  "application/javascript",
-  "application/json",
-  "application/xml",
-  "text/xml",
-  "image/png",
-  "image/jpeg",
-  "image/gif",
-  "image/svg+xml",
-  "image/webp",
-  "video/mp4",
-  "video/webm",
-  "audio/mp3",
-  "audio/ogg",
-  "font/woff",
-  "font/woff2",
-  "application/pdf",
-  "application/zip",
-  "application/octet-stream",
-  "ld+json",
-  "module",
-  "nomodule",
-  "IE=edge",
-  "width=device-width, initial-scale=1",
-  "width=device-width, initial-scale=1.0",
-  "index, follow",
-  "noindex, nofollow",
-  "index, nofollow",
-  "noindex, follow",
-  "all",
-  "none",
-  "noarchive",
-  "nosnippet",
-  "noimageindex",
-  "notranslate",
-  "noydir",
-  "noodp"
-])
-
-
 def escape_attribute_key(k: str) -> str:
     return (
         faster_escape(k)
@@ -370,6 +139,30 @@ _key_cache_escape = _get_caching_escape_func(escape_attribute_key,
                                              # length of 100 should be extremely rare
                                              max_string_length=100)
 
+
+AttrKey = Union[SafeString, str]
+AttrValue = Union[str, SafeString, int, float, Decimal, None]
+
+@lru_cache(maxsize=None)
+def process_attribute(key: AttrKey, val: AttrValue) -> str:
+    if key not in _common_safe_attribute_names:
+        key = (
+            _key_cache_escape(key)
+            if isinstance(key, str)
+            else key.safe_str
+        )
+    elif TYPE_CHECKING:
+        assert isinstance(key, str)
+
+    if type(val) is str:
+        return f' {key}="{_val_cache_escape(val)}"'
+    elif type(val) is SafeString:
+        return f' {key}="{val.safe_str}"'
+    elif val is None:
+        return " " + key
+    elif isinstance(val, (int, float, Decimal)):
+        return f' {key}="{val}"'
+    return ""
 
 class Tag:
     __slots__ = (
@@ -394,40 +187,14 @@ class Tag:
 
     def __call__(
         self,
-        attrs_or_first_child: Union[dict[Union[SafeString, str], Union[str, SafeString, int, float, Decimal, None]], Node],
+        attrs_or_first_child: Union[dict[AttrKey, AttrValue], Node],
         *children: Node,
     ) -> Union[TagTuple, SafeString]:
         if isinstance(attrs_or_first_child, dict):
-            # in this case this tends to be faster than attrs = "".join([...])
-            attrs: list[str] = []
-            for key in attrs_or_first_child:
-                # seems to be faster than using .items()
-                val: Union[str, SafeString, int, float, Decimal, None] = attrs_or_first_child[key]
-
-                # optimization: a large portion of attribute keys should be
-                # covered by this check. It allows us to skip escaping
-                # where it is not needed. Note this is for attribute names only;
-                # attributes values are always escaped (when they are `str`s)
-                # key_: str
-                if key not in _common_safe_attribute_names:
-                    key = (
-                        _key_cache_escape(key)
-                        if isinstance(key, str)
-                        else key.safe_str
-                    )
-                elif TYPE_CHECKING:
-                    assert isinstance(key, str)
-
-                if val in _common_safe_attribute_values:
-                    attrs.append(f' {key}="{val}"')
-                elif type(val) is str:
-                    attrs.append(f' {key}="{_val_cache_escape(val)}"')
-                elif type(val) is SafeString:
-                    attrs.append(f' {key}="{val.safe_str}"')
-                elif val is None:
-                    attrs.append(" " + key)
-                elif isinstance(val, (int, float, Decimal)):
-                    attrs.append(f' {key}="{val}"')
+            attrs: list[str] = [
+                process_attribute(k, attrs_or_first_child[k])
+                for k in attrs_or_first_child
+            ]
 
             if children:
                 return self.tag_start + "".join(attrs) + ">", children, self.closing_tag
