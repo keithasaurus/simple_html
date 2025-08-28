@@ -48,6 +48,9 @@ def faster_escape(s: str) -> str:
      - we don't check if some of the replacements are desired
      - we don't re-assign a variable many times.
     """
+    if "'" not in s and '"' not in s and '<' not in s and ">" not in s and '&' not in s:
+        return s
+
     return s.replace(
         "&", "&amp;"   # Must be done first!
     ).replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;").replace('\'', "&#x27;")
