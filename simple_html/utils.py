@@ -28,6 +28,8 @@ def _get_caching_escape_func(
 
 
 class SafeString:
+    __slots__ = ("safe_str",)
+
     def __init__(self, safe_str: str) -> None:
         self.safe_str = safe_str
 
