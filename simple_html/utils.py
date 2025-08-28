@@ -172,7 +172,7 @@ class Tag:
             if type(attrs_or_first_child) is tuple:
                 return self.tag_start_no_attrs + attrs_or_first_child[0], attrs_or_first_child[1], attrs_or_first_child[2] + self.closing_tag
             elif type(attrs_or_first_child) is str:
-                return SafeString(self.tag_start_no_attrs + attrs_or_first_child + self.closing_tag)
+                return SafeString(self.tag_start_no_attrs +  faster_escape(attrs_or_first_child) + self.closing_tag)
             elif type(attrs_or_first_child) is SafeString:
                 return SafeString(self.tag_start_no_attrs + attrs_or_first_child.safe_str + self.closing_tag)
             else:
