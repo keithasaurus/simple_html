@@ -150,7 +150,7 @@ _key_cache_escape = _get_caching_escape_func(escape_attribute_key,
 AttrKey = Union[SafeString, str]
 AttrValue = Union[str, SafeString, int, float, Decimal, None]
 
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=10000)
 def process_attribute(key: AttrKey, val: AttrValue) -> str:
     if key not in _common_safe_attribute_names:
         key = (
