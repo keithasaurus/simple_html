@@ -108,7 +108,7 @@ def escape_attribute_key(k: str) -> str:
 AttrKey = Union[str, SafeString]
 AttrVal = Union[str, SafeString, int, float, Decimal, None]
 
-@lru_cache(maxsize=10000)
+@lru_cache(maxsize=20000)
 def _render_attrs(key_val: tuple[AttrKey, AttrVal]) -> str:
     key, val = key_val
     if key not in _common_safe_attribute_names:
@@ -155,7 +155,6 @@ class Tag:
     def __call__(
         self,
         attrs_or_first_child: Union[dict[AttrKey, AttrVal], Node],
-
         *children: Node,
     ) -> Union[TagTuple, SafeString]:
         if isinstance(attrs_or_first_child, dict):
