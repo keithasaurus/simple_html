@@ -482,3 +482,7 @@ def render(*nodes: Node, escape_func: Callable[[str], str] = _str_cache_escape) 
     _render(nodes, results.append, escape_func)
 
     return "".join(results)
+
+
+def prerender(*nodes: Node, escape_func: Callable[[str], str] = _str_cache_escape) -> SafeString:
+    return SafeString(render(*nodes, escape_func=escape_func))

@@ -22,6 +22,7 @@ from simple_html import (
     nav, a, main, section, article, aside, footer, span, img, time,
     blockquote, code, pre, form, label, input_, textarea, button, table, thead, tbody, tr, th, td
 )
+from simple_html.utils import prerender
 
 
 def hello_world_empty(objs: List[None]) -> None:
@@ -116,6 +117,40 @@ def lorem_ipsum(titles: List[str]) -> None:
                 ),
             )
         )
+
+
+_large_footer = prerender(
+    footer({"class": "site-footer"},
+           div({"class": "container"},
+               div({"class": "footer-content"},
+                   div({"class": "footer-section"},
+                       h4("About Tech Insights"),
+                       p("Your go-to resource for web development tutorials, programming guides, and the latest technology trends. We help developers stay current with industry best practices.")
+                       ),
+                   div({"class": "footer-section"},
+                       h4("Quick Links"),
+                       ul(
+                           li(a({"href": "/privacy"}, "Privacy Policy")),
+                           li(a({"href": "/terms"}, "Terms of Service")),
+                           li(a({"href": "/sitemap"}, "Sitemap")),
+                           li(a({"href": "/advertise"}, "Advertise"))
+                       )
+                       ),
+                   div({"class": "footer-section"},
+                       h4("Contact Info"),
+                       p("Email: hello@techinsights.dev"),
+                       p("Location: San Francisco, CA"),
+                       p("Phone: (555) 123-4567")
+                       )
+                   ),
+               hr,
+               div({"class": "footer-bottom"},
+                   p("© 2024 Tech Insights. All rights reserved. Built with simple_html library."),
+                   p("Made with ❤️ for the developer community")
+                   )
+               )
+           )
+)
 
 
 def large_page(titles: list[str]) -> None:
@@ -347,19 +382,22 @@ def large_page(titles: list[str]) -> None:
                                                div(
                                                    label({"for": "name"}, "Name:"),
                                                    br,
-                                                   input_({"type": "text", "id": "name", "name": "name", "required": None})
+                                                   input_(
+                                                       {"type": "text", "id": "name", "name": "name", "required": None})
                                                ),
                                                div(
                                                    label({"for": "email"}, "Email:"),
                                                    br,
                                                    input_(
-                                                       {"type": "email", "id": "email", "name": "email", "required": None})
+                                                       {"type": "email", "id": "email", "name": "email",
+                                                        "required": None})
                                                ),
                                                div(
                                                    label({"for": "comment"}, "Your Comment:"),
                                                    br,
-                                                   textarea({"id": "comment", "name": "comment", "rows": "5", "cols": "50",
-                                                             "required": None})
+                                                   textarea(
+                                                       {"id": "comment", "name": "comment", "rows": "5", "cols": "50",
+                                                        "required": None})
                                                ),
                                                br,
                                                button({"type": "submit"}, "Post Comment")
@@ -388,7 +426,8 @@ def large_page(titles: list[str]) -> None:
                                         li(a({"href": "/tutorial/rest-api-python"},
                                              "Building REST APIs with Python and FastAPI")),
                                         li(a({"href": "/tutorial/react-hooks"}, "Advanced React Hooks Patterns")),
-                                        li(a({"href": "/tutorial/docker-basics"}, "Docker for Beginners: Complete Guide")),
+                                        li(a({"href": "/tutorial/docker-basics"},
+                                             "Docker for Beginners: Complete Guide")),
                                         li(a({"href": "/tutorial/graphql-intro"}, "Introduction to GraphQL")),
                                         li(a({"href": "/tutorial/css-grid"}, "Mastering CSS Grid Layout"))
                                     )
@@ -432,36 +471,7 @@ def large_page(titles: list[str]) -> None:
                                 )
                           ),
 
-                     footer({"class": "site-footer"},
-                            div({"class": "container"},
-                                div({"class": "footer-content"},
-                                    div({"class": "footer-section"},
-                                        h4("About Tech Insights"),
-                                        p("Your go-to resource for web development tutorials, programming guides, and the latest technology trends. We help developers stay current with industry best practices.")
-                                        ),
-                                    div({"class": "footer-section"},
-                                        h4("Quick Links"),
-                                        ul(
-                                            li(a({"href": "/privacy"}, "Privacy Policy")),
-                                            li(a({"href": "/terms"}, "Terms of Service")),
-                                            li(a({"href": "/sitemap"}, "Sitemap")),
-                                            li(a({"href": "/advertise"}, "Advertise"))
-                                        )
-                                        ),
-                                    div({"class": "footer-section"},
-                                        h4("Contact Info"),
-                                        p("Email: hello@techinsights.dev"),
-                                        p("Location: San Francisco, CA"),
-                                        p("Phone: (555) 123-4567")
-                                        )
-                                    ),
-                                hr,
-                                div({"class": "footer-bottom"},
-                                    p("© 2024 Tech Insights. All rights reserved. Built with simple_html library."),
-                                    p("Made with ❤️ for the developer community")
-                                    )
-                                )
-                            )
+                     _large_footer
                  )
                  )
         )
