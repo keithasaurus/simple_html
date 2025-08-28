@@ -175,7 +175,7 @@ class Tag:
         "tag_start_no_attrs",
         "rendered",
         "no_children_close",
-        "_repr"
+        "_repr",
     )
 
     def __init__(self, name: str, self_closing: bool = False) -> None:
@@ -195,15 +195,16 @@ class Tag:
         *children: Node,
     ) -> Union[TagTuple, SafeString]:
         if isinstance(attrs_or_first_child, dict):
-            attrs: list[str] = [
+            tag_and_attrs: str = self.tag_start + "".join([
+                # runs faster than .items() in my experience
                 process_attribute(k, attrs_or_first_child[k])
                 for k in attrs_or_first_child
-            ]
+            ])
 
             if children:
-                return self.tag_start + "".join(attrs) + ">", children, self.closing_tag
+                return tag_and_attrs + ">", children, self.closing_tag
             else:
-                return SafeString(self.tag_start + "".join(attrs) + self.no_children_close)
+                return SafeString(tag_and_attrs + self.no_children_close)
         else:
             return self.tag_start_no_attrs, (attrs_or_first_child,) + children, self.closing_tag
 
