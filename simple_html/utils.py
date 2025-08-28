@@ -58,6 +58,10 @@ _val_cache_escape = _get_caching_escape_func(faster_escape,
                                              maxsize=20000)
 
 
+_str_cache_escape = _get_caching_escape_func(faster_escape,
+                                             max_string_length=2000,
+                                             maxsize=10000)
+
 Node = Union[
     str,
     SafeString,
@@ -207,23 +211,25 @@ class Tag:
         return self._repr
 
 
-def _render(nodes: Iterable[Node], append_to_list: Callable[[str], None]) -> None:
+def _render(nodes: Iterable[Node],
+            append_to_list: Callable[[str], None],
+            escape_func: Callable[[str], str]) -> None:
     """
     mutate a list instead of constantly rendering strings
     """
     for node in nodes:
         if type(node) is tuple:
             append_to_list(node[0])
-            _render(node[1], append_to_list)
+            _render(node[1], append_to_list, escape_func)
             append_to_list(node[2])
         elif type(node) is SafeString:
             append_to_list(node.safe_str)
         elif type(node) is str:
-            append_to_list(faster_escape(node))
+            append_to_list(escape_func(node))
         elif type(node) is Tag:
             append_to_list(node.rendered)
         elif type(node) is list or type(node) is GeneratorType:
-            _render(node, append_to_list)
+            _render(node, append_to_list, escape_func)
         elif isinstance(node, (int, float, Decimal)):
             append_to_list(str(node))
         else:
@@ -467,8 +473,8 @@ def render_styles(
     return SafeString("".join(ret))
 
 
-def render(*nodes: Node) -> str:
+def render(*nodes: Node, escape_func: Callable[[str], str] = _str_cache_escape) -> str:
     results: list[str] = []
-    _render(nodes, results.append)
+    _render(nodes, results.append, escape_func)
 
     return "".join(results)
