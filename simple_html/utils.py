@@ -1,4 +1,5 @@
 from decimal import Decimal
+from functools import lru_cache
 from types import GeneratorType
 from typing import Any, Union, Generator, Iterable, Callable, Final, TYPE_CHECKING
 
@@ -104,6 +105,31 @@ def escape_attribute_key(k: str) -> str:
         .replace(" ", "&nbsp;")
     )
 
+AttrKey = Union[str, SafeString]
+AttrVal = Union[str, SafeString, int, float, Decimal, None]
+
+@lru_cache(maxsize=10000)
+def _render_attrs(key_val: tuple[AttrKey, AttrVal]) -> str:
+    key, val = key_val
+    if key not in _common_safe_attribute_names:
+        key = (
+            escape_attribute_key(key)
+            if isinstance(key, str)
+            else key.safe_str
+        )
+    elif TYPE_CHECKING:
+        assert isinstance(key, str)
+
+    if type(val) is str:
+        return f' {key}="{faster_escape(val)}"'
+    elif type(val) is SafeString:
+        return f' {key}="{val.safe_str}"'
+    elif val is None:
+        return " " + key
+    elif isinstance(val, (int, float, Decimal)):
+        return f' {key}="{val}"'
+    raise TypeError(f"unsupported type {type(val)}")
+
 
 class Tag:
     __slots__ = (
@@ -128,38 +154,15 @@ class Tag:
 
     def __call__(
         self,
-        attrs_or_first_child: Union[dict[Union[SafeString, str], Union[str, SafeString, int, float, Decimal, None]], Node],
+        attrs_or_first_child: Union[dict[AttrKey, AttrVal], Node],
+
         *children: Node,
     ) -> Union[TagTuple, SafeString]:
         if isinstance(attrs_or_first_child, dict):
-            # in this case this tends to be faster than attrs = "".join([...])
-            attrs: list[str] = []
-            for key in attrs_or_first_child:
-                # seems to be faster than using .items()
-                val: Union[str, SafeString, int, float, Decimal, None] = attrs_or_first_child[key]
-
-                # optimization: a large portion of attribute keys should be
-                # covered by this check. It allows us to skip escaping
-                # where it is not needed. Note this is for attribute names only;
-                # attributes values are always escaped (when they are `str`s)
-                # key_: str
-                if key not in _common_safe_attribute_names:
-                    key = (
-                        escape_attribute_key(key)
-                        if isinstance(key, str)
-                        else key.safe_str
-                    )
-                elif TYPE_CHECKING:
-                    assert isinstance(key, str)
-
-                if type(val) is str:
-                    attrs.append(f' {key}="{faster_escape(val)}"')
-                elif type(val) is SafeString:
-                    attrs.append(f' {key}="{val.safe_str}"')
-                elif val is None:
-                    attrs.append(" " + key)
-                elif isinstance(val, (int, float, Decimal)):
-                    attrs.append(f' {key}="{val}"')
+            attrs: list[str] = [
+                _render_attrs(kv)
+                for kv in attrs_or_first_child.items()
+            ]
 
             if children:
                 return self.tag_start + "".join(attrs) + ">", children, self.closing_tag
