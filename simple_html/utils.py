@@ -165,8 +165,18 @@ class Tag:
                 return self.tag_start + "".join(attrs) + ">", children, self.closing_tag
             else:
                 return SafeString(self.tag_start + "".join(attrs) + self.no_children_close)
-        else:
+        elif children:
             return self.tag_start_no_attrs, (attrs_or_first_child,) + children, self.closing_tag
+        else:
+            # special case single-child
+            if type(attrs_or_first_child) is tuple:
+                return self.tag_start_no_attrs + attrs_or_first_child[0], attrs_or_first_child[1], attrs_or_first_child[2] + self.closing_tag
+            elif type(attrs_or_first_child) is str:
+                return SafeString(self.tag_start_no_attrs + attrs_or_first_child + self.closing_tag)
+            elif type(attrs_or_first_child) is SafeString:
+                return SafeString(self.tag_start_no_attrs + attrs_or_first_child.safe_str + self.closing_tag)
+            else:
+                return self.tag_start_no_attrs, (attrs_or_first_child,), self.closing_tag
 
     def __repr__(self) -> str:
         return self._repr
