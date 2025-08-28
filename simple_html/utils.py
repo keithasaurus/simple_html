@@ -10,6 +10,7 @@ def _get_caching_escape_func(
         max_string_length: int | None
 ) -> Callable[[str], str]:
     """
+    @param func: underlying function that will be called
     @param maxsize: maximum number of entries in the lru_cache (use `None` for no maximum -- not recommended)
     @param max_string_length: maximum length of the strings for which we'll use the cache. Caching lots of very long strings
         could result in heavy memory consumption
