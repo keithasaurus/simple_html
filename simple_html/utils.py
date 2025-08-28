@@ -492,11 +492,12 @@ def prerender(*nodes: Node, escape_func: Callable[[str], str] = _str_cache_escap
 
 
 def html_cache(
-        func: Callable[..., Node]
+        func: Callable[..., Node],
+        maxsize: int | None,
 ) -> Callable[..., SafeString]:
     # ParamSpec is not yet capable of binding `Hashable` types, so it would
     # fail to typecheck for lru_cache anyway
-    @lru_cache(maxsize=1000)
+    @lru_cache(maxsize=maxsize)
     def inner(*args: Any, **kwargs: Any) -> SafeString:
         return SafeString(render(func(*args, **kwargs)))
 
