@@ -1,6 +1,30 @@
 from decimal import Decimal
+from functools import lru_cache
 from types import GeneratorType
 from typing import Any, Union, Generator, Iterable, Callable, Final, TYPE_CHECKING
+
+
+def _get_caching_escape_func(
+        func: Callable[[str], str],
+        maxsize: int | None,
+        max_string_length: int | None
+) -> Callable[[str], str]:
+    """
+    @param maxsize: maximum number of entries in the lru_cache (use `None` for no maximum -- not recommended)
+    @param max_string_length: maximum length of the strings for which we'll use the cache. Caching lots of very long strings
+        could result in heavy memory consumption
+    """
+    _cache_escape = lru_cache(maxsize=maxsize)(func)
+
+    if max_string_length is not None:
+        def inner(s: str) -> str:
+            if len(s) > max_string_length:
+                return func(s)
+            else:
+                return _cache_escape(s)
+        return inner
+    else:
+         return _cache_escape
 
 
 class SafeString:
@@ -27,6 +51,12 @@ def faster_escape(s: str) -> str:
     return s.replace(
         "&", "&amp;"   # Must be done first!
     ).replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;").replace('\'', "&#x27;")
+
+
+_val_cache_escape = _get_caching_escape_func(faster_escape,
+                                             max_string_length=200,
+                                             maxsize=20000)
+
 
 Node = Union[
     str,
@@ -104,6 +134,11 @@ def escape_attribute_key(k: str) -> str:
         .replace(" ", "&nbsp;")
     )
 
+_key_cache_escape = _get_caching_escape_func(escape_attribute_key,
+                                             maxsize=2000,
+                                             # length of 100 should be extremely rare
+                                             max_string_length=100)
+
 
 class Tag:
     __slots__ = (
@@ -145,7 +180,7 @@ class Tag:
                 # key_: str
                 if key not in _common_safe_attribute_names:
                     key = (
-                        escape_attribute_key(key)
+                        _key_cache_escape(key)
                         if isinstance(key, str)
                         else key.safe_str
                     )
@@ -153,7 +188,7 @@ class Tag:
                     assert isinstance(key, str)
 
                 if type(val) is str:
-                    attrs.append(f' {key}="{faster_escape(val)}"')
+                    attrs.append(f' {key}="{_val_cache_escape(val)}"')
                 elif type(val) is SafeString:
                     attrs.append(f' {key}="{val.safe_str}"')
                 elif val is None:
