@@ -184,15 +184,15 @@ class Tag:
     )
 
     def __init__(self, name: str, self_closing: bool = False) -> None:
-        self._repr = f"Tag(name='{name}', self_closing={self_closing})"
-        self.tag_start = f"<{name}"
-        self.tag_start_no_attrs = f"{self.tag_start}>"
-        self.closing_tag = f"</{name}>"
+        self._repr: str = f"Tag(name='{name}', self_closing={self_closing})"
+        self.tag_start: str = f"<{name}"
+        self.tag_start_no_attrs: str = f"{self.tag_start}>"
+        self.closing_tag: str = f"</{name}>"
         if self_closing:
-            self.no_children_close = "/>"
+            self.no_children_close: str = f"<{name}" "/>"
         else:
             self.no_children_close = f">{self.closing_tag}"
-        self.rendered = f"{self.tag_start}{self.no_children_close}"
+        self.rendered: str = f"{self.tag_start}{self.no_children_close}"
 
     def __call__(
         self,
