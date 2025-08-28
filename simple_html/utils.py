@@ -189,7 +189,7 @@ class Tag:
         self.tag_start_no_attrs: str = f"{self.tag_start}>"
         self.closing_tag: str = f"</{name}>"
         if self_closing:
-            self.no_children_close: str = f"<{name}" "/>"
+            self.no_children_close: str = "/>"
         else:
             self.no_children_close = f">{self.closing_tag}"
         self.rendered: str = f"{self.tag_start}{self.no_children_close}"
