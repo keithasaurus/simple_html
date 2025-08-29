@@ -440,7 +440,7 @@ def render(*nodes: Node) -> str:
 
     return "".join(results)
 
-TemplatePart = Union[
+_TemplatePart = Union[
     tuple[Literal["STATIC"], str],
     tuple[Literal["ARG"], str] # the str is the arg name
 ]
@@ -450,8 +450,9 @@ class Templatizable(Protocol):
         ...
 
 def _traverse_node(node: Node,
-                   template_parts: list[TemplatePart],
+                   template_parts: list[_TemplatePart],
                    sentinel_objects: dict[int, str]) -> None:
+    # note that this should stay up-to-speed with the `Node` definition
     if type(node) is tuple:
         # TagTuple
         template_parts.append(('STATIC', node[0]))
@@ -485,16 +486,11 @@ def _traverse_node(node: Node,
     else:
         raise TypeError(f"Got unexpected type for node: {type(node)}")
 
-
-def templatize(
-        func: Templatizable,
-) -> Templatizable:
-    # TODO: clean up allowed args
-    # get args
+def _probe_func(func: Templatizable) -> list[_TemplatePart]:
+    # TODO: try different types of arguments...?
     sig = inspect.signature(func)
-    param_names = list(sig.parameters.keys())
+    param_names = sig.parameters.keys()
 
-    # assert valid (only strings and SafeStrings allowed)
     if not param_names:
         raise ValueError("Function must have at least one parameter")
 
@@ -505,7 +501,7 @@ def templatize(
 
     for param_name in param_names:
         # Create a unique string sentinel and intern it so we can find it by identity
-        sentinel = sys.intern(f"__SENTINEL_{param_name}_{id(object())}__")
+        sentinel = f"__SENTINEL_{param_name}_{id(object())}__"
         sentinel_objects[id(sentinel)] = param_name
         probe_args[param_name] = sentinel
 
@@ -513,15 +509,22 @@ def templatize(
     template_node = func(**probe_args)
 
     # traverse `Node` tree structure to find usages of arguments by id
-    template_parts: list[TemplatePart] = []
+    template_parts: list[_TemplatePart] = []
 
     _traverse_node(template_node, template_parts, sentinel_objects)
 
-    # convert non-argument nodes to strings and coalesce for speed
-    coalesced_parts: list[Union[str, SafeString]] = [] # string's are for parameter names
-    current_static = []
+    return template_parts
 
-    for part_type, content in template_parts:
+_CoalescedPart = Union[str, SafeString]
+
+def _coalesce_func(func: Templatizable) -> list[_CoalescedPart]:
+    template_parts_1 = _probe_func(func)
+
+    # convert non-argument nodes to strings and coalesce for speed
+    coalesced_parts: list[_CoalescedPart] = [] # string's are for parameter names
+    current_static: list[str] = []
+
+    for part_type, content in template_parts_1:
         if part_type == 'STATIC':
             current_static.append(str(content))
         else:  # ARG
@@ -534,6 +537,11 @@ def templatize(
     # Flush any remaining static content
     if current_static:
         coalesced_parts.append(SafeString(''.join(current_static)))
+
+    return coalesced_parts
+
+def templatize(func: Templatizable) -> Templatizable:
+    coalesced_parts = _coalesce_func(func)
 
     # return new function -- should just be a list of SafeStrings
     def template_function(**kwargs: Node) -> Node:
