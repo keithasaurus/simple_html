@@ -442,7 +442,8 @@ def render(*nodes: Node) -> str:
 _ARG_LOCATION = Union[str, int, tuple[int, str]]
 _TemplatePart = Union[
     tuple[Literal["STATIC"], str],
-    tuple[Literal["ARG"], _ARG_LOCATION] # the str is the arg name
+    tuple[Literal["ARG"], _ARG_LOCATION], # the str is the arg name
+    tuple[Literal["DYNAMIC"], Union[list[Node], Generator[Node, None, None]]]
 ]
 
 class Templatizable(Protocol):
@@ -458,6 +459,9 @@ def _traverse_node(node: Node,
 
     def append_arg(arg: _ARG_LOCATION) -> None:
         return template_parts.append(("ARG", arg))
+
+    def append_dynamic(obj: Union[list[Node], Generator[Node, None, None]]) -> None:
+        return template_parts.append(("DYNAMIC", obj))
 
     node_id = id(node)
 
@@ -491,6 +495,7 @@ def _traverse_node(node: Node,
             # This is an argument placeholder - add a marker
             append_arg(sentinel_objects[node_id])
         else:
+
             for item in node:
                 _traverse_node(item, template_parts, sentinel_objects)
     elif type(node) is GeneratorType:
@@ -575,7 +580,7 @@ def _probe_func(func: Templatizable, variant: Literal[1, 2, 3]) -> list[_Templat
     return template_parts
 
 
-_CoalescedPart = Union[_ARG_LOCATION, SafeString]
+_CoalescedPart = Union[_ARG_LOCATION, SafeString, list[Node], Generator[Node, None, None]]
 
 def _coalesce_func(func: Templatizable) -> list[_CoalescedPart]:
     template_part_lists: tuple[list[_TemplatePart], list[_TemplatePart], list[_TemplatePart]] = (
@@ -612,8 +617,10 @@ def _coalesce_func(func: Templatizable) -> list[_CoalescedPart]:
 
 def get_arg_val(args: tuple[Node, ...],
                 kwargs: dict[str, Node],
-                location: _ARG_LOCATION) -> Node:
-    if isinstance(location, tuple):
+                location: Union[_ARG_LOCATION, list[Node], Generator[Node, None, None]]) -> Node:
+    if isinstance(location, (list, Generator)):
+        return location
+    elif isinstance(location, tuple):
         int_loc, str_loc = location
         if len(args) >= int_loc + 1:
             return args[int_loc]
