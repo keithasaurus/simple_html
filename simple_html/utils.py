@@ -1,5 +1,8 @@
+import inspect
+import sys
 from decimal import Decimal
-from typing import Any, Union, Generator, Iterable, Callable, Final, TYPE_CHECKING, Protocol
+from types import GeneratorType
+from typing import Any, Union, Generator, Iterable, Callable, Final, TYPE_CHECKING, Protocol, Literal
 
 
 class SafeString:
@@ -436,13 +439,6 @@ def render(*nodes: Node) -> str:
     _render(nodes, results.append)
 
     return "".join(results)
-
-
-from _decimal import Decimal
-from types import GeneratorType
-from typing import Literal, Union
-import inspect
-import sys
 
 TemplatePart = Union[
     tuple[Literal["STATIC"], str],

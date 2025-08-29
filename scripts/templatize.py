@@ -1,6 +1,8 @@
-from simple_html import *
 import time
-from simple_html.utils import templatize
+
+from simple_html import title, html, head, body, div, h1, br
+from simple_html.utils import templatize, render, Node
+
 
 def html_func(name: str, age: int) -> Node:
     return html(
