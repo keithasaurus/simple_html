@@ -485,6 +485,14 @@ def _traverse_node(node: Node,
     elif type(node) is Tag:
         append_static(node.rendered)
     elif type(node) is list or type(node) is GeneratorType:
+        node_id = id(node)
+        if node_id in sentinel_objects:
+            # This is an argument placeholder - add a marker
+            append_arg(sentinel_objects[node_id])
+        else:
+            for item in node:
+                _traverse_node(item, template_parts, sentinel_objects)
+    elif type(node) is GeneratorType:
         for item in node:
             _traverse_node(item, template_parts, sentinel_objects)
     elif isinstance(node, (int, float, Decimal)):
