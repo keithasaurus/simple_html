@@ -1,5 +1,6 @@
 import json
 from decimal import Decimal
+from itertools import cycle
 from typing import Generator
 
 import pytest
@@ -309,6 +310,17 @@ def test_templatize_fails_for_arbitrary_logic() -> None:
         templatize(greet)
 
 
-# def test_templatize_fails_for_differently_sized_parts() -> None:
-#     def greet(name: str) -> Node:
-#         if name
+def test_templatize_fails_for_differently_sized_parts() -> None:
+    size = cycle([1, 2])
+    def greet(name: str) -> Node:
+        if next(size) == 1:
+            return div(name)
+        else:
+            return div(name, "bad")
+
+    assert render(greet("abc")) == "<div>abc</div>"
+    assert render(greet("abc")) == "<div>abcbad</div>"
+
+    with pytest.raises(AssertionError):
+        templatize(greet)
+
