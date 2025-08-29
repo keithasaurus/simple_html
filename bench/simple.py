@@ -150,13 +150,9 @@ def _get_head(title_: str) -> Node:
                     """)
                  )
 
-
-
-def large_page(titles: list[str]) -> None:
-    for t in titles:
-        render(
-            DOCTYPE_HTML5,
-            html({"lang": "en"},
+@templatize
+def _html(t: str) -> Node:
+    return html({"lang": "en"},
                  _get_head(title_=t),
                  body(
                      header({"class": "site-header"},
@@ -471,4 +467,12 @@ def large_page(titles: list[str]) -> None:
                             )
                  )
                  )
+
+
+
+def large_page(titles: list[str]) -> None:
+    for t in titles:
+        render(
+            DOCTYPE_HTML5,
+            _html(t=t)
         )
