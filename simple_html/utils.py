@@ -451,12 +451,12 @@ class Templatizable(Protocol):
 
 def _traverse_node(node: Node,
                    template_parts: list[_TemplatePart],
-                   sentinel_objects: dict[int, str]) -> None:
+                   sentinel_objects: dict[int, _ARG_LOCATION]) -> None:
 
-    def append_static(obj: str) -> _TemplatePart:
+    def append_static(obj: str) -> None:
         return template_parts.append(("STATIC", obj))
 
-    def append_arg(arg: _ARG_LOCATION) -> _TemplatePart:
+    def append_arg(arg: _ARG_LOCATION) -> None:
         return template_parts.append(("ARG", arg))
 
     node_id = id(node)
@@ -505,7 +505,7 @@ def _traverse_node(node: Node,
     else:
         raise TypeError(f"Got unexpected type for node: {type(node)}")
 
-def _cannot_templatize_message(func: Callable[[...], Any],
+def _cannot_templatize_message(func: Callable[..., Any],
                                extra_message: str) -> str:
     return f"Could not templatize function '{func.__name__}'. {extra_message}"
 
@@ -526,6 +526,7 @@ def _probe_func(func: Templatizable, variant: Literal[1, 2, 3]) -> list[_Templat
     probe_args = []
     probe_kwargs = {}
 
+    sentinel: Union[str, list[int], int]
     for i, (param_name, param) in enumerate(parameters.items()):
         if variant == 1:
             # Create a unique string sentinel and intern it so we can find it by identity
@@ -612,13 +613,13 @@ def _coalesce_func(func: Templatizable) -> list[_CoalescedPart]:
 def get_arg_val(args: tuple[Node, ...],
                 kwargs: dict[str, Node],
                 location: _ARG_LOCATION) -> Node:
-    if type(location) is tuple:
+    if isinstance(location, tuple):
         int_loc, str_loc = location
         if len(args) >= int_loc + 1:
             return args[int_loc]
         else:
             return kwargs[str_loc]
-    elif type(location) is int:
+    elif isinstance(location, int):
         return args[location]
     else:
         return kwargs[location]
@@ -630,7 +631,7 @@ def templatize(func: Templatizable) -> Templatizable:
     # return new function -- should just be a list of SafeStrings
     def template_function(*args: Node, **kwargs: Node) -> Node:
         return [
-            part if type(part) is SafeString else get_arg_val(args, kwargs, part)
+            part if isinstance(part, SafeString) else get_arg_val(args, kwargs, part)
             for part in coalesced_parts
         ]
 
