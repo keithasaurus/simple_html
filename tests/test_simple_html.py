@@ -284,7 +284,8 @@ def test_templatize() -> None:
                     # list
                     ["wow"],
                     # generator
-                    (name for _ in range(3)))
+                    (name for _ in range(3))
+                    )
             )
         )
 
@@ -297,7 +298,11 @@ def test_templatize() -> None:
 
 def test_templatize_fails_for_arbitrary_logic() -> None:
     def greet(name: str) -> Node:
-        return html("Your name is ", name, " and your name is ", len(name), " characters long")
+        return html("Your name is ",
+                    name,
+                    " and this is what it looks like twice: ",
+                    name + name
+                    )
 
     with pytest.raises(AssertionError):
         templatize(greet)

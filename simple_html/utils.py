@@ -1,5 +1,4 @@
 import inspect
-import sys
 from decimal import Decimal
 from types import GeneratorType
 from typing import Any, Union, Generator, Iterable, Callable, Final, TYPE_CHECKING, Protocol, Literal
@@ -449,6 +448,8 @@ class Templatizable(Protocol):
     def __call__(self, **kwargs: Node) -> Node:
         ...
 
+_CANNOT_TEMPLATIZE_ERROR: Final[str] = "Could not templatize. Templatizable functions should not perform logic."
+
 def _traverse_node(node: Node,
                    template_parts: list[_TemplatePart],
                    sentinel_objects: dict[int, str]) -> None:
@@ -459,6 +460,8 @@ def _traverse_node(node: Node,
     def append_arg(arg: str) -> _TemplatePart:
         return template_parts.append(("ARG", arg))
 
+    node_id = id(node)
+
     # note that this should stay up-to-speed with the `Node` definition
     if type(node) is tuple:
         # TagTuple
@@ -468,7 +471,6 @@ def _traverse_node(node: Node,
         append_static(node[2])
     elif type(node) is str:
         # Check if this string is one of our sentinels
-        node_id = id(node)
         if node_id in sentinel_objects:
             # This is an argument placeholder - add a marker
             append_arg(sentinel_objects[node_id])
@@ -477,15 +479,13 @@ def _traverse_node(node: Node,
             append_static(faster_escape(node))
     elif type(node) is SafeString:
         # SafeString content - check if it's a sentinel
-        node_id = id(node.safe_str)
         if node_id in sentinel_objects:
             append_arg(sentinel_objects[node_id])
         else:
             append_static(node.safe_str)
     elif type(node) is Tag:
         append_static(node.rendered)
-    elif type(node) is list or type(node) is GeneratorType:
-        node_id = id(node)
+    elif type(node) is list:
         if node_id in sentinel_objects:
             # This is an argument placeholder - add a marker
             append_arg(sentinel_objects[node_id])
@@ -496,8 +496,11 @@ def _traverse_node(node: Node,
         for item in node:
             _traverse_node(item, template_parts, sentinel_objects)
     elif isinstance(node, (int, float, Decimal)):
-        # Other types - convert to string
-        append_static(str(node))
+        if node_id in sentinel_objects:
+            append_arg(sentinel_objects[node_id])
+        else:
+            # Other types - convert to string
+            append_static(str(node))
     else:
         raise TypeError(f"Got unexpected type for node: {type(node)}")
 
@@ -533,8 +536,16 @@ def _probe_func(func: Templatizable, variant: Literal[1, 2, 3]) -> list[_Templat
             sentinel_objects[id(sentinel)] = param_name
             probe_args[param_name] = sentinel
 
-    # Call function to get the Node tree
-    template_node = func(**probe_args)
+    try:
+        # Call function to get the Node tree
+        template_node = func(**probe_args)
+    except Exception as e:
+        raise Exception(
+            e,
+            AssertionError(_CANNOT_TEMPLATIZE_ERROR)
+        )
+
+
 
     # traverse `Node` tree structure to find usages of arguments by id
     template_parts: list[_TemplatePart] = []
@@ -546,21 +557,25 @@ def _probe_func(func: Templatizable, variant: Literal[1, 2, 3]) -> list[_Templat
 _CoalescedPart = Union[str, SafeString]
 
 def _coalesce_func(func: Templatizable) -> list[_CoalescedPart]:
-    template_parts_1 = _probe_func(func, 1)
-    template_parts_2 = _probe_func(func, 2)
-    template_parts_3 = _probe_func(func, 3)
-    assert len(template_parts_1) == len(template_parts_2) == len(template_parts_3)
+    template_part_lists: tuple[list[_TemplatePart], list[_TemplatePart], list[_TemplatePart]] = (
+        _probe_func(func, 1),
+        _probe_func(func, 2),
+        _probe_func(func, 3)
+    )
+    assert len(template_part_lists[0]) == len(template_part_lists[1]) == len(template_part_lists[2]), _CANNOT_TEMPLATIZE_ERROR
 
-    for part_1, part_2, part_3 in zip(template_parts_1, template_parts_2, template_parts_3):
-        assert part_1[0] == part_2[0] == part_3[0]
+    for part_1, part_2, part_3 in zip(*template_part_lists):
+        assert part_1[0] == part_2[0] == part_3[0], _CANNOT_TEMPLATIZE_ERROR
         if part_1[0] == "STATIC":
-            assert part_1[1] == part_2[1] == part_3[1], "Could not templatize. Templatizable functions should not perform logic."
+            print(part_1[1], part_2[1], part_3[1])
+            print(part_1[1] == part_2[1] == part_3[1])
+            assert (part_1[1] == part_2[1] == part_3[1]), _CANNOT_TEMPLATIZE_ERROR
 
     # convert non-argument nodes to strings and coalesce for speed
     coalesced_parts: list[_CoalescedPart] = [] # string's are for parameter names
     current_static: list[str] = []
 
-    for part_type, content in template_parts_1:
+    for part_type, content in template_part_lists[0]:
         if part_type == 'STATIC':
             current_static.append(str(content))
         else:  # ARG
