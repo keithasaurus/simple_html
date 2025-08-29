@@ -1,7 +1,7 @@
 import inspect
 from decimal import Decimal
 from types import GeneratorType
-from typing import Any, Union, Generator, Iterable, Callable, Final, TYPE_CHECKING, Protocol, Literal
+from typing import Any, Union, Generator, Iterable, Callable, Final, TYPE_CHECKING, Protocol, Literal, Never
 
 
 class SafeString:
@@ -439,16 +439,15 @@ def render(*nodes: Node) -> str:
 
     return "".join(results)
 
+_ARG_LOCATION = Union[str, int, tuple[int, str]]
 _TemplatePart = Union[
     tuple[Literal["STATIC"], str],
-    tuple[Literal["ARG"], str] # the str is the arg name
+    tuple[Literal["ARG"], _ARG_LOCATION] # the str is the arg name
 ]
 
 class Templatizable(Protocol):
     def __call__(self, **kwargs: Node) -> Node:
         ...
-
-_CANNOT_TEMPLATIZE_ERROR: Final[str] = "Could not templatize. Templatizable functions should not perform logic."
 
 def _traverse_node(node: Node,
                    template_parts: list[_TemplatePart],
@@ -457,7 +456,7 @@ def _traverse_node(node: Node,
     def append_static(obj: str) -> _TemplatePart:
         return template_parts.append(("STATIC", obj))
 
-    def append_arg(arg: str) -> _TemplatePart:
+    def append_arg(arg: _ARG_LOCATION) -> _TemplatePart:
         return template_parts.append(("ARG", arg))
 
     node_id = id(node)
@@ -473,7 +472,9 @@ def _traverse_node(node: Node,
         # Check if this string is one of our sentinels
         if node_id in sentinel_objects:
             # This is an argument placeholder - add a marker
-            append_arg(sentinel_objects[node_id])
+            append_arg(
+                sentinel_objects[node_id]
+            )
         else:
             # Regular string content
             append_static(faster_escape(node))
@@ -504,48 +505,66 @@ def _traverse_node(node: Node,
     else:
         raise TypeError(f"Got unexpected type for node: {type(node)}")
 
+def _cannot_templatize_message(func: Callable[[...], Any],
+                               extra_message: str) -> str:
+    return f"Could not templatize function '{func.__name__}'. {extra_message}"
+
+_SHOULD_NOT_PERFORM_LOGIC = "Templatizable functions should not perform logic."
+_NO_ARGS_OR_KWARGS = "Templatizable functions cannot accept *args or **kwargs."
+
 def _probe_func(func: Templatizable, variant: Literal[1, 2, 3]) -> list[_TemplatePart]:
     # TODO: try different types of arguments...?
     sig = inspect.signature(func)
-    param_names = sig.parameters.keys()
+    parameters = sig.parameters
 
-    if not param_names:
+    if not parameters:
         raise ValueError("Function must have at least one parameter")
 
     # probe function with properly typed arguments
     # Use interned sentinel objects that we can identify by id
-    sentinel_objects: dict[int, str] = {}
-    probe_args = {}
+    sentinel_objects: dict[int, _ARG_LOCATION] = {}
+    probe_args = []
+    probe_kwargs = {}
 
-    if variant == 1:
-        for param_name in param_names:
+    for i, (param_name, param) in enumerate(parameters.items()):
+        if variant == 1:
             # Create a unique string sentinel and intern it so we can find it by identity
             sentinel = f"__SENTINEL_{param_name}_{id(object())}__"
-            sentinel_objects[id(sentinel)] = param_name
-            probe_args[param_name] = sentinel
-    elif variant == 2:
-        for param_name in param_names:
+        elif variant == 2:
             # Create a unique string sentinel and intern it so we can find it by identity
             sentinel = [id(object())]
-            sentinel_objects[id(sentinel)] = param_name
-            probe_args[param_name] = sentinel
-    else:
-        for param_name in param_names:
+        else:
             # Create a unique string sentinel and intern it so we can find it by identity
             sentinel = 1039917274618672531762351823761235 + id(object())
-            sentinel_objects[id(sentinel)] = param_name
-            probe_args[param_name] = sentinel
+
+        sentinel_id = id(sentinel)
+
+        # Determine how to pass this parameter
+        if param.kind == inspect.Parameter.POSITIONAL_ONLY:
+            probe_args.append(sentinel)
+            sentinel_objects[sentinel_id] = i
+        elif param.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD:
+            # For mixed parameters, we could pass as positional or keyword
+            # Let's pass as positional if it's among the first parameters
+            probe_args.append(sentinel)
+            sentinel_objects[sentinel_id] = (i, param.name)
+        elif param.kind == inspect.Parameter.KEYWORD_ONLY:
+            probe_kwargs[param_name] = sentinel
+            sentinel_objects[sentinel_id] = param.name
+        elif param.kind == inspect.Parameter.VAR_POSITIONAL:
+            raise AssertionError(_cannot_templatize_message(func, _NO_ARGS_OR_KWARGS))
+
+        elif param.kind == inspect.Parameter.VAR_KEYWORD:
+            raise AssertionError(_cannot_templatize_message(func, _NO_ARGS_OR_KWARGS))
 
     try:
-        # Call function to get the Node tree
-        template_node = func(**probe_args)
+        # Call function with both args and kwargs
+        template_node = func(*probe_args, **probe_kwargs)
     except Exception as e:
         raise Exception(
             e,
-            AssertionError(_CANNOT_TEMPLATIZE_ERROR)
+            AssertionError(_cannot_templatize_message(func, _SHOULD_NOT_PERFORM_LOGIC))
         )
-
-
 
     # traverse `Node` tree structure to find usages of arguments by id
     template_parts: list[_TemplatePart] = []
@@ -554,7 +573,8 @@ def _probe_func(func: Templatizable, variant: Literal[1, 2, 3]) -> list[_Templat
 
     return template_parts
 
-_CoalescedPart = Union[str, SafeString]
+
+_CoalescedPart = Union[_ARG_LOCATION, SafeString]
 
 def _coalesce_func(func: Templatizable) -> list[_CoalescedPart]:
     template_part_lists: tuple[list[_TemplatePart], list[_TemplatePart], list[_TemplatePart]] = (
@@ -562,14 +582,12 @@ def _coalesce_func(func: Templatizable) -> list[_CoalescedPart]:
         _probe_func(func, 2),
         _probe_func(func, 3)
     )
-    assert len(template_part_lists[0]) == len(template_part_lists[1]) == len(template_part_lists[2]), _CANNOT_TEMPLATIZE_ERROR
+    assert len(template_part_lists[0]) == len(template_part_lists[1]) == len(template_part_lists[2]), _cannot_templatize_message(func, _SHOULD_NOT_PERFORM_LOGIC)
 
     for part_1, part_2, part_3 in zip(*template_part_lists):
-        assert part_1[0] == part_2[0] == part_3[0], _CANNOT_TEMPLATIZE_ERROR
+        assert part_1[0] == part_2[0] == part_3[0], _cannot_templatize_message(func, _SHOULD_NOT_PERFORM_LOGIC)
         if part_1[0] == "STATIC":
-            print(part_1[1], part_2[1], part_3[1])
-            print(part_1[1] == part_2[1] == part_3[1])
-            assert (part_1[1] == part_2[1] == part_3[1]), _CANNOT_TEMPLATIZE_ERROR
+            assert (part_1[1] == part_2[1] == part_3[1]), _cannot_templatize_message(func, _SHOULD_NOT_PERFORM_LOGIC)
 
     # convert non-argument nodes to strings and coalesce for speed
     coalesced_parts: list[_CoalescedPart] = [] # string's are for parameter names
@@ -591,13 +609,28 @@ def _coalesce_func(func: Templatizable) -> list[_CoalescedPart]:
 
     return coalesced_parts
 
+def get_arg_val(args: tuple[Node, ...],
+                kwargs: dict[str, Node],
+                location: _ARG_LOCATION) -> Node:
+    if type(location) is tuple:
+        int_loc, str_loc = location
+        if len(args) >= int_loc + 1:
+            return args[int_loc]
+        else:
+            return kwargs[str_loc]
+    elif type(location) is int:
+        return args[location]
+    else:
+        return kwargs[location]
+
+
 def templatize(func: Templatizable) -> Templatizable:
     coalesced_parts = _coalesce_func(func)
 
     # return new function -- should just be a list of SafeStrings
-    def template_function(**kwargs: Node) -> Node:
+    def template_function(*args: Node, **kwargs: Node) -> Node:
         return [
-            kwargs[part] if type(part) is str else part
+            part if type(part) is SafeString else get_arg_val(args, kwargs, part)
             for part in coalesced_parts
         ]
 

@@ -295,14 +295,15 @@ def test_templatize() -> None:
 
     templatized = templatize(greet)
     assert render(templatized(name="John Doe", age=100)) == expected
+    assert render(templatized("John Doe", age=100)) == expected
+    assert render(templatized("John Doe", 100)) == expected
 
 def test_templatize_fails_for_arbitrary_logic() -> None:
     def greet(name: str) -> Node:
         return html("Your name is ",
                     name,
                     " and this is what it looks like twice: ",
-                    name + name
-                    )
+                    name + name)
 
     with pytest.raises(AssertionError):
         templatize(greet)
