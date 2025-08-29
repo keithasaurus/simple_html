@@ -486,7 +486,7 @@ def _traverse_node(node: Node,
     else:
         raise TypeError(f"Got unexpected type for node: {type(node)}")
 
-def _probe_func(func: Templatizable) -> list[_TemplatePart]:
+def _probe_func(func: Templatizable, variant: Literal[1, 2, 3]) -> list[_TemplatePart]:
     # TODO: try different types of arguments...?
     sig = inspect.signature(func)
     param_names = sig.parameters.keys()
@@ -499,11 +499,24 @@ def _probe_func(func: Templatizable) -> list[_TemplatePart]:
     sentinel_objects: dict[int, str] = {}
     probe_args = {}
 
-    for param_name in param_names:
-        # Create a unique string sentinel and intern it so we can find it by identity
-        sentinel = f"__SENTINEL_{param_name}_{id(object())}__"
-        sentinel_objects[id(sentinel)] = param_name
-        probe_args[param_name] = sentinel
+    if variant == 1:
+        for param_name in param_names:
+            # Create a unique string sentinel and intern it so we can find it by identity
+            sentinel = f"__SENTINEL_{param_name}_{id(object())}__"
+            sentinel_objects[id(sentinel)] = param_name
+            probe_args[param_name] = sentinel
+    elif variant == 2:
+        for param_name in param_names:
+            # Create a unique string sentinel and intern it so we can find it by identity
+            sentinel = [id(object())]
+            sentinel_objects[id(sentinel)] = param_name
+            probe_args[param_name] = sentinel
+    else:
+        for param_name in param_names:
+            # Create a unique string sentinel and intern it so we can find it by identity
+            sentinel = 1039917274618672531762351823761235 + id(object())
+            sentinel_objects[id(sentinel)] = param_name
+            probe_args[param_name] = sentinel
 
     # Call function to get the Node tree
     template_node = func(**probe_args)
@@ -518,7 +531,15 @@ def _probe_func(func: Templatizable) -> list[_TemplatePart]:
 _CoalescedPart = Union[str, SafeString]
 
 def _coalesce_func(func: Templatizable) -> list[_CoalescedPart]:
-    template_parts_1 = _probe_func(func)
+    template_parts_1 = _probe_func(func, 1)
+    template_parts_2 = _probe_func(func, 2)
+    template_parts_3 = _probe_func(func, 3)
+    assert len(template_parts_1) == len(template_parts_2) == len(template_parts_3)
+
+    for part_1, part_2, part_3 in zip(template_parts_1, template_parts_2, template_parts_3):
+        assert part_1[0] == part_2[0] == part_3[0]
+        if part_1[0] == "STATIC":
+            assert part_1[1] == part_2[1] == part_3[1], "Could not templatize. Templatizable functions should not perform logic."
 
     # convert non-argument nodes to strings and coalesce for speed
     coalesced_parts: list[_CoalescedPart] = [] # string's are for parameter names

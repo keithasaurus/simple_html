@@ -2,6 +2,8 @@ import json
 from decimal import Decimal
 from typing import Generator
 
+import pytest
+
 from simple_html import (
     SafeString,
     a,
@@ -293,3 +295,14 @@ def test_templatize() -> None:
     templatized = templatize(greet)
     assert render(templatized(name="John Doe", age=100)) == expected
 
+def test_templatize_fails_for_arbitrary_logic() -> None:
+    def greet(name: str) -> Node:
+        return html("Your name is ", name, " and your name is ", len(name), " characters long")
+
+    with pytest.raises(AssertionError):
+        templatize(greet)
+
+
+# def test_templatize_fails_for_differently_sized_parts() -> None:
+#     def greet(name: str) -> Node:
+#         if name
