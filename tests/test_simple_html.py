@@ -21,9 +21,9 @@ from simple_html import (
     DOCTYPE_HTML5,
     render,
     render_styles,
-    img,
+    img, title, h1,
 )
-from simple_html.utils import escape_attribute_key
+from simple_html.utils import escape_attribute_key, templatize
 
 
 def test_renders_no_children() -> None:
@@ -267,3 +267,29 @@ def test_tag_repr() -> None:
 
 def test_render_number_attributes() -> None:
     assert render(div({"x": 1, "y": 2.01, "z": Decimal("3.02")})) == '<div x="1" y="2.01" z="3.02"></div>'
+
+def test_templatize() -> None:
+    def greet(name: str, age: int) -> Node:
+        return html(
+            head(title("hi, ", name)),
+            body(
+                div({"class": "content",
+                     "blabla": "bla"},
+                    # raw str / int
+                    h1("hi ", name, "I'm ", age),
+                    # tag
+                    br,
+                    # list
+                    ["wow"],
+                    # generator
+                    (name for _ in range(3)))
+            )
+        )
+
+
+    expected = """<html><head><title>hi, John Doe</title></head><body><div class="content" blabla="bla"><h1>hi John DoeI&#x27;m 100</h1><br/>wowJohn DoeJohn DoeJohn Doe</div></body></html>"""
+    assert render(greet("John Doe", 100)) == expected
+
+    templatized = templatize(greet)
+    assert render(templatized(name="John Doe", age=100)) == expected
+
