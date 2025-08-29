@@ -452,37 +452,44 @@ class Templatizable(Protocol):
 def _traverse_node(node: Node,
                    template_parts: list[_TemplatePart],
                    sentinel_objects: dict[int, str]) -> None:
+
+    def append_static(obj: str) -> _TemplatePart:
+        return template_parts.append(("STATIC", obj))
+
+    def append_arg(arg: str) -> _TemplatePart:
+        return template_parts.append(("ARG", arg))
+
     # note that this should stay up-to-speed with the `Node` definition
     if type(node) is tuple:
         # TagTuple
-        template_parts.append(('STATIC', node[0]))
+        append_static(node[0])
         for n in node[1]:
             _traverse_node(n, template_parts, sentinel_objects)
-        template_parts.append(('STATIC', node[2]))
+        append_static(node[2])
     elif type(node) is str:
         # Check if this string is one of our sentinels
         node_id = id(node)
         if node_id in sentinel_objects:
             # This is an argument placeholder - add a marker
-            template_parts.append(('ARG', sentinel_objects[node_id]))
+            append_arg(sentinel_objects[node_id])
         else:
             # Regular string content
-            template_parts.append(('STATIC', faster_escape(node)))
+            append_static(faster_escape(node))
     elif type(node) is SafeString:
         # SafeString content - check if it's a sentinel
         node_id = id(node.safe_str)
         if node_id in sentinel_objects:
-            template_parts.append(('ARG', sentinel_objects[node_id]))
+            append_arg(sentinel_objects[node_id])
         else:
-            template_parts.append(('STATIC', node.safe_str))
+            append_static(node.safe_str)
     elif type(node) is Tag:
-        template_parts.append(('STATIC', node.rendered))
+        append_static(node.rendered)
     elif type(node) is list or type(node) is GeneratorType:
         for item in node:
             _traverse_node(item, template_parts, sentinel_objects)
     elif isinstance(node, (int, float, Decimal)):
         # Other types - convert to string
-        template_parts.append(('STATIC', str(node)))
+        append_static(str(node))
     else:
         raise TypeError(f"Got unexpected type for node: {type(node)}")
 
