@@ -1,6 +1,5 @@
 from decimal import Decimal
-from types import GeneratorType
-from typing import Any, Union, Generator, Iterable, Callable, Final, TYPE_CHECKING
+from typing import Any, Union, Generator, Iterable, Callable, Final, TYPE_CHECKING, Protocol
 
 
 class SafeString:
@@ -437,3 +436,108 @@ def render(*nodes: Node) -> str:
     _render(nodes, results.append)
 
     return "".join(results)
+
+
+from _decimal import Decimal
+from types import GeneratorType
+from typing import Literal, Union
+import inspect
+import sys
+
+TemplatePart = Union[
+    tuple[Literal["STATIC"], str],
+    tuple[Literal["ARG"], str] # the str is the arg name
+]
+
+class Templatizable(Protocol):
+    def __call__(self, **kwargs: Node) -> Node:
+        ...
+
+def templatize(
+        func: Templatizable,
+) -> Templatizable:
+    # get args
+    sig = inspect.signature(func)
+    param_names = list(sig.parameters.keys())
+
+    # assert valid (only strings and SafeStrings allowed)
+    if not param_names:
+        raise ValueError("Function must have at least one parameter")
+
+    # probe function with properly typed arguments
+    # Use interned sentinel objects that we can identify by id
+    sentinel_objects = {}
+    probe_args = {}
+
+    for param_name in param_names:
+        # Create a unique string sentinel and intern it so we can find it by identity
+        sentinel = sys.intern(f"__SENTINEL_{param_name}_{id(object())}__")
+        sentinel_objects[id(sentinel)] = param_name
+        probe_args[param_name] = sentinel
+
+    # Call function to get the Node tree
+    template_node = func(**probe_args)
+
+    # traverse `Node` tree structure to find usages of arguments by id
+    template_parts: list[TemplatePart] = []
+
+    def traverse_node(node: Node) -> None:
+        if isinstance(node, str):
+            # Check if this string is one of our sentinels
+            node_id = id(node)
+            if node_id in sentinel_objects:
+                # This is an argument placeholder - add a marker
+                template_parts.append(('ARG', sentinel_objects[node_id]))
+            else:
+                # Regular string content
+                template_parts.append(('STATIC', faster_escape(node)))
+        elif type(node) is tuple:
+            # TagTuple
+            template_parts.append(('STATIC', node[0]))
+            for n in node[1]:
+                traverse_node(n)
+            template_parts.append(('STATIC', node[2]))
+        elif type(node) is SafeString:
+            # SafeString content - check if it's a sentinel
+            node_id = id(node.safe_str)
+            if node_id in sentinel_objects:
+                template_parts.append(('ARG', sentinel_objects[node_id]))
+            else:
+                template_parts.append(('STATIC', node.safe_str))
+        elif type(node) is Tag:
+            template_parts.append(('STATIC', node.rendered))
+        elif type(node) is list or type(node) is GeneratorType:
+            for item in node:
+                traverse_node(item)
+        elif isinstance(node, (int, float, Decimal)):
+            # Other types - convert to string
+            template_parts.append(('STATIC', str(node)))
+
+    traverse_node(template_node)
+
+    # convert non-argument nodes to strings and coalesce for speed
+    coalesced_parts: list[Union[str, SafeString]] = [] # string's are for parameter names
+    current_static = []
+
+    for part_type, content in template_parts:
+        if part_type == 'STATIC':
+            current_static.append(str(content))
+        else:  # ARG
+            # Flush accumulated static content
+            if current_static:
+                coalesced_parts.append(SafeString(''.join(current_static)))
+                current_static = []
+            coalesced_parts.append(content)
+
+    # Flush any remaining static content
+    if current_static:
+        coalesced_parts.append(SafeString(''.join(current_static)))
+
+    # return new function -- should just be a list of SafeStrings
+    def template_function(**kwargs: Node) -> Node:
+        return [
+            kwargs[part] if type(part) is str else part
+            for part in coalesced_parts
+        ]
+
+    return template_function
