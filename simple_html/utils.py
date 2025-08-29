@@ -523,10 +523,10 @@ def _probe_func(func: Templatizable, variant: Literal[1, 2, 3]) -> list[_Templat
     # probe function with properly typed arguments
     # Use interned sentinel objects that we can identify by id
     sentinel_objects: dict[int, _ARG_LOCATION] = {}
-    probe_args = []
-    probe_kwargs = {}
+    probe_args: list[Node] = []
+    probe_kwargs: dict[str, Node] = {}
 
-    sentinel: Union[str, list[int], int]
+    sentinel: Node
     for i, (param_name, param) in enumerate(parameters.items()):
         if variant == 1:
             # Create a unique string sentinel and intern it so we can find it by identity
