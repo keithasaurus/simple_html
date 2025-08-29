@@ -26,7 +26,7 @@ from simple_html import (
     render_styles,
     img, title, h1,
 )
-from simple_html.utils import escape_attribute_key, templatize
+from simple_html.utils import escape_attribute_key, templatize, _coalesce_func
 
 
 def test_renders_no_children() -> None:
@@ -282,16 +282,12 @@ def test_templatize() -> None:
                     h1("hi ", name, "I'm ", age),
                     # tag
                     br,
-                    # list
-                    ["wow"],
-                    # generator
-                    (name for _ in range(3))
                     )
             )
         )
 
 
-    expected = """<html><head><title>hi, John Doe</title></head><body><div class="content" blabla="bla"><h1>hi John DoeI&#x27;m 100</h1><br/>wowJohn DoeJohn DoeJohn Doe</div></body></html>"""
+    expected = """<html><head><title>hi, John Doe</title></head><body><div class="content" blabla="bla"><h1>hi John DoeI&#x27;m 100</h1><br/></div></body></html>"""
     assert render(greet("John Doe", 100)) == expected
 
     templatized = templatize(greet)
@@ -324,3 +320,13 @@ def test_templatize_fails_for_differently_sized_parts() -> None:
     with pytest.raises(AssertionError):
         templatize(greet)
 
+
+def test_templatize_coalescing() -> None:
+    def greet(name: str) -> Node:
+        return body(div("Your name is ", name))
+
+    assert _coalesce_func(greet) == [
+        SafeString("<body><div>Your name is "),  # yay
+        (0, "name"), # arg location
+        SafeString("</div></body>"), # yay
+    ]

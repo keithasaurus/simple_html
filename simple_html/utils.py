@@ -1,7 +1,8 @@
 import inspect
 from decimal import Decimal
 from types import GeneratorType
-from typing import Any, Union, Generator, Iterable, Callable, Final, TYPE_CHECKING, Protocol, Literal, Never
+from typing import Any, Union, Generator, Iterable, Callable, Final, TYPE_CHECKING, Protocol, Literal, Never, cast
+from uuid import uuid4
 
 
 class SafeString:
@@ -439,15 +440,26 @@ def render(*nodes: Node) -> str:
 
     return "".join(results)
 
+
 _ARG_LOCATION = Union[str, int, tuple[int, str]]
 _TemplatePart = Union[
     tuple[Literal["STATIC"], str],
     tuple[Literal["ARG"], _ARG_LOCATION], # the str is the arg name
-    tuple[Literal["DYNAMIC"], Union[list[Node], Generator[Node, None, None]]]
+]
+
+TemplateNode = Union[
+    str,
+    SafeString,
+    float,
+    int,
+    Decimal,
+    "Tag",
+    "TagTuple",
+    # list and generator types excluded because they are often mutated
 ]
 
 class Templatizable(Protocol):
-    def __call__(self, **kwargs: Node) -> Node:
+    def __call__(self, *args: TemplateNode, **kwargs: TemplateNode) -> TemplateNode:
         ...
 
 def _traverse_node(node: Node,
@@ -459,9 +471,6 @@ def _traverse_node(node: Node,
 
     def append_arg(arg: _ARG_LOCATION) -> None:
         return template_parts.append(("ARG", arg))
-
-    def append_dynamic(obj: Union[list[Node], Generator[Node, None, None]]) -> None:
-        return template_parts.append(("DYNAMIC", obj))
 
     node_id = id(node)
 
@@ -476,9 +485,7 @@ def _traverse_node(node: Node,
         # Check if this string is one of our sentinels
         if node_id in sentinel_objects:
             # This is an argument placeholder - add a marker
-            append_arg(
-                sentinel_objects[node_id]
-            )
+            append_arg(sentinel_objects[node_id])
         else:
             # Regular string content
             append_static(faster_escape(node))
@@ -490,17 +497,6 @@ def _traverse_node(node: Node,
             append_static(node.safe_str)
     elif type(node) is Tag:
         append_static(node.rendered)
-    elif type(node) is list:
-        if node_id in sentinel_objects:
-            # This is an argument placeholder - add a marker
-            append_arg(sentinel_objects[node_id])
-        else:
-
-            for item in node:
-                _traverse_node(item, template_parts, sentinel_objects)
-    elif type(node) is GeneratorType:
-        for item in node:
-            _traverse_node(item, template_parts, sentinel_objects)
     elif isinstance(node, (int, float, Decimal)):
         if node_id in sentinel_objects:
             append_arg(sentinel_objects[node_id])
@@ -528,17 +524,17 @@ def _probe_func(func: Templatizable, variant: Literal[1, 2, 3]) -> list[_Templat
     # probe function with properly typed arguments
     # Use interned sentinel objects that we can identify by id
     sentinel_objects: dict[int, _ARG_LOCATION] = {}
-    probe_args: list[Node] = []
-    probe_kwargs: dict[str, Node] = {}
+    probe_args: list[TemplateNode] = []
+    probe_kwargs: dict[str, TemplateNode] = {}
 
-    sentinel: Node
+    sentinel: TemplateNode
     for i, (param_name, param) in enumerate(parameters.items()):
         if variant == 1:
             # Create a unique string sentinel and intern it so we can find it by identity
             sentinel = f"__SENTINEL_{param_name}_{id(object())}__"
         elif variant == 2:
             # Create a unique string sentinel and intern it so we can find it by identity
-            sentinel = [id(object())]
+            sentinel = uuid4().hex
         else:
             # Create a unique string sentinel and intern it so we can find it by identity
             sentinel = 1039917274618672531762351823761235 + id(object())
@@ -580,7 +576,7 @@ def _probe_func(func: Templatizable, variant: Literal[1, 2, 3]) -> list[_Templat
     return template_parts
 
 
-_CoalescedPart = Union[_ARG_LOCATION, SafeString, list[Node], Generator[Node, None, None]]
+_CoalescedPart = Union[_ARG_LOCATION, SafeString]
 
 def _coalesce_func(func: Templatizable) -> list[_CoalescedPart]:
     template_part_lists: tuple[list[_TemplatePart], list[_TemplatePart], list[_TemplatePart]] = (
@@ -615,12 +611,10 @@ def _coalesce_func(func: Templatizable) -> list[_CoalescedPart]:
 
     return coalesced_parts
 
-def get_arg_val(args: tuple[Node, ...],
-                kwargs: dict[str, Node],
-                location: Union[_ARG_LOCATION, list[Node], Generator[Node, None, None]]) -> Node:
-    if isinstance(location, (list, Generator)):
-        return location
-    elif isinstance(location, tuple):
+def _get_arg_val(args: tuple[TemplateNode, ...],
+                 kwargs: dict[str, TemplateNode],
+                 location: _ARG_LOCATION) -> Node:
+    if isinstance(location, tuple):
         int_loc, str_loc = location
         if len(args) >= int_loc + 1:
             return args[int_loc]
@@ -632,14 +626,14 @@ def get_arg_val(args: tuple[Node, ...],
         return kwargs[location]
 
 
-def templatize(func: Templatizable) -> Templatizable:
+def templatize(func: Templatizable) -> Callable[..., Node]:
     coalesced_parts = _coalesce_func(func)
 
     # return new function -- should just be a list of SafeStrings
-    def template_function(*args: Node, **kwargs: Node) -> Node:
-        return [
-            part if isinstance(part, SafeString) else get_arg_val(args, kwargs, part)
+    def template_function(*args: TemplateNode, **kwargs: TemplateNode) -> Node:
+        return cast(Node, [
+            part if isinstance(part, SafeString) else _get_arg_val(args, kwargs, part)
             for part in coalesced_parts
-        ]
+        ])
 
     return template_function
