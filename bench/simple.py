@@ -22,6 +22,7 @@ from simple_html import (
     nav, a, main, section, article, aside, footer, span, img, time,
     blockquote, code, pre, form, label, input_, textarea, button, table, thead, tbody, tr, th, td
 )
+from simple_html.utils import templatize
 
 
 def hello_world_empty(objs: List[None]) -> None:
@@ -118,19 +119,16 @@ def lorem_ipsum(titles: List[str]) -> None:
         )
 
 
-def large_page(titles: list[str]) -> None:
-    for t in titles:
-        render(
-            DOCTYPE_HTML5,
-            html({"lang": "en"},
-                 head(
+@templatize
+def _get_head(title_: str) -> None:
+    return head(
                      meta({"charset": "UTF-8"}),
                      meta({"name": "viewport", "content": "width=device-width, initial-scale=1.0"}),
                      meta({"name": "description",
                            "content": "Tech Insights - Your source for the latest in web development, AI, and programming trends"}),
                      meta({"name": "keywords",
                            "content": "web development, programming, AI, JavaScript, Python, tech news"}),
-                     title(t),
+                     title(title_),
                      link({"rel": "stylesheet", "href": "/static/css/main.css"}),
                      link({"rel": "icon", "type": "image/x-icon", "href": "/favicon.ico"}),
                      style("""
@@ -150,7 +148,16 @@ def large_page(titles: list[str]) -> None:
                         .stats-table th, .stats-table td { padding: 0.5rem; border: 1px solid #ddd; text-align: left; }
                         .stats-table th { background: #f0f0f0; }
                     """)
-                 ),
+                 )
+
+
+
+def large_page(titles: list[str]) -> None:
+    for t in titles:
+        render(
+            DOCTYPE_HTML5,
+            html({"lang": "en"},
+                 _get_head(title_=t),
                  body(
                      header({"class": "site-header"},
                             div({"class": "container"},

@@ -449,9 +449,45 @@ class Templatizable(Protocol):
     def __call__(self, **kwargs: Node) -> Node:
         ...
 
+def _traverse_node(node: Node,
+                   template_parts: list[TemplatePart],
+                   sentinel_objects: dict[int, str]) -> None:
+    if isinstance(node, str):
+        # Check if this string is one of our sentinels
+        node_id = id(node)
+        if node_id in sentinel_objects:
+            # This is an argument placeholder - add a marker
+            template_parts.append(('ARG', sentinel_objects[node_id]))
+        else:
+            # Regular string content
+            template_parts.append(('STATIC', faster_escape(node)))
+    elif type(node) is tuple:
+        # TagTuple
+        template_parts.append(('STATIC', node[0]))
+        for n in node[1]:
+            _traverse_node(n, template_parts, sentinel_objects)
+        template_parts.append(('STATIC', node[2]))
+    elif type(node) is SafeString:
+        # SafeString content - check if it's a sentinel
+        node_id = id(node.safe_str)
+        if node_id in sentinel_objects:
+            template_parts.append(('ARG', sentinel_objects[node_id]))
+        else:
+            template_parts.append(('STATIC', node.safe_str))
+    elif type(node) is Tag:
+        template_parts.append(('STATIC', node.rendered))
+    elif type(node) is list or type(node) is GeneratorType:
+        for item in node:
+            _traverse_node(item, template_parts, sentinel_objects)
+    elif isinstance(node, (int, float, Decimal)):
+        # Other types - convert to string
+        template_parts.append(('STATIC', str(node)))
+
+
 def templatize(
         func: Templatizable,
 ) -> Templatizable:
+    # TODO: clean up allowed args
     # get args
     sig = inspect.signature(func)
     param_names = list(sig.parameters.keys())
@@ -462,7 +498,7 @@ def templatize(
 
     # probe function with properly typed arguments
     # Use interned sentinel objects that we can identify by id
-    sentinel_objects = {}
+    sentinel_objects: dict[int, str] = {}
     probe_args = {}
 
     for param_name in param_names:
@@ -477,39 +513,7 @@ def templatize(
     # traverse `Node` tree structure to find usages of arguments by id
     template_parts: list[TemplatePart] = []
 
-    def traverse_node(node: Node) -> None:
-        if isinstance(node, str):
-            # Check if this string is one of our sentinels
-            node_id = id(node)
-            if node_id in sentinel_objects:
-                # This is an argument placeholder - add a marker
-                template_parts.append(('ARG', sentinel_objects[node_id]))
-            else:
-                # Regular string content
-                template_parts.append(('STATIC', faster_escape(node)))
-        elif type(node) is tuple:
-            # TagTuple
-            template_parts.append(('STATIC', node[0]))
-            for n in node[1]:
-                traverse_node(n)
-            template_parts.append(('STATIC', node[2]))
-        elif type(node) is SafeString:
-            # SafeString content - check if it's a sentinel
-            node_id = id(node.safe_str)
-            if node_id in sentinel_objects:
-                template_parts.append(('ARG', sentinel_objects[node_id]))
-            else:
-                template_parts.append(('STATIC', node.safe_str))
-        elif type(node) is Tag:
-            template_parts.append(('STATIC', node.rendered))
-        elif type(node) is list or type(node) is GeneratorType:
-            for item in node:
-                traverse_node(item)
-        elif isinstance(node, (int, float, Decimal)):
-            # Other types - convert to string
-            template_parts.append(('STATIC', str(node)))
-
-    traverse_node(template_node)
+    _traverse_node(template_node, [], sentinel_objects)
 
     # convert non-argument nodes to strings and coalesce for speed
     coalesced_parts: list[Union[str, SafeString]] = [] # string's are for parameter names
