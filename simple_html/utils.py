@@ -452,7 +452,13 @@ class Templatizable(Protocol):
 def _traverse_node(node: Node,
                    template_parts: list[TemplatePart],
                    sentinel_objects: dict[int, str]) -> None:
-    if isinstance(node, str):
+    if type(node) is tuple:
+        # TagTuple
+        template_parts.append(('STATIC', node[0]))
+        for n in node[1]:
+            _traverse_node(n, template_parts, sentinel_objects)
+        template_parts.append(('STATIC', node[2]))
+    elif type(node) is str:
         # Check if this string is one of our sentinels
         node_id = id(node)
         if node_id in sentinel_objects:
@@ -461,12 +467,6 @@ def _traverse_node(node: Node,
         else:
             # Regular string content
             template_parts.append(('STATIC', faster_escape(node)))
-    elif type(node) is tuple:
-        # TagTuple
-        template_parts.append(('STATIC', node[0]))
-        for n in node[1]:
-            _traverse_node(n, template_parts, sentinel_objects)
-        template_parts.append(('STATIC', node[2]))
     elif type(node) is SafeString:
         # SafeString content - check if it's a sentinel
         node_id = id(node.safe_str)
@@ -482,6 +482,8 @@ def _traverse_node(node: Node,
     elif isinstance(node, (int, float, Decimal)):
         # Other types - convert to string
         template_parts.append(('STATIC', str(node)))
+    else:
+        raise TypeError(f"Got unexpected type for node: {type(node)}")
 
 
 def templatize(
@@ -513,7 +515,7 @@ def templatize(
     # traverse `Node` tree structure to find usages of arguments by id
     template_parts: list[TemplatePart] = []
 
-    _traverse_node(template_node, [], sentinel_objects)
+    _traverse_node(template_node, template_parts, sentinel_objects)
 
     # convert non-argument nodes to strings and coalesce for speed
     coalesced_parts: list[Union[str, SafeString]] = [] # string's are for parameter names

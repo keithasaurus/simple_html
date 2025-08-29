@@ -22,7 +22,7 @@ from simple_html import (
     nav, a, main, section, article, aside, footer, span, img, time,
     blockquote, code, pre, form, label, input_, textarea, button, table, thead, tbody, tr, th, td
 )
-from simple_html.utils import templatize
+from simple_html.utils import templatize, Node
 
 
 def hello_world_empty(objs: List[None]) -> None:
@@ -120,7 +120,7 @@ def lorem_ipsum(titles: List[str]) -> None:
 
 
 @templatize
-def _get_head(title_: str) -> None:
+def _get_head(title_: str) -> Node:
     return head(
                      meta({"charset": "UTF-8"}),
                      meta({"name": "viewport", "content": "width=device-width, initial-scale=1.0"}),
