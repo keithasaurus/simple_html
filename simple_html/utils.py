@@ -529,25 +529,20 @@ def _probe_func(func: Templatizable, variant: Literal[1, 2, 3]) -> list[_Templat
     sentinel: Node
     for i, (param_name, param) in enumerate(parameters.items()):
         if variant == 1:
-            # Create a unique string sentinel and intern it so we can find it by identity
             sentinel = f"__SENTINEL_{param_name}_{id(object())}__"
         elif variant == 2:
-            # Create a unique string sentinel and intern it so we can find it by identity
             sentinel = uuid4().hex
         else:
-            # Create a unique string sentinel and intern it so we can find it by identity
             sentinel = 1039917274618672531762351823761235 + id(object())
 
         sentinel_id = id(sentinel)
 
-        # Determine how to pass this parameter
         if param.kind == inspect.Parameter.POSITIONAL_ONLY:
             probe_args.append(sentinel)
             sentinel_objects[sentinel_id] = i
         elif param.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD:
-            # For mixed parameters, we could pass as positional or keyword
-            # Let's pass as positional if it's among the first parameters
             probe_args.append(sentinel)
+            # allow either an index or key lookup
             sentinel_objects[sentinel_id] = (i, param.name)
         elif param.kind == inspect.Parameter.KEYWORD_ONLY:
             probe_kwargs[param_name] = sentinel
@@ -559,7 +554,6 @@ def _probe_func(func: Templatizable, variant: Literal[1, 2, 3]) -> list[_Templat
             raise AssertionError(_cannot_templatize_message(func, _NO_ARGS_OR_KWARGS))
 
     try:
-        # Call function with both args and kwargs
         template_node = func(*probe_args, **probe_kwargs)
     except Exception as e:
         raise Exception(
