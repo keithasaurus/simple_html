@@ -449,6 +449,9 @@ def process_node_4(x: tuple[str, tuple[Node, ...], str]) -> Node:
 def process_node_5(x: list[tuple[str, tuple[Node, ...], str] | str | SafeString]) -> Node:
     return h1
 
+def process_node_6(a, b) -> Node:
+    return h1
+
 
 # Test the validation
 test_functions: list[tuple[Templatizable, bool, str]] = [
@@ -458,6 +461,7 @@ test_functions: list[tuple[Templatizable, bool, str]] = [
     (process_node_3, False, "bool should fail"),
     (process_node_4, True, "TagTuple should pass"),
     (process_node_5, True, "complex nested Union should pass"),
+    (process_node_6, True, "unannotated args should pass"),
 ]
 
 for func, should_pass, description in test_functions:
