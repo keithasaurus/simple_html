@@ -6,6 +6,8 @@ from uuid import uuid4
 
 
 class SafeString:
+    __slots__ = ("safe_str",)
+
     def __init__(self, safe_str: str) -> None:
         self.safe_str = safe_str
 
@@ -634,3 +636,7 @@ def templatize(func: Templatizable) -> Callable[..., Node]:
         ])
 
     return template_function
+
+
+def prerender(*nodes: Node) -> SafeString:
+    return SafeString(render(*nodes))
