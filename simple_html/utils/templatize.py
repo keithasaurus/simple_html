@@ -1,4 +1,11 @@
+import inspect
+from decimal import Decimal
+from types import GeneratorType
+from typing import Union, Literal, Callable, Any, get_args, get_origin
+from uuid import uuid4
 
+from simple_html import Node, SafeString
+from simple_html.helpers import faster_escape, Tag
 
 _ARG_LOCATION = Union[str, int, tuple[int, str]]
 _TemplatePart = Union[
@@ -46,8 +53,11 @@ def _traverse_node(node: Node,
     elif type(node) is Tag:
         append_static(node.rendered)
     elif isinstance(node, (list, GeneratorType)):
-        for n in node:
-            _traverse_node(n, template_parts, sentinel_objects)
+        if node_id in sentinel_objects:
+            append_arg(sentinel_objects[node_id])
+        else:
+            for n in node:
+                _traverse_node(n, template_parts, sentinel_objects)
     elif isinstance(node, (int, float, Decimal)):
         if node_id in sentinel_objects:
             append_arg(sentinel_objects[node_id])
@@ -86,7 +96,7 @@ def _probe_func(func: Templatizable, variant: Literal[1, 2, 3]) -> list[_Templat
         elif variant == 2:
             sentinel = uuid4().hex
         else:
-            sentinel = 1039917274618672531762351823761235 + id(object())
+            sentinel = [id(object())]
 
         sentinel_id = id(sentinel)
 
@@ -184,50 +194,55 @@ def templatize(func: Templatizable) -> Callable[..., Node]:
     return template_function
 
 
-
 def is_valid_node(node: Any) -> bool:
     """Check if the given object is a valid Node."""
-    origin = get_origin(node)
-    args = get_args(node)
-
-    if isinstance(node, (str, SafeString, float, int, Decimal)):
+    # Check basic types first
+    if isinstance(node, (str, SafeString, float, int, Decimal, Tag)):
         return True
     elif isinstance(node, list):
         return all(is_valid_node(item) for item in node)
     elif isinstance(node, GeneratorType):
         return all(is_valid_node(item) for item in node)
-    elif isinstance(node, Tag):
-        return True
-    elif origin is tuple and len(args) == 3:
-        # Assuming the tuple structure is (str, list[Node], str)
-        tag_tuple_type = args
-        if not isinstance(tag_tuple_type[0], str) or not isinstance(tag_tuple_type[2], str):
+    elif isinstance(node, tuple) and len(node) == 3:
+        # TagTuple structure: (str, tuple[Node, ...], str)
+        if not isinstance(node[0], str) or not isinstance(node[2], str):
             return False
-        return all(is_valid_node(item) for item in tag_tuple_type[1])
+        return all(is_valid_node(item) for item in node[1])
     else:
         return False
 
 
-def validate_node_annotations(func: Callable) -> Callable:
+def validate_node_annotations(func: Templatizable) -> Templatizable:
     """
     Decorator to validate that all arguments annotated with Node are instances of Node.
 
     :param func: The function to decorate.
     :return: A wrapped function that performs validation.
     """
-    from inspect import signature
+    sig = inspect.signature(func)
 
-    sig = signature(func)
-    annotations = sig.annotations
-
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: Any, **kwargs: Any) -> Node:
         bound_args = sig.bind(*args, **kwargs)
-        for name, value in bound_args.arguments.items():
-            if name in annotations and get_origin(annotations[name]) is Union:
-                args = get_args(annotations[name])
-                if Node in args:
+        bound_args.apply_defaults()
+
+        for param_name, param in sig.parameters.items():
+            if param_name in bound_args.arguments:
+                value = bound_args.arguments[param_name]
+                annotation = param.annotation
+
+                # Check if the parameter is annotated with Node or Union containing Node
+                should_validate = False
+
+                if annotation == Node:
+                    should_validate = True
+                elif get_origin(annotation) is Union:
+                    union_args = get_args(annotation)
+                    if Node in union_args:
+                        should_validate = True
+
+                if should_validate:
                     if not is_valid_node(value):
-                        raise TypeError(f"Argument '{name}' must be a valid Node, got {type(value).__name__}")
+                        raise TypeError(f"Argument '{param_name}' must be a valid Node, got {type(value).__name__}")
 
         return func(*args, **kwargs)
 
@@ -236,10 +251,10 @@ def validate_node_annotations(func: Callable) -> Callable:
 
 # Example usage
 @validate_node_annotations
-def process_node(node: Node) -> None:
-    print(f"Processing node: {node}")
+def process_node(node: Node) -> Node:
+    return node
 
 
-# Example nodes
-root = Tag(rendered="root")
+# Example nodes - Fix the Tag creation
+root = Tag("root")  # Tag constructor takes name, not rendered parameter
 process_node(root)

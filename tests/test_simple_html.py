@@ -26,7 +26,8 @@ from simple_html import (
     render_styles,
     img, title, h1, h2,
 )
-from simple_html.helpers import escape_attribute_key, templatize, _coalesce_func, Tag
+from simple_html.helpers import escape_attribute_key, Tag
+from simple_html.utils.templatize import templatize, _coalesce_func
 
 
 def test_renders_no_children() -> None:
