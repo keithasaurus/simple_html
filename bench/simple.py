@@ -1,4 +1,4 @@
-from typing import List, Tuple, Generic, TypeVar
+from typing import List, Tuple
 
 from simple_html import (
     h1,

@@ -2,7 +2,7 @@ import inspect
 from decimal import Decimal
 from functools import lru_cache
 from types import GeneratorType
-from typing import Any, Union, Generator, Iterable, Callable, Final, TYPE_CHECKING, Protocol, Literal, Never, cast
+from typing import Any, Union, Generator, Iterable, Callable, Final, TYPE_CHECKING, Protocol, Literal
 from uuid import uuid4
 
 
