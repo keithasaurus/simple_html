@@ -1,6 +1,9 @@
 import json
 from decimal import Decimal
+from itertools import cycle
 from typing import Generator
+
+import pytest
 
 from simple_html import (
     SafeString,
@@ -21,9 +24,9 @@ from simple_html import (
     DOCTYPE_HTML5,
     render,
     render_styles,
-    img,
+    img, title, h1,
 )
-from simple_html.utils import escape_attribute_key
+from simple_html.utils import escape_attribute_key, templatize, _coalesce_func
 
 
 def test_renders_no_children() -> None:
@@ -267,3 +270,65 @@ def test_tag_repr() -> None:
 
 def test_render_number_attributes() -> None:
     assert render(div({"x": 1, "y": 2.01, "z": Decimal("3.02")})) == '<div x="1" y="2.01" z="3.02"></div>'
+
+def test_templatize() -> None:
+    def greet(name: str, age: int) -> Node:
+        return html(
+            head(title("hi, ", name)),
+            body(
+                div({"class": "content",
+                     "blabla": "bla"},
+                    # raw str / int
+                    h1("hi ", name, "I'm ", age),
+                    # tag
+                    br,
+                    ["ok", name, "hmm"],
+                    (name for _ in range(3))
+                    )
+            )
+        )
+
+
+    expected = """<html><head><title>hi, John Doe</title></head><body><div class="content" blabla="bla"><h1>hi John DoeI&#x27;m 100</h1><br/>okJohn DoehmmJohn DoeJohn DoeJohn Doe</div></body></html>"""
+    assert render(greet("John Doe", 100)) == expected
+
+    templatized = templatize(greet)
+    assert render(templatized(name="John Doe", age=100)) == expected
+    assert render(templatized("John Doe", age=100)) == expected
+    assert render(templatized("John Doe", 100)) == expected
+
+def test_templatize_fails_for_arbitrary_logic() -> None:
+    def greet(name: str) -> Node:
+        return html("Your name is ",
+                    name,
+                    " and this is what it looks like twice: ",
+                    name + name)
+
+    with pytest.raises(AssertionError):
+        templatize(greet)
+
+
+def test_templatize_fails_for_differently_sized_parts() -> None:
+    size = cycle([1, 2])
+    def greet(name: str) -> Node:
+        if next(size) == 1:
+            return div(name)
+        else:
+            return div(name, "bad")
+
+    assert render(greet("abc")) == "<div>abc</div>"
+    assert render(greet("abc")) == "<div>abcbad</div>"
+
+    with pytest.raises(AssertionError):
+        templatize(greet)
+
+
+def test_templatize_coalescing() -> None:
+    def greet(name: str) -> Node:
+        return body(div("Your name is ", name))
+
+    assert _coalesce_func(greet) == [
+        SafeString("<body><div>Your name is "),  # yay
+        (0, "name"), # arg location
+        SafeString("</div></body>"), # yay
+    ]
