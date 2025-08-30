@@ -629,10 +629,10 @@ def templatize(func: Templatizable) -> Callable[..., Node]:
     coalesced_parts = _coalesce_func(func)
 
     def template_function(*args: Node, **kwargs: Node) -> Node:
-        return cast(Node, [
+        return [
             part if isinstance(part, SafeString) else _get_arg_val(args, kwargs, part)
             for part in coalesced_parts
-        ])
+        ]
 
     return template_function
 
