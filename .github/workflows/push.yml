@@ -26,7 +26,7 @@ jobs:
       - name: run bench (pure python)
         run: poetry run python -m bench.run
       - name: mypyc
-        run: poetry run mypyc simple_html/utils.py
+        run: poetry run mypyc simple_html/helpers.py
       - name: run tests
         run: poetry run pytest
       - name: run bench (compiled)

@@ -22,7 +22,7 @@ from simple_html import (
     nav, a, main, section, article, aside, footer, span, img, time,
     blockquote, code, pre, form, label, input_, textarea, button, table, thead, tbody, tr, th, td
 )
-from simple_html.utils import templatize, Node
+from simple_html.helpers import templatize, Node
 
 
 def hello_world_empty(objs: List[None]) -> None:
