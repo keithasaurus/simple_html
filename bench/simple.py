@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, Generic, TypeVar
 
 from simple_html import (
     h1,
@@ -120,6 +120,7 @@ def _lorem_html(title_: str) -> Node:
 def lorem_ipsum(titles: List[str]) -> None:
     for t in titles:
         render(_lorem_html(t))
+
 
 
 @templatize

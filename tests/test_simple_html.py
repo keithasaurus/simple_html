@@ -282,12 +282,14 @@ def test_templatize() -> None:
                     h1("hi ", name, "I'm ", age),
                     # tag
                     br,
+                    ["ok", name, "hmm"],
+                    (name for _ in range(3))
                     )
             )
         )
 
 
-    expected = """<html><head><title>hi, John Doe</title></head><body><div class="content" blabla="bla"><h1>hi John DoeI&#x27;m 100</h1><br/></div></body></html>"""
+    expected = """<html><head><title>hi, John Doe</title></head><body><div class="content" blabla="bla"><h1>hi John DoeI&#x27;m 100</h1><br/>okJohn DoehmmJohn DoeJohn DoeJohn Doe</div></body></html>"""
     assert render(greet("John Doe", 100)) == expected
 
     templatized = templatize(greet)

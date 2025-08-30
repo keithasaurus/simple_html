@@ -447,19 +447,9 @@ _TemplatePart = Union[
     tuple[Literal["ARG"], _ARG_LOCATION], # the str is the arg name
 ]
 
-TemplateNode = Union[
-    str,
-    SafeString,
-    float,
-    int,
-    Decimal,
-    "Tag",
-    "TagTuple",
-    # list and generator types excluded because they are often mutated
-]
 
 class Templatizable(Protocol):
-    def __call__(self, *args: TemplateNode, **kwargs: TemplateNode) -> TemplateNode:
+    def __call__(self, *args: Node, **kwargs: Node) -> Node:
         ...
 
 def _traverse_node(node: Node,
@@ -497,6 +487,9 @@ def _traverse_node(node: Node,
             append_static(node.safe_str)
     elif type(node) is Tag:
         append_static(node.rendered)
+    elif isinstance(node, (list, GeneratorType)):
+        for n in node:
+            _traverse_node(n, template_parts, sentinel_objects)
     elif isinstance(node, (int, float, Decimal)):
         if node_id in sentinel_objects:
             append_arg(sentinel_objects[node_id])
@@ -504,6 +497,7 @@ def _traverse_node(node: Node,
             # Other types - convert to string
             append_static(str(node))
     else:
+        print(node)
         raise TypeError(f"Got unexpected type for node: {type(node)}")
 
 def _cannot_templatize_message(func: Callable[..., Any],
@@ -524,10 +518,10 @@ def _probe_func(func: Templatizable, variant: Literal[1, 2, 3]) -> list[_Templat
     # probe function with properly typed arguments
     # Use interned sentinel objects that we can identify by id
     sentinel_objects: dict[int, _ARG_LOCATION] = {}
-    probe_args: list[TemplateNode] = []
-    probe_kwargs: dict[str, TemplateNode] = {}
+    probe_args: list[Node] = []
+    probe_kwargs: dict[str, Node] = {}
 
-    sentinel: TemplateNode
+    sentinel: Node
     for i, (param_name, param) in enumerate(parameters.items()):
         if variant == 1:
             # Create a unique string sentinel and intern it so we can find it by identity
@@ -611,8 +605,8 @@ def _coalesce_func(func: Templatizable) -> list[_CoalescedPart]:
 
     return coalesced_parts
 
-def _get_arg_val(args: tuple[TemplateNode, ...],
-                 kwargs: dict[str, TemplateNode],
+def _get_arg_val(args: tuple[Node, ...],
+                 kwargs: dict[str, Node],
                  location: _ARG_LOCATION) -> Node:
     if isinstance(location, tuple):
         int_loc, str_loc = location
@@ -630,7 +624,7 @@ def templatize(func: Templatizable) -> Callable[..., Node]:
     coalesced_parts = _coalesce_func(func)
 
     # return new function -- should just be a list of SafeStrings
-    def template_function(*args: TemplateNode, **kwargs: TemplateNode) -> Node:
+    def template_function(*args: Node, **kwargs: Node) -> Node:
         return cast(Node, [
             part if isinstance(part, SafeString) else _get_arg_val(args, kwargs, part)
             for part in coalesced_parts
