@@ -628,7 +628,6 @@ def _get_arg_val(args: tuple[Node, ...],
 def templatize(func: Templatizable) -> Callable[..., Node]:
     coalesced_parts = _coalesce_func(func)
 
-    # return new function -- should just be a list of SafeStrings
     def template_function(*args: Node, **kwargs: Node) -> Node:
         return cast(Node, [
             part if isinstance(part, SafeString) else _get_arg_val(args, kwargs, part)
