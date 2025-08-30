@@ -24,9 +24,9 @@ from simple_html import (
     DOCTYPE_HTML5,
     render,
     render_styles,
-    img, title, h1,
+    img, title, h1, h2,
 )
-from simple_html.utils import escape_attribute_key, templatize, _coalesce_func
+from simple_html.utils import escape_attribute_key, templatize, _coalesce_func, Tag
 
 
 def test_renders_no_children() -> None:
@@ -331,4 +331,18 @@ def test_templatize_coalescing() -> None:
         SafeString("<body><div>Your name is "),  # yay
         (0, "name"), # arg location
         SafeString("</div></body>"), # yay
+    ]
+
+def test_template_handles_node_arg() -> None:
+    @templatize
+    def hi(node: Node) -> Node:
+        return div(node)
+
+    assert hi(div) == [
+        SafeString(safe_str='<div>'), div, SafeString(safe_str='</div>')
+    ]
+    assert hi([["ok"], 5, h2("h2")]) == [
+        SafeString("<div>"),
+        [["ok"], 5, h2("h2")],
+        SafeString('</div>'),
     ]
