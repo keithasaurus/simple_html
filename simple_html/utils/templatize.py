@@ -1,5 +1,6 @@
 import inspect
 import types
+import warnings
 from decimal import Decimal
 from types import GeneratorType
 from typing import Union, Literal, Callable, Any, get_args, get_origin, Generator, ForwardRef
@@ -77,6 +78,8 @@ _SHOULD_NOT_PERFORM_LOGIC = "Templatizable functions should not perform logic."
 _NO_ARGS_OR_KWARGS = "Templatizable functions cannot accept *args or **kwargs."
 
 def _probe_func(func: Templatizable, variant: Literal[1, 2, 3]) -> list[_TemplatePart]:
+    warn_if_invalid_annotations(func)
+
     # TODO: try different types of arguments...?
     sig = inspect.signature(func)
     parameters = sig.parameters
@@ -250,7 +253,7 @@ def _is_valid_node_annotation(annotation: Any) -> bool:
     return False
 
 
-def validate_node_annotations(func: Templatizable) -> Templatizable:
+def warn_if_invalid_annotations(func: Templatizable) -> None:
     """
     Decorator to validate that the function signature only uses valid Node annotations.
     Validates at decoration time, not runtime.
@@ -275,10 +278,7 @@ def validate_node_annotations(func: Templatizable) -> Templatizable:
 
         # Check if annotation is valid for Node types
         if not _is_valid_node_annotation(annotation):
-            raise TypeError(
+            warnings.warn(
                 f"Parameter '{param_name}' in function '{func.__name__}' has invalid annotation: {annotation}. "
-                f"Only Node-compatible types are allowed."
+                f"Only Node-compatible types are allowed in Templatize."
             )
-
-    # If we get here, the function signature is valid
-    return func

@@ -157,7 +157,7 @@ def _get_head(title_: str) -> Node:
 
 
 @templatize
-def _html(t: str) -> Node:
+def _html(t: str | bool) -> Node:
     return html({"lang": "en"},
                 _get_head(title_=t),
                 body(
