@@ -6,7 +6,7 @@ from types import GeneratorType
 from typing import Union, Literal, Callable, Any, get_args, get_origin, Generator, ForwardRef
 from uuid import uuid4
 
-from simple_html import Node, SafeString, h1
+from simple_html import Node, SafeString
 from simple_html.core import faster_escape, Tag
 
 _ARG_LOCATION = Union[str, int, tuple[int, str]]
@@ -78,17 +78,15 @@ _SHOULD_NOT_PERFORM_LOGIC = "Templatizable functions should not perform logic."
 _NO_ARGS_OR_KWARGS = "Templatizable functions cannot accept *args or **kwargs."
 
 def _probe_func(func: Templatizable, variant: Literal[1, 2, 3]) -> list[_TemplatePart]:
-    match find_invalid_annotations(func):
-        case None:
-            pass
-        case list() as bad_params:
-            for bad_param, annotation in bad_params:
-                warnings.warn(
-                    f"Parameter '{bad_param}' in function '{func.__name__}' has invalid annotation: {annotation}. "
-                    f"Only `simple_html.Node`-compatible types are allowed in Templatize."
-                )
-        case "no_args":
-            raise TypeError(f"Function '{func.__name__}' must have at least one parameter")
+    result = find_invalid_annotations(func)
+    if isinstance(result, list):
+        for bad_param, annotation in result:
+            warnings.warn(
+                f"Parameter '{bad_param}' in function '{func.__name__}' has invalid annotation: {annotation}. "
+                f"Only `simple_html.Node`-compatible types are allowed in Templatize."
+            )
+    elif result == "no_args":
+        raise TypeError(f"Function '{func.__name__}' must have at least one parameter")
 
     sig = inspect.signature(func)
     parameters = sig.parameters
@@ -240,8 +238,7 @@ def _is_valid_node_annotation(annotation: Any) -> bool:
         if len(type_args) == 3:
             # TagTuple structure: (str, tuple[Node, ...], str)
             first_arg, second_arg, third_arg = type_args
-            if (first_arg == str and third_arg == str and
-                    get_origin(second_arg) is tuple and len(get_args(second_arg)) >= 1):
+            if (first_arg is str and third_arg is str and get_origin(second_arg) is tuple and len(get_args(second_arg)) >= 1):
                 # Check if the tuple contains Node types (like tuple[Node, ...])
                 inner_args = get_args(second_arg)
                 return all(_is_valid_node_annotation(arg) for arg in inner_args if arg is not ...)
