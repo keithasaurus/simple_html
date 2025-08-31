@@ -31,22 +31,33 @@ def hello_world_empty(objs: List[None]) -> None:
         render(h1("Hello, World!"))
 
 
+@templatize
+def _basic_html(list_items: list[Node]) -> Node:
+    return html(
+            head(title("A Great Web page!")),
+            body(
+                h1({"class": "great header",
+                    "id": "header1",
+                    "other_attr": "5"},
+                   "Welcome!"),
+                div(
+                    p("What a great web page!!!", br, br),
+                    ul(list_items)
+                )
+            )
+    )
+
+
 def basic(objs: List[Tuple[str, str, List[str]]]) -> None:
     for title_, content, oks in objs:
-        render(
-            DOCTYPE_HTML5,
-            html(
-                head(title("A Great Web page!")),
-                body(
-                    h1({"class": "great header",
-                        "id": "header1",
-                        "other_attr": "5"},
-                       "Welcome!"),
-                    div(
-                        p("What a great web page!!!", br, br),
-                        ul([
-                            li({"class": "item-stuff"}, SafeString(ss))
-                            for ss in oks])))))
+
+        render(DOCTYPE_HTML5,
+               _basic_html(
+                   [
+                       li({"class": "item-stuff"}, SafeString(ss))
+                       for ss in oks
+                   ]
+               ))
 
 
 def basic_long(objs: List[Tuple[str, str, List[str]]]) -> None:
