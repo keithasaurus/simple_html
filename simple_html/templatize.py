@@ -78,9 +78,18 @@ _SHOULD_NOT_PERFORM_LOGIC = "Templatizable functions should not perform logic."
 _NO_ARGS_OR_KWARGS = "Templatizable functions cannot accept *args or **kwargs."
 
 def _probe_func(func: Templatizable, variant: Literal[1, 2, 3]) -> list[_TemplatePart]:
-    warn_if_invalid_annotations(func)
+    match find_invalid_annotations(func):
+        case None:
+            pass
+        case list() as bad_params:
+            for bad_param, annotation in bad_params:
+                warnings.warn(
+                    f"Parameter '{bad_param}' in function '{func.__name__}' has invalid annotation: {annotation}. "
+                    f"Only `simple_html.Node`-compatible types are allowed in Templatize."
+                )
+        case "no_args":
+            raise TypeError(f"Function '{func.__name__}' must have at least one parameter")
 
-    # TODO: try different types of arguments...?
     sig = inspect.signature(func)
     parameters = sig.parameters
 
@@ -253,7 +262,7 @@ def _is_valid_node_annotation(annotation: Any) -> bool:
     return False
 
 
-def warn_if_invalid_annotations(func: Templatizable) -> None:
+def find_invalid_annotations(func: Templatizable) -> Union[list[tuple[str, Any]], None, Literal["no_args"]]:
     """
     Decorator to validate that the function signature only uses valid Node annotations.
     Validates at decoration time, not runtime.
@@ -266,19 +275,19 @@ def warn_if_invalid_annotations(func: Templatizable) -> None:
 
     # Check if function has at least one parameter
     if not sig.parameters:
-        raise TypeError(f"Function '{func.__name__}' must have at least one parameter")
+        return "no_args"
+    else:
+        bad_params = []
+        # Check each parameter's annotation
+        for param_name, param in sig.parameters.items():
+            annotation = param.annotation
 
-    # Check each parameter's annotation
-    for param_name, param in sig.parameters.items():
-        annotation = param.annotation
+            # Skip parameters without annotations
+            if annotation == inspect.Parameter.empty:
+                continue
 
-        # Skip parameters without annotations
-        if annotation == inspect.Parameter.empty:
-            continue
+            # Check if annotation is valid for Node types
+            if not _is_valid_node_annotation(annotation):
+                bad_params.append((param_name, annotation))
 
-        # Check if annotation is valid for Node types
-        if not _is_valid_node_annotation(annotation):
-            warnings.warn(
-                f"Parameter '{param_name}' in function '{func.__name__}' has invalid annotation: {annotation}. "
-                f"Only Node-compatible types are allowed in Templatize."
-            )
+        return bad_params or None

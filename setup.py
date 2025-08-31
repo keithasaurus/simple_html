@@ -2,7 +2,7 @@ try:
     import tomllib
 except ModuleNotFoundError:
     # python 3.10 and earlier
-    import tomli as tomllib
+    import tomli as tomllib  # type: ignore[no-redef]
 
 from pathlib import Path
 from setuptools import setup

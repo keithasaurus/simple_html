@@ -1,10 +1,10 @@
 from decimal import Decimal
-from typing import Union, Generator
+from typing import Union, Generator, Any, Literal
 
 import pytest
 
-from simple_html import Node, SafeString, Tag
-from simple_html.templatize import _is_valid_node_annotation
+from simple_html import Node, SafeString, Tag, h1
+from simple_html.templatize import _is_valid_node_annotation, Templatizable, find_invalid_annotations
 
 test_annotations = [
     # Basic valid Node types
@@ -121,80 +121,50 @@ test_annotations = [
     (tuple[str, tuple[Node, ...], str, int], False, "Four-element tuple"),
 ]
 
-# Run the tests
-print("Testing _is_valid_node_annotation:")
-passed = 0
-failed = 0
 
 @pytest.mark.parametrize('annotation,expected_result,description', test_annotations)
-def test_annotation(annotation, expected_result, description) -> None:
+def test_annotation(annotation: Any, expected_result: bool, description: str) -> None:
     assert _is_valid_node_annotation(annotation) is expected_result, description
-#
-#
-# for annotation, should_pass, description in test_cases:
-#     try:
-#         result = _is_valid_node_annotation(annotation)
-#         if result == should_pass:
-#             status = "✓ PASS"
-#             passed += 1
-#         else:
-#             status = f"✗ FAIL (expected {should_pass}, got {result})"
-#             failed += 1
-#         print(f"{status}: {description} - {annotation}")
-#     except Exception as e:
-#         print(f"✗ ERROR: {description} - {annotation}: {e}")
-#         failed += 1
-#
-# print(f"\nResults: {passed} passed, {failed} failed, {len(test_cases)} total")
-#
-# # Note: The actual test functions need to be defined properly for this to work
-# def process_node(node: Node, a: None) -> Node:
-#     return node
-#
-#
-# def process_node_1() -> Node:
-#     return h1
-#
-#
-# def process_node_2(a: list[str], b: str, c: list[Node]) -> Node:
-#     return h1
-#
-#
-# def process_node_3(a: bool) -> Node:
-#     return h1
-#
-#
-# def process_node_4(x: tuple[str, tuple[Node, ...], str]) -> Node:
-#     return h1
-#
-#
-# def process_node_5(x: list[tuple[str, tuple[Node, ...], str] | str | SafeString]) -> Node:
-#     return h1
-#
-# def process_node_6(a, b) -> Node:
-#     return h1
-#
-#
-# # Test the validation
-# test_functions: list[tuple[Templatizable, bool, str]] = [
-#     (process_node, False, "None annotation should fail"),
-#     (process_node_1, False, "no parameters should fail"),
-#     (process_node_2, True, "mixed valid types should pass"),
-#     (process_node_3, False, "bool should fail"),
-#     (process_node_4, True, "TagTuple should pass"),
-#     (process_node_5, True, "complex nested Union should pass"),
-#     (process_node_6, True, "unannotated args should pass"),
-# ]
-#
-# for func, should_pass, description in test_functions:
-#     try:
-#         validate_node_annotations(func)
-#         if should_pass:
-#             print(f"✓ {func.__name__}: PASSED - {description}")
-#         else:
-#             print(f"✗ {func.__name__}: SHOULD HAVE FAILED - {description}")
-#     except TypeError as e:
-#         if not should_pass:
-#             print(f"✓ {func.__name__}: CORRECTLY FAILED - {description}")
-#         else:
-#             print(f"✗ {func.__name__}: UNEXPECTEDLY FAILED - {description}: {e}")
+
+
+# Note: The actual test functions need to be defined properly for this to work
+def process_node(node: Node, a: None) -> Node:
+    return node
+
+
+def process_node_1() -> Node:
+    return h1
+
+
+def process_node_2(a: list[str], b: str, c: list[Node]) -> Node:
+    return h1
+
+
+def process_node_3(a: bool) -> Node:
+    return h1
+
+
+def process_node_4(x: tuple[str, tuple[Node, ...], str]) -> Node:
+    return h1
+
+
+def process_node_5(x: list[tuple[str, tuple[Node, ...], str] | str | SafeString]) -> Node:
+    return h1
+
+def process_node_6(a, b) -> Node:  # type: ignore[no-untyped-def]
+    return h1
+
+
+# Test the validation
+test_functions: list[tuple[Templatizable, Union[list[tuple[str, Any]], Literal["no_args"], None], str]] = [
+    (process_node, [("a", None)], "None annotation should fail"),
+    (process_node_1, "no_args", "should warn that there are no parameters"),
+    (process_node_2, None, "mixed valid types should pass"),
+    (process_node_3, [("a", bool)], "bool should fail"),
+    (process_node_4, None, "TagTuple should pass"),
+    (process_node_5, None, "complex nested Union should pass"),
+    (process_node_6, None, "unannotated args should pass"),
+]
+@pytest.mark.parametrize('func,expected_result,description', test_functions)
+def test_annotations_are_properly_checked_on_functions(func: Templatizable, expected_result: Union[list[tuple[str, Any]], Literal["no_args"], None], description: str) -> None:
+    assert find_invalid_annotations(func) == expected_result, description
