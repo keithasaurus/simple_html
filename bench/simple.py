@@ -1,4 +1,4 @@
-from typing import List, Tuple, Generic, TypeVar
+from typing import List, Tuple
 
 from simple_html import (
     h1,
@@ -22,8 +22,8 @@ from simple_html import (
     nav, a, main, section, article, aside, footer, span, img, time,
     blockquote, code, pre, form, label, input_, textarea, button, table, thead, tbody, tr, th, td
 )
-from simple_html.helpers import Node
-from simple_html.utils.templatize import templatize
+from simple_html.core import Node
+from simple_html.templatize import templatize
 
 
 def hello_world_empty(objs: List[None]) -> None:
@@ -157,7 +157,7 @@ def _get_head(title_: str) -> Node:
 
 
 @templatize
-def _html(t: str | bool) -> Node:
+def _html(t: str) -> Node:
     return html({"lang": "en"},
                 _get_head(title_=t),
                 body(

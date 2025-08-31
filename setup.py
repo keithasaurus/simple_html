@@ -19,7 +19,7 @@ project_data = toml_data["project"]
 setup(
     name="simple-html",
     ext_modules=mypycify([
-        "simple_html/helpers.py",
+        "simple_html/core.py",
     ]),
     author=project_data["authors"][0]["name"],
     packages=["simple_html"],

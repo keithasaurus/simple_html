@@ -4,7 +4,7 @@ from typing import Union, Generator
 import pytest
 
 from simple_html import Node, SafeString, Tag
-from simple_html.utils.templatize import _is_valid_node_annotation
+from simple_html.templatize import _is_valid_node_annotation
 
 test_annotations = [
     # Basic valid Node types

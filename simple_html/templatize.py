@@ -7,7 +7,7 @@ from typing import Union, Literal, Callable, Any, get_args, get_origin, Generato
 from uuid import uuid4
 
 from simple_html import Node, SafeString, h1
-from simple_html.helpers import faster_escape, Tag
+from simple_html.core import faster_escape, Tag
 
 _ARG_LOCATION = Union[str, int, tuple[int, str]]
 _TemplatePart = Union[
