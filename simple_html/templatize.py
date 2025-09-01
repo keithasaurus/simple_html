@@ -227,7 +227,7 @@ def _is_valid_node_annotation(annotation: Any) -> bool:
         return True
 
     # Check for Union types (like Optional[Node] or Union[Node, str])
-    elif (origin := get_origin(annotation)) is Union or (hasattr(types, 'UnionType') and isinstance(annotation, types.UnionType)):
+    elif get_origin(annotation) is Union or (hasattr(types, 'UnionType') and isinstance(annotation, types.UnionType)):
         union_args = get_args(annotation)
         # All union members must be valid Node types (except None for Optional)
         return all(_is_valid_node_annotation(arg) for arg in union_args if arg is not type(None))
