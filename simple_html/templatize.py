@@ -207,7 +207,7 @@ def templatize(func: Templatizable) -> Callable[..., Node]:
 
 def _is_valid_node_annotation(annotation: Any) -> bool:
     """Check if an annotation represents a valid Node type (recursive)."""
-    # Handle ForwardRef objects
+
     if isinstance(annotation, ForwardRef):
         # Get the string argument from ForwardRef
         ref_name = annotation.__forward_arg__
@@ -249,7 +249,7 @@ def _is_valid_node_annotation(annotation: Any) -> bool:
     elif (origin := get_origin(annotation)) is not None:
         type_args = get_args(annotation)
         if type_args:
-            # For list[Node], Generator[Node, None, None], etc.
+            # For list[Node], Generator[Node, None, None]
             if origin is list:
                 # All list element types must be valid Node types
                 return all(_is_valid_node_annotation(arg) for arg in type_args)
@@ -263,19 +263,13 @@ def find_invalid_annotations(func: Templatizable) -> Union[list[tuple[str, Any]]
     """
     Decorator to validate that the function signature only uses valid Node annotations.
     Validates at decoration time, not runtime.
-
-    :param func: The function to decorate.
-    :return: The original function if validation passes.
-    :raises: TypeError if the function has invalid annotations.
     """
     sig = inspect.signature(func)
 
-    # Check if function has at least one parameter
     if not sig.parameters:
         return "no_args"
     else:
         bad_params = []
-        # Check each parameter's annotation
         for param_name, param in sig.parameters.items():
             annotation = param.annotation
 

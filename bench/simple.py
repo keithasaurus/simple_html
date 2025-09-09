@@ -34,23 +34,22 @@ def hello_world_empty(objs: List[None]) -> None:
 @templatize
 def _basic_html(list_items: list[Node]) -> Node:
     return html(
-            head(title("A Great Web page!")),
-            body(
-                h1({"class": "great header",
-                    "id": "header1",
-                    "other_attr": "5"},
-                   "Welcome!"),
-                div(
-                    p("What a great web page!!!", br, br),
-                    ul(list_items)
-                )
+        head(title("A Great Web page!")),
+        body(
+            h1({"class": "great header",
+                "id": "header1",
+                "other_attr": "5"},
+               "Welcome!"),
+            div(
+                p("What a great web page!!!", br, br),
+                ul(list_items)
             )
+        )
     )
 
 
 def basic(objs: List[Tuple[str, str, List[str]]]) -> None:
     for title_, content, oks in objs:
-
         render(DOCTYPE_HTML5,
                _basic_html(
                    [
@@ -134,6 +133,24 @@ def lorem_ipsum(titles: List[str]) -> None:
         render(_lorem_html(t))
 
 
+def _article(heading: str,
+             published_date_iso: str,
+             published_data_readable,
+             author: str,
+             read_time_minutes: str,
+             content: list[Node],
+             is_featured: bool = False):
+    return article(
+        {"class": "post" + ("featured-post" if is_featured else ""), },
+        h2(heading),
+        p({"class": "post-meta"},
+          "Published on ", time({"datetime": published_date_iso}, published_data_readable),
+          " by ", span({"class": "author"}, author),
+          " | ", span({"class": "read-time"}, read_time_minutes, " min read")
+          ),
+        content
+    )
+
 
 @templatize
 def _get_head(title_: str) -> Node:
@@ -168,7 +185,8 @@ def _get_head(title_: str) -> Node:
 
 
 @templatize
-def _html(t: str) -> Node:
+def _html(t: str,
+          articles: list[Node]) -> Node:
     return html({"lang": "en"},
                 _get_head(title_=t),
                 body(
@@ -190,177 +208,7 @@ def _html(t: str) -> Node:
                            ),
                     main({"class": "container main-content"},
                          section({"class": "content-area"},
-                                 article({"class": "post featured-post"},
-                                         h2("Complete Guide to Modern Web Development in 2024"),
-                                         p({"class": "post-meta"},
-                                           "Published on ", time({"datetime": "2024-03-15"}, "March 15, 2024"),
-                                           " by ", span({"class": "author"}, "Sarah Johnson"),
-                                           " | ", span({"class": "read-time"}, "12 min read")
-                                           ),
-                                         img({"src": "/images/web-dev-2024.jpg",
-                                              "alt": "Modern web development tools and frameworks",
-                                              "style": "width: 100%; height: 300px; object-fit: cover; border-radius: 8px;"}),
-                                         p(
-                                             "Web development has evolved significantly in recent years, transforming from simple static pages ",
-                                             "to complex, interactive applications that power our digital world. The landscape continues to change ",
-                                             "rapidly, driven by new technologies, frameworks, and methodologies that promise to make development ",
-                                             "faster, more efficient, and more accessible."
-                                         ),
-                                         h3("Key Technologies Shaping the Future"),
-                                         p("The modern web development ecosystem is built around several core technologies:"),
-                                         ul(
-                                             li("**Component-based frameworks** like React, Vue, and Angular that promote reusable UI components"),
-                                             li("**Progressive Web Apps (PWAs)** that bridge the gap between web and native applications"),
-                                             li("**Serverless architectures** using AWS Lambda, Vercel Functions, and Netlify Functions"),
-                                             li("**JAMstack** (JavaScript, APIs, Markup) for better performance and security"),
-                                             li("**GraphQL** for more efficient data fetching and API design"),
-                                             li("**TypeScript** for type-safe JavaScript development"),
-                                             li("**Edge computing** for reduced latency and improved user experience")
-                                         ),
-                                         h3("Framework Comparison"),
-                                         table({"class": "stats-table"},
-                                               thead(
-                                                   tr(
-                                                       th("Framework"),
-                                                       th("Learning Curve"),
-                                                       th("Performance"),
-                                                       th("Community"),
-                                                       th("Use Case")
-                                                   )
-                                               ),
-                                               tbody(
-                                                   tr(
-                                                       td("React"),
-                                                       td("Medium"),
-                                                       td("High"),
-                                                       td("Very Large"),
-                                                       td("Complex UIs, SPAs")
-                                                   ),
-                                                   tr(
-                                                       td("Vue.js"),
-                                                       td("Easy"),
-                                                       td("High"),
-                                                       td("Large"),
-                                                       td("Rapid prototyping, SME apps")
-                                                   ),
-                                                   tr(
-                                                       td("Angular"),
-                                                       td("Steep"),
-                                                       td("High"),
-                                                       td("Large"),
-                                                       td("Enterprise applications")
-                                                   ),
-                                                   tr(
-                                                       td("Svelte"),
-                                                       td("Easy"),
-                                                       td("Very High"),
-                                                       td("Growing"),
-                                                       td("Performance-critical apps")
-                                                   )
-                                               )
-                                               ),
-                                         h3("Code Example: Modern Component"),
-                                         p("Here's an example of a modern React component using hooks and TypeScript:"),
-                                         pre({"class": "code-block"},
-                                             code("""
-        interface User {
-          id: number;
-          name: string;
-          email: string;
-        }
-
-        const UserProfile: React.FC<{ userId: number }> = ({ userId }) => {
-          const [user, setUser] = useState<User | null>(null);
-          const [loading, setLoading] = useState(true);
-
-          useEffect(() => {
-            fetchUser(userId)
-              .then(setUser)
-              .finally(() => setLoading(false));
-          }, [userId]);
-
-          if (loading) return <div>Loading...</div>;
-          if (!user) return <div>User not found</div>;
-
-          return (
-            <div className="user-profile">
-              <h2>{user.name}</h2>
-              <p>{user.email}</p>
-            </div>
-          );
-        };
-                                    """)
-                                             ),
-                                         h3("Best Practices for 2024"),
-                                         p("As we move forward in 2024, several best practices have emerged:"),
-                                         ol(
-                                             li("**Performance First**: Optimize for Core Web Vitals and user experience metrics"),
-                                             li("**Accessibility by Default**: Implement WCAG guidelines from the start of development"),
-                                             li("**Security-First Mindset**: Use CSP headers, sanitize inputs, and follow OWASP guidelines"),
-                                             li("**Mobile-First Design**: Start with mobile layouts and progressively enhance for larger screens"),
-                                             li("**Sustainable Web Development**: Optimize for energy efficiency and reduced carbon footprint")
-                                         ),
-                                         blockquote(
-                                             p("\"The best web developers are those who understand that technology should serve users, not the other way around.\""),
-                                             footer("— John Doe, Senior Frontend Architect at TechCorp")
-                                         )
-                                         ),
-
-                                 article({"class": "post"},
-                                         h2("The Rise of AI in Development: Tools and Techniques"),
-                                         p({"class": "post-meta"},
-                                           "Published on ", time({"datetime": "2024-03-10"}, "March 10, 2024"),
-                                           " by ", span({"class": "author"}, "Michael Chen"),
-                                           " | ", span({"class": "read-time"}, "8 min read")
-                                           ),
-                                         p(
-                                             "Artificial Intelligence is fundamentally transforming how we write, test, and deploy code. ",
-                                             "From intelligent autocomplete suggestions to automated bug detection and code generation, ",
-                                             "AI tools are becoming essential companions for modern developers."
-                                         ),
-                                         h3("Popular AI Development Tools"),
-                                         ul(
-                                             li("**GitHub Copilot**: AI-powered code completion and generation"),
-                                             li("**ChatGPT & GPT-4**: Code explanation, debugging, and architecture advice"),
-                                             li("**Amazon CodeWhisperer**: Real-time code suggestions with security scanning"),
-                                             li("**DeepCode**: AI-powered code review and vulnerability detection"),
-                                             li("**Kite**: Intelligent code completion for Python and JavaScript")
-                                         ),
-                                         p(
-                                             "These tools don't replace developers but rather augment their capabilities, ",
-                                             "allowing them to focus on higher-level problem solving and creative solutions."
-                                         )
-                                         ),
-
-                                 article({"class": "post"},
-                                         h2("Python vs JavaScript: Which Language to Learn in 2024?"),
-                                         p({"class": "post-meta"},
-                                           "Published on ", time({"datetime": "2024-03-05"}, "March 5, 2024"),
-                                           " by ", span({"class": "author"}, "Emily Rodriguez"),
-                                           " | ", span({"class": "read-time"}, "10 min read")
-                                           ),
-                                         p(
-                                             "The eternal debate continues: should new developers learn Python or JavaScript first? ",
-                                             "Both languages have their strengths and use cases, and the answer largely depends on ",
-                                             "your career goals and the type of projects you want to work on."
-                                         ),
-                                         h3("Python Advantages"),
-                                         ul(
-                                             li("Simple, readable syntax that's beginner-friendly"),
-                                             li("Excellent for data science, machine learning, and AI"),
-                                             li("Strong in automation, scripting, and backend development"),
-                                             li("Huge ecosystem of libraries and frameworks (Django, Flask, NumPy, pandas)")
-                                         ),
-                                         h3("JavaScript Advantages"),
-                                         ul(
-                                             li("Essential for web development (frontend and backend with Node.js)"),
-                                             li("Immediate visual feedback when learning"),
-                                             li("Huge job market and demand"),
-                                             li("Versatile: runs in browsers, servers, mobile apps, and desktop applications")
-                                         ),
-                                         p("The truth is, both languages are valuable, and learning one makes learning the other easier.")
-                                         ),
-
+                                 articles,
                                  section({"class": "comment-section"},
                                          h3("Join the Discussion"),
                                          form({"class": "comment-form", "action": "/submit-comment", "method": "POST"},
@@ -492,7 +340,180 @@ def _html(t: str) -> Node:
 
 def large_page(titles: list[str]) -> None:
     for t in titles:
+        articles = [
+            _article(
+                "Complete Guide to Modern Web Development in 2024",
+                "2024-03-15",
+                "March 15, 2024",
+                "Sarah Johnson",
+                read_time_minutes=12,
+                content=[
+                    img({"src": "/images/web-dev-2024.jpg",
+                         "alt": "Modern web development tools and frameworks",
+                         "style": "width: 100%; height: 300px; object-fit: cover; border-radius: 8px;"}),
+                    p(
+                        "Web development has evolved significantly in recent years, transforming from simple static pages ",
+                        "to complex, interactive applications that power our digital world. The landscape continues to change ",
+                        "rapidly, driven by new technologies, frameworks, and methodologies that promise to make development ",
+                        "faster, more efficient, and more accessible."
+                    ),
+                    h3("Key Technologies Shaping the Future"),
+                    p("The modern web development ecosystem is built around several core technologies:"),
+                    ul(
+                        li("**Component-based frameworks** like React, Vue, and Angular that promote reusable UI components"),
+                        li("**Progressive Web Apps (PWAs)** that bridge the gap between web and native applications"),
+                        li("**Serverless architectures** using AWS Lambda, Vercel Functions, and Netlify Functions"),
+                        li("**JAMstack** (JavaScript, APIs, Markup) for better performance and security"),
+                        li("**GraphQL** for more efficient data fetching and API design"),
+                        li("**TypeScript** for type-safe JavaScript development"),
+                        li("**Edge computing** for reduced latency and improved user experience")
+                    ),
+                    h3("Framework Comparison"),
+                    table({"class": "stats-table"},
+                          thead(
+                              tr(
+                                  th("Framework"),
+                                  th("Learning Curve"),
+                                  th("Performance"),
+                                  th("Community"),
+                                  th("Use Case")
+                              )
+                          ),
+                          tbody(
+                              tr(
+                                  td("React"),
+                                  td("Medium"),
+                                  td("High"),
+                                  td("Very Large"),
+                                  td("Complex UIs, SPAs")
+                              ),
+                              tr(
+                                  td("Vue.js"),
+                                  td("Easy"),
+                                  td("High"),
+                                  td("Large"),
+                                  td("Rapid prototyping, SME apps")
+                              ),
+                              tr(
+                                  td("Angular"),
+                                  td("Steep"),
+                                  td("High"),
+                                  td("Large"),
+                                  td("Enterprise applications")
+                              ),
+                              tr(
+                                  td("Svelte"),
+                                  td("Easy"),
+                                  td("Very High"),
+                                  td("Growing"),
+                                  td("Performance-critical apps")
+                              )
+                          )
+                          ),
+                    h3("Code Example: Modern Component"),
+                    p("Here's an example of a modern React component using hooks and TypeScript:"),
+                    pre({"class": "code-block"},
+                        code("""
+            interface User {
+              id: number;
+              name: string;
+              email: string;
+            }
+
+            const UserProfile: React.FC<{ userId: number }> = ({ userId }) => {
+              const [user, setUser] = useState<User | null>(null);
+              const [loading, setLoading] = useState(true);
+
+              useEffect(() => {
+                fetchUser(userId)
+                  .then(setUser)
+                  .finally(() => setLoading(false));
+              }, [userId]);
+
+              if (loading) return <div>Loading...</div>;
+              if (!user) return <div>User not found</div>;
+
+              return (
+                <div className="user-profile">
+                  <h2>{user.name}</h2>
+                  <p>{user.email}</p>
+                </div>
+              );
+            };
+                                        """)
+                        ),
+                    h3("Best Practices for 2024"),
+                    p("As we move forward in 2024, several best practices have emerged:"),
+                    ol(
+                        li("**Performance First**: Optimize for Core Web Vitals and user experience metrics"),
+                        li("**Accessibility by Default**: Implement WCAG guidelines from the start of development"),
+                        li("**Security-First Mindset**: Use CSP headers, sanitize inputs, and follow OWASP guidelines"),
+                        li("**Mobile-First Design**: Start with mobile layouts and progressively enhance for larger screens"),
+                        li("**Sustainable Web Development**: Optimize for energy efficiency and reduced carbon footprint")
+                    ),
+                    blockquote(
+                        p("\"The best web developers are those who understand that technology should serve users, not the other way around.\""),
+                        footer("— John Doe, Senior Frontend Architect at TechCorp")
+                    )]
+
+            ),
+            _article(
+                "The Rise of AI in Development: Tools and Techniques",
+                "2024-03-10",
+                "March 10, 2024",
+                "Michael Chen",
+                8,
+                [p(
+                    "Artificial Intelligence is fundamentally transforming how we write, test, and deploy code. ",
+                    "From intelligent autocomplete suggestions to automated bug detection and code generation, ",
+                    "AI tools are becoming essential companions for modern developers."
+                ),
+                    h3("Popular AI Development Tools"),
+                    ul(
+                        li("**GitHub Copilot**: AI-powered code completion and generation"),
+                        li("**ChatGPT & GPT-4**: Code explanation, debugging, and architecture advice"),
+                        li("**Amazon CodeWhisperer**: Real-time code suggestions with security scanning"),
+                        li("**DeepCode**: AI-powered code review and vulnerability detection"),
+                        li("**Kite**: Intelligent code completion for Python and JavaScript")
+                    ),
+                    p(
+                        "These tools don't replace developers but rather augment their capabilities, ",
+                        "allowing them to focus on higher-level problem solving and creative solutions."
+                    )
+                ]
+            ),
+
+            _article(
+                "Python vs JavaScript: Which Language to Learn in 2024?",
+                "2024-03-05",
+                "March 5, 2024",
+                "Emily Rodriguez",
+                9,
+                [
+                    p(
+                        "The eternal debate continues: should new developers learn Python or JavaScript first? ",
+                        "Both languages have their strengths and use cases, and the answer largely depends on ",
+                        "your career goals and the type of projects you want to work on."
+                    ),
+                    h3("Python Advantages"),
+                    ul(
+                        li("Simple, readable syntax that's beginner-friendly"),
+                        li("Excellent for data science, machine learning, and AI"),
+                        li("Strong in automation, scripting, and backend development"),
+                        li("Huge ecosystem of libraries and frameworks (Django, Flask, NumPy, pandas)")
+                    ),
+                    h3("JavaScript Advantages"),
+                    ul(
+                        li("Essential for web development (frontend and backend with Node.js)"),
+                        li("Immediate visual feedback when learning"),
+                        li("Huge job market and demand"),
+                        li("Versatile: runs in browsers, servers, mobile apps, and desktop applications")
+                    ),
+                    p("The truth is, both languages are valuable, and learning one makes learning the other easier.")
+                ]
+            )]
+
         render(
             DOCTYPE_HTML5,
-            _html(t=t)
+            _html(t, articles)
         )
