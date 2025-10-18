@@ -1,9 +1,7 @@
 import json
 from decimal import Decimal
-from itertools import cycle
 from typing import Generator
 
-import pytest
 
 from simple_html import (
     SafeString,
@@ -24,7 +22,7 @@ from simple_html import (
     DOCTYPE_HTML5,
     render,
     render_styles,
-    img, title, h1, h2,
+    img,
 )
 from simple_html.core import escape_attribute_key
 
