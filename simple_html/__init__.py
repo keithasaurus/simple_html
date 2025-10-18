@@ -1,4 +1,4 @@
-from simple_html.core import SafeString as SafeString, Tag as Tag, render as render, render_styles as render_styles, Node as Node, TagTuple as TagTuple
+from simple_html.core import SafeString as SafeString, Tag as Tag, render as render, render_styles as render_styles, Node as Node, TagTuple as TagTuple, prerender as prerender
 
 DOCTYPE_HTML5 = SafeString("<!doctype html>")
 

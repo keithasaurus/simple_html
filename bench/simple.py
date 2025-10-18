@@ -23,7 +23,6 @@ from simple_html import (
     blockquote, code, pre, form, label, input_, textarea, button, table, thead, tbody, tr, th, td
 )
 from simple_html.core import Node
-from simple_html.templatize import templatize
 
 
 def hello_world_empty(objs: List[None]) -> None:
@@ -31,7 +30,6 @@ def hello_world_empty(objs: List[None]) -> None:
         render(h1("Hello, World!"))
 
 
-@templatize
 def _basic_html(list_items: list[Node]) -> Node:
     return html(
         head(title("A Great Web page!")),
@@ -107,7 +105,6 @@ def basic_long(objs: List[Tuple[str, str, List[str]]]) -> None:
         )
 
 
-@templatize
 def _lorem_html(title_: str) -> Node:
     return html(
         {"lang": "en"},
@@ -152,7 +149,6 @@ def _article(heading: str,
     )
 
 
-@templatize
 def _get_head(title_: str) -> Node:
     return head(
         meta({"charset": "UTF-8"}),
@@ -184,7 +180,6 @@ def _get_head(title_: str) -> Node:
     )
 
 
-@templatize
 def _html(t: str,
           articles: list[Node]) -> Node:
     return html({"lang": "en"},

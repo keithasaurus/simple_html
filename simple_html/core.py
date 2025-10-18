@@ -183,7 +183,7 @@ def _render(nodes: Iterable[Node], append_to_list: Callable[[str], None]) -> Non
     """
     for node in nodes:
         # SafeString first because they are very common in performance-sensitive contexts,
-        # such as `templatize` and `prerender`
+        # such as `prerender`
         if type(node) is SafeString:
             append_to_list(node.safe_str)
         elif type(node) is str:
