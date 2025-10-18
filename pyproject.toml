@@ -34,7 +34,7 @@ python = "^3.9"
 
 [tool.poetry.group.dev.dependencies]
 jinja2 = "3.1.6"
-mypy = "1.17.1"
+mypy = "1.18.2"
 pytest = "8.4.1"
 setuptools = "80.9.0"
 fast-html = "1.0.12"
@@ -45,7 +45,7 @@ ruff = "0.12.8"
 [build-system]
 requires = [
     "poetry-core>=1.0.0",
-    "mypy[mypyc]==1.17.1",
+    "mypy[mypyc]==1.18.2",
     "tomli==2.2.1"
 ]
 
