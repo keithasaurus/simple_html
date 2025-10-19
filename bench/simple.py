@@ -22,7 +22,7 @@ from simple_html import (
     nav, a, main, section, article, aside, footer, span, img, time,
     blockquote, code, pre, form, label, input_, textarea, button, table, thead, tbody, tr, th, td
 )
-from simple_html.core import Node
+from simple_html.core import Node, prerender
 
 
 def hello_world_empty(objs: List[None]) -> None:
@@ -179,6 +179,38 @@ def _get_head(title_: str) -> Node:
                     """)
     )
 
+_footer = prerender(
+    footer({"class": "site-footer"},
+                           div({"class": "container"},
+                               div({"class": "footer-content"},
+                                   div({"class": "footer-section"},
+                                       h4("About Tech Insights"),
+                                       p("Your go-to resource for web development tutorials, programming guides, and the latest technology trends. We help developers stay current with industry best practices.")
+                                       ),
+                                   div({"class": "footer-section"},
+                                       h4("Quick Links"),
+                                       ul(
+                                           li(a({"href": "/privacy"}, "Privacy Policy")),
+                                           li(a({"href": "/terms"}, "Terms of Service")),
+                                           li(a({"href": "/sitemap"}, "Sitemap")),
+                                           li(a({"href": "/advertise"}, "Advertise"))
+                                       )
+                                       ),
+                                   div({"class": "footer-section"},
+                                       h4("Contact Info"),
+                                       p("Email: hello@techinsights.dev"),
+                                       p("Location: San Francisco, CA"),
+                                       p("Phone: (555) 123-4567")
+                                       )
+                                   ),
+                               hr,
+                               div({"class": "footer-bottom"},
+                                   p("© 2024 Tech Insights. All rights reserved. Built with simple_html library."),
+                                   p("Made with ❤️ for the developer community")
+                                   )
+                               )
+                           )
+)
 
 def _html(t: str,
           articles: list[Node]) -> Node:
@@ -299,36 +331,7 @@ def _html(t: str,
                                )
                          ),
 
-                    footer({"class": "site-footer"},
-                           div({"class": "container"},
-                               div({"class": "footer-content"},
-                                   div({"class": "footer-section"},
-                                       h4("About Tech Insights"),
-                                       p("Your go-to resource for web development tutorials, programming guides, and the latest technology trends. We help developers stay current with industry best practices.")
-                                       ),
-                                   div({"class": "footer-section"},
-                                       h4("Quick Links"),
-                                       ul(
-                                           li(a({"href": "/privacy"}, "Privacy Policy")),
-                                           li(a({"href": "/terms"}, "Terms of Service")),
-                                           li(a({"href": "/sitemap"}, "Sitemap")),
-                                           li(a({"href": "/advertise"}, "Advertise"))
-                                       )
-                                       ),
-                                   div({"class": "footer-section"},
-                                       h4("Contact Info"),
-                                       p("Email: hello@techinsights.dev"),
-                                       p("Location: San Francisco, CA"),
-                                       p("Phone: (555) 123-4567")
-                                       )
-                                   ),
-                               hr,
-                               div({"class": "footer-bottom"},
-                                   p("© 2024 Tech Insights. All rights reserved. Built with simple_html library."),
-                                   p("Made with ❤️ for the developer community")
-                                   )
-                               )
-                           )
+                    _footer
                 )
                 )
 
