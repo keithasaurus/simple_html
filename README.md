@@ -225,3 +225,51 @@ node = custom_elem(
 render(node)
 # <custom-elem id="some-custom-elem-id">Wow</custom-elem>
 ```
+
+### Optimization
+
+#### `prerender`
+
+`prerender` is a very simple function. It simply `render`s a `Node` and encapsulates the resulting string inside 
+a `SafeString` (so its contents won't be escaped again). It's most useful at the top level, so its contents are 
+rendered only once. A simple use case might be website footers:
+
+```python
+from simple_html import SafeString, prerender, footer, div, a, head, body, title, h1, html, render
+
+prerendered_footer: SafeString = prerender(
+    footer(
+        div(a({"href": "/about"}, "About Us")),
+        div(a({"href": "/blog"}, "Blog")),
+        div(a({"href": "/contact"}, "Contact"))
+    )
+)
+
+
+def render_page(page_title: str) -> str:
+    return render(
+        html(
+            head(title(page_title)),
+            body(
+                h1(page_title),
+                prerendered_footer  # this is extremely fast to render
+            )
+        )
+    )
+```
+This greatly reduces the amount of work `render` needs to do on the content when outputting HTML.
+
+#### Caching
+You may want to cache rendered content. This is easy to do in many ways; the main thing to keep in 
+mind is you'll likely want to return a `SafeString`. Again, `prerender` is a natural fit:
+
+```python
+from simple_html import prerender, SafeString, h1
+from functools import lru_cache
+
+@lru_cache
+def greeting(name: str) -> SafeString:
+    return prerender(
+        h1(f"Hello, {name}")
+    )
+```
