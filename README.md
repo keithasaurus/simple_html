@@ -257,7 +257,7 @@ def render_page(page_title: str) -> str:
         )
     )
 ```
-This greatly reduces the amount of work `render` needs to do on the content when outputting HTML.
+This greatly reduces the amount of work `render` needs to do on the prerendered content when outputting HTML.
 
 #### Caching
 You may want to cache rendered content. This is easy to do in many ways; the main thing to keep in 
