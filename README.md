@@ -286,9 +286,9 @@ def greeting(name: str) -> SafeString:
     )
 ```
 
-One thing to remember is that not all variants of `Node` are hashable, and thus will work as _arguments_ to a function 
-where the arguments constitute the cache key -- i.e. `list[Node]` is not hashable. Another way to use `prerender` 
-in combination with a caching function is to prerender arguments:
+One thing to remember is that not all variants of `Node` are hashable, and thus cannot be passed directly to a function 
+where the arguments constitute the cache key -- e.g. lists and generators are not hashable, but they can be 
+valid `Node`s. Another way to use `prerender` in combination with a caching function is to prerender arguments:
 
 ```python
 from simple_html import prerender, SafeString, h1, div, html, body, head, ul, li
