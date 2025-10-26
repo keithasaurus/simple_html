@@ -18,6 +18,7 @@
 ```python
 from simple_html import h1, render
 
+
 node = h1("Hello World!")
 
 render(node)  
@@ -35,6 +36,7 @@ render(node)
 Here's a fuller-featured example:
 ```python
 from simple_html import render, DOCTYPE_HTML5, html, head, title, body, h1, div, p, br, ul, li
+
 
 render(
     DOCTYPE_HTML5,
@@ -79,6 +81,7 @@ As you might have noticed, there are several ways to use `Tag`s:
 ```python
 from simple_html import br, div, h1, img, span, render
 
+
 # raw node renders to empty tag
 render(br)
 # <br/>
@@ -106,6 +109,7 @@ escaped by default; `SafeString`s can be used to bypass escaping.
 ```python
 from simple_html import br, p, SafeString, render
 
+
 node = p("Escaped & stuff",
          br,
          SafeString("Not escaped & stuff"))
@@ -121,6 +125,7 @@ that Tag attributes with `None` as the value will only render the attribute name
 ```python
 from simple_html import div, render
 
+
 node = div({"empty-str-attribute": "", 
             "key-only-attr": None})
 
@@ -132,6 +137,7 @@ String attributes are escaped by default -- both keys and values. You can use `S
 
 ```python
 from simple_html import div, render, SafeString
+
 
 render(
     div({"<bad>":"</also bad>"})
@@ -149,6 +155,7 @@ You can also use `int`, `float`, and `Decimal` instances for attribute values.
 from decimal import Decimal
 from simple_html import div, render, SafeString
 
+
 render(
     div({"x": 1, "y": 2.3, "z": Decimal('3.45')})    
 )
@@ -160,6 +167,7 @@ render(
 You can render inline CSS styles with `render_styles`:
 ```python
 from simple_html import div, render, render_styles
+
 
 styles = render_styles({"min-width": "25px"})
 
@@ -183,6 +191,7 @@ You can pass many items as a `Tag`'s children using `*args`, lists or generators
 ```python
 from typing import Generator
 from simple_html import div, render, Node, br, p
+
 
 div(
     *["neat", br], p("cool")
@@ -214,6 +223,7 @@ For convenience, most common tags are provided, but you can also create your own
 ```python
 from simple_html import Tag, render
 
+
 custom_elem = Tag("custom-elem")
 
 # works the same as any other tag
@@ -236,6 +246,7 @@ which ensures the render operation happens only once. A simple use case might be
 
 ```python
 from simple_html import SafeString, prerender, footer, div, a, head, body, title, h1, html, render
+
 
 prerendered_footer: SafeString = prerender(
     footer(
@@ -267,6 +278,7 @@ mind is you'll likely want to return a `SafeString`. For example, here's how you
 from simple_html import prerender, SafeString, h1
 from functools import lru_cache
 
+
 @lru_cache
 def greeting(name: str) -> SafeString:
     return prerender(
@@ -281,6 +293,7 @@ is to prerender arguments:
 ```python
 from simple_html import prerender, SafeString, h1, div, html, body, head, ul, li
 from functools import lru_cache
+
 
 @lru_cache
 def cached_content(children: SafeString) -> SafeString:
