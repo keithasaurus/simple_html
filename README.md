@@ -261,7 +261,7 @@ This greatly reduces the amount of work `render` needs to do on the prerendered 
 
 #### Caching
 You may want to cache rendered content. This is easy to do in many ways; the main thing to keep in 
-mind is you'll likely want to return a `SafeString`. Again, `prerender` is a natural fit:
+mind is you'll likely want to return a `SafeString`. For example, here's how you might cache locally with `lru_cache`:
 
 ```python
 from simple_html import prerender, SafeString, h1
@@ -271,5 +271,37 @@ from functools import lru_cache
 def greeting(name: str) -> SafeString:
     return prerender(
         h1(f"Hello, {name}")
+    )
+```
+
+One thing to keep in mind is that not all variants of `Node` will work as _arguments_ to a function like the 
+one above -- i.e. `list[Node]` is not cacheable. Another way to use `prerender` in combination with a caching function
+is to prerender arguments:
+
+```python
+from simple_html import prerender, SafeString, h1, div, html, body, head, ul, li
+from functools import lru_cache
+
+@lru_cache
+def cached_content(children: SafeString) -> SafeString:
+    return prerender(
+        div(
+            h1("This content is cached according to the content of the children"),
+            children,
+            # presumably this function would have a lot more elements for it to be worth 
+            # the caching overhead
+        )
+    )
+
+def page():
+    return html(
+        head,
+        body(
+            cached_content(
+                prerender(ul([
+                    li(letter) for letter in "abcdefg" 
+                ]))
+            )
+        )
     )
 ```
