@@ -230,9 +230,9 @@ render(node)
 
 #### `prerender`
 
-`prerender` is a very simple function. It simply `render`s a `Node` and encapsulates the resulting string inside 
-a `SafeString` (so its contents won't be escaped again). It's most useful at the top level, so its contents are 
-rendered only once. A simple use case might be website footers:
+`prerender` is a very simple function. It just `render`s a `Node` and puts the resulting string inside 
+a `SafeString` (so its contents won't be escaped again). It's most useful for prerendering at the module level, 
+which ensures the render operation happens only once. A simple use case might be a website's footer:
 
 ```python
 from simple_html import SafeString, prerender, footer, div, a, head, body, title, h1, html, render
