@@ -76,7 +76,7 @@ warn_unused_ignores = true
 warn_unreachable = true
 
 [tool.cibuildwheel]
-skip = ["cp38-*", "cp314*"]
+skip = ["cp38-*", "cp315*"]
 
 [tool.cibuildwheel.windows]
 archs = ["AMD64", "x86"]
