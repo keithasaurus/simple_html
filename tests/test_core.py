@@ -2,6 +2,7 @@ import json
 from decimal import Decimal
 from typing import Generator
 
+
 from simple_html import (
     SafeString,
     a,
@@ -23,7 +24,7 @@ from simple_html import (
     render_styles,
     img,
 )
-from simple_html.utils import escape_attribute_key
+from simple_html.core import escape_attribute_key
 
 
 def test_renders_no_children() -> None:

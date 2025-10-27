@@ -2,7 +2,7 @@ try:
     import tomllib
 except ModuleNotFoundError:
     # python 3.10 and earlier
-    import tomli as tomllib
+    import tomli as tomllib  # type: ignore[no-redef]
 
 from pathlib import Path
 from setuptools import setup
@@ -19,7 +19,7 @@ project_data = toml_data["project"]
 setup(
     name="simple-html",
     ext_modules=mypycify([
-        "simple_html/utils.py",
+        "simple_html",
     ]),
     author=project_data["authors"][0]["name"],
     packages=["simple_html"],

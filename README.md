@@ -3,7 +3,7 @@
 ## Why use it?
 - clean syntax
 - fully-typed
-- speed -- faster even than jinja
+- speed -- often faster than jinja
 - zero dependencies
 - escaped by default
 - usually renders fewer bytes than templating
@@ -17,6 +17,7 @@
 
 ```python
 from simple_html import h1, render
+
 
 node = h1("Hello World!")
 
@@ -35,6 +36,7 @@ render(node)
 Here's a fuller-featured example:
 ```python
 from simple_html import render, DOCTYPE_HTML5, html, head, title, body, h1, div, p, br, ul, li
+
 
 render(
     DOCTYPE_HTML5,
@@ -79,6 +81,7 @@ As you might have noticed, there are several ways to use `Tag`s:
 ```python
 from simple_html import br, div, h1, img, span, render
 
+
 # raw node renders to empty tag
 render(br)
 # <br/>
@@ -106,6 +109,7 @@ escaped by default; `SafeString`s can be used to bypass escaping.
 ```python
 from simple_html import br, p, SafeString, render
 
+
 node = p("Escaped & stuff",
          br,
          SafeString("Not escaped & stuff"))
@@ -121,6 +125,7 @@ that Tag attributes with `None` as the value will only render the attribute name
 ```python
 from simple_html import div, render
 
+
 node = div({"empty-str-attribute": "", 
             "key-only-attr": None})
 
@@ -132,6 +137,7 @@ String attributes are escaped by default -- both keys and values. You can use `S
 
 ```python
 from simple_html import div, render, SafeString
+
 
 render(
     div({"<bad>":"</also bad>"})
@@ -149,6 +155,7 @@ You can also use `int`, `float`, and `Decimal` instances for attribute values.
 from decimal import Decimal
 from simple_html import div, render, SafeString
 
+
 render(
     div({"x": 1, "y": 2.3, "z": Decimal('3.45')})    
 )
@@ -160,6 +167,7 @@ render(
 You can render inline CSS styles with `render_styles`:
 ```python
 from simple_html import div, render, render_styles
+
 
 styles = render_styles({"min-width": "25px"})
 
@@ -183,6 +191,7 @@ You can pass many items as a `Tag`'s children using `*args`, lists or generators
 ```python
 from typing import Generator
 from simple_html import div, render, Node, br, p
+
 
 div(
     *["neat", br], p("cool")
@@ -214,6 +223,7 @@ For convenience, most common tags are provided, but you can also create your own
 ```python
 from simple_html import Tag, render
 
+
 custom_elem = Tag("custom-elem")
 
 # works the same as any other tag
@@ -225,3 +235,89 @@ node = custom_elem(
 render(node)
 # <custom-elem id="some-custom-elem-id">Wow</custom-elem>
 ```
+
+### Optimization
+
+#### `prerender`
+
+`prerender` is a very simple function. It just `render`s a `Node` and puts the resulting string inside 
+a `SafeString` (so its contents won't be escaped again). It's most useful for prerendering at the module level, 
+which ensures the render operation happens only once. A simple use case might be a website's footer:
+
+```python
+from simple_html import SafeString, prerender, footer, div, a, head, body, title, h1, html, render
+
+
+prerendered_footer: SafeString = prerender(
+    footer(
+        div(a({"href": "/about"}, "About Us")),
+        div(a({"href": "/blog"}, "Blog")),
+        div(a({"href": "/contact"}, "Contact"))
+    )
+)
+
+
+def render_page(page_title: str) -> str:
+    return render(
+        html(
+            head(title(page_title)),
+            body(
+                h1(page_title),
+                prerendered_footer  # this is extremely fast to render
+            )
+        )
+    )
+```
+This greatly reduces the amount of work `render` needs to do on the prerendered content when outputting HTML.
+
+#### Caching
+You may want to cache rendered content. This is easy to do; the main thing to keep in 
+mind is you'll likely want to return a `SafeString`. For example, here's how you might cache with `lru_cache`:
+
+```python
+from simple_html import prerender, SafeString, h1
+from functools import lru_cache
+
+
+@lru_cache
+def greeting(name: str) -> SafeString:
+    return prerender(
+        h1(f"Hello, {name}")
+    )
+```
+
+One thing to remember is that not all variants of `Node` are hashable, and thus cannot be passed directly to a function 
+where the arguments constitute the cache key -- e.g. lists and generators are not hashable, but they can be 
+valid `Node`s. Another way to use `prerender` in combination with a caching function is to prerender arguments:
+
+```python
+from simple_html import prerender, SafeString, h1, div, html, body, head, ul, li
+from functools import lru_cache
+
+
+@lru_cache
+def cached_content(children: SafeString) -> SafeString:
+    return prerender(
+        div(
+            h1("This content is cached according to the content of the children"),
+            children,
+            # presumably this function would have a lot more elements for it to be worth 
+            # the caching overhead
+        )
+    )
+
+def page(words_to_render: list[str]):
+    return html(
+        head,
+        body(
+            cached_content(
+                prerender(ul([
+                    li(word) for word in words_to_render 
+                ]))
+            )
+        )
+    )
+```
+Keep in mind that using `prerender` on dynamic content -- not at the module level -- still incurs all the overhead
+of `render` each time that content is rendered, so, for this approach to make sense, the prerendered content should 
+be a small portion of the full content of the `cached_content` function. 

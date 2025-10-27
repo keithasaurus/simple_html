@@ -1,6 +1,6 @@
 [project]
 name = "simple-html"
-version = "3.0.0"
+version = "3.1.0"
 description="Template-less HTML rendering in Python"
 authors = [
     {name="Keith Philpott"}
@@ -34,7 +34,7 @@ python = "^3.9"
 
 [tool.poetry.group.dev.dependencies]
 jinja2 = "3.1.6"
-mypy = "1.17.1"
+mypy = "1.18.2"
 pytest = "8.4.1"
 setuptools = "80.9.0"
 fast-html = "1.0.12"
@@ -45,7 +45,7 @@ ruff = "0.12.8"
 [build-system]
 requires = [
     "poetry-core>=1.0.0",
-    "mypy[mypyc]==1.17.1",
+    "mypy[mypyc]==1.18.2",
     "tomli==2.2.1"
 ]
 
@@ -76,7 +76,7 @@ warn_unused_ignores = true
 warn_unreachable = true
 
 [tool.cibuildwheel]
-skip = ["cp38-*", "cp314*"]
+skip = ["cp38-*", "cp315*"]
 
 [tool.cibuildwheel.windows]
 archs = ["AMD64", "x86"]
